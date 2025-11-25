@@ -18,7 +18,7 @@ private
     M N : Type ℓ
     P Q : Prop
 
-propFunExt : {A : Prop} {B : A → Type ℓ} {f : (x : A) → B x} {g : (x : A) → B x}
+propFunExt : ∀ {ℓ ℓ'} {A : Prop ℓ} {B : A → Type ℓ'} {f : (x : A) → B x} {g : (x : A) → B x}
   → ((x : A) → f x ≡ g x) → f ≡ g
 propFunExt h i x = h x i
 
@@ -88,6 +88,9 @@ record _⋆-Modal_ (P : Prop) (M : Type ℓ) : Type ℓ where
   -- iso-⋆ .Iso.leftInv (η x) = refl
   -- iso-⋆ .Iso.leftInv (trivial p {x = x} i) j = {!!}
 
+from-⋆-Modal : {{M⋆ : P ⋆-Modal M}} → P ⋆ M → M
+from-⋆-Modal {{M⋆}} x = _⋆-Modal_.iso-⋆  M⋆ .Iso.fun x
+
 open _⋆-Modal_ public
 
 record _→-Modal (P : Prop) (M : Type ℓ) : Type ℓ where
@@ -128,6 +131,7 @@ give-give' p A M a = transport⁻Transport (M .snd _) a
 give'-give : ∀ {P} (p : P) A (M : [ Type ℓ ∣ P ↪ A ]) (a : A p)
   → give' p A M (give p A M a) ≡ a
 give'-give p A M a = transportTransport⁻ (M .snd _) a
+
 
 G : (A : P → (Type ℓ))
   → (B : (P →ᴰ A) → Type ℓ)

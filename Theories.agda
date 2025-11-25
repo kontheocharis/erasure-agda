@@ -3,6 +3,7 @@ module Theories where
 open import Agda.Primitive
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv
+open import Data.Nat using (ℕ; suc)
   
 {-# BUILTIN REWRITE _≡_ #-}
 
@@ -232,3 +233,6 @@ record LC : Type (lsuc ℓ) where
       su n (recΛ zr su n)
     ∎
 
+  embed-nat : ℕ → Λ
+  embed-nat ℕ.zero = zeroΛ
+  embed-nat (suc x) = succΛ (embed-nat x)

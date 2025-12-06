@@ -1,4 +1,4 @@
-{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-unsolved-metas --cubical #-}
 module Gluing where
 
 open import Cubical.Foundations.Prelude renaming (_∙_ to trans)

@@ -1,3 +1,4 @@
+{-# OPTIONS  --cubical #-}
 module Models where
 
 open import Agda.Primitive

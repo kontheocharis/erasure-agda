@@ -1,3 +1,4 @@
+{-# OPTIONS --allow-unsolved-metas #-}
 module Theories where
 
 open import Agda.Primitive
@@ -142,14 +143,14 @@ module _ (sorts : ITT-sorts {ℓp} {ℓty} {ℓtm}) where
     lamz-appz' {j = z} {t = t} = lamz-appz
     lamz-appz' {X = X} {j = ω} {t = t} =
       (λ i → [ ( λ p → lam (λ x → ↑[[_]]-id {t# =  λ _ →  coe (cong X [↑[_]]-id) (app (↑[ p ] t) (↑[ p ] ([ x ]*)) ) } i p)) ])
-      ∙ (λ i → [ (λ p → {!  !}) ])  -- UMMMM
+      ∙ (?)  -- UMMMM
       ∙ [↑[_]]-id
 
     appz-lamz' : appz' {j = j} {X = X} (lamz' f) t ≡ f t
     appz-lamz' {j = z} {X = X} {f = f} {t = t} = appz-lamz
     appz-lamz' {j = ω} {X = X} {f = f} {t = t} =
-      (λ i → [ (λ p → coe (cong X [↑[_]]-id) ({!!})) ])
-      ∙ {!!} -- Just usual cubical BS
+      (λ i → [ (λ p → coe (cong X [↑[_]]-id) ({! !})) ])
+      ∙ {! !} -- Just usual cubical BS
       ∙ [↑[_]]-id
 
     zeroz : Tm z Nat

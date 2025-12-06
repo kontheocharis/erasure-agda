@@ -22,9 +22,6 @@ open ITT-sorts
 open ITT-ctors
 
 -- MLTT model of ITT
-
--- Ignores irrelevance.
-
 module MLTT-ITT {ℓ} {ℓ'} (m : MLTT {ℓ} {ℓ'}) where
   open MLTT
   open ITT 
@@ -63,8 +60,7 @@ module MLTT-ITT {ℓ} {ℓ'} (m : MLTT {ℓ} {ℓ'}) where
   i .sorts = i-sorts
   i .ctors = i-ctors
 
--- ITT model(1) of MLTT
-
+-- ITT model of MLTT using irrelevant terms
 module ITT-MLTT1 {ℓ} {ℓ'} (i : ITT {lzero} {ℓ} {ℓ'}) where
   open ITT
   open MLTT 
@@ -77,29 +73,26 @@ module ITT-MLTT1 {ℓ} {ℓ'} (i : ITT {lzero} {ℓ} {ℓ'}) where
 
   m-ctors : MLTT-ctors m-sorts
   m-ctors .Π = i .Π z -- z or ω doesn't matter here
-  m-ctors .lam x = i .[_] (λ p → i .lam {z} (λ y → i .↑[_]_ p (x y)))
-  m-ctors .app x y = {! i .[_] (λ p → app [x] ) !}
-  m-ctors .lam-app = {!!}
-  m-ctors .app-lam = {!!}
-  m-ctors .U = {!!}
-  m-ctors .El = {!!}
-  m-ctors .Nat = {!!}
-  m-ctors .zero = {!!}
-  m-ctors .succ = {!!}
-  m-ctors .elim-Nat = {!!}
-  m-ctors .elim-Nat-zero = {!!}
-  m-ctors .elim-Nat-succ = {!!}
+  m-ctors .lam x = ITT.lamz i x
+  m-ctors .app x y = ITT.appz i x y
+  m-ctors .lam-app = ITT.lamz-appz i
+  m-ctors .app-lam = ITT.appz-lamz i
+  m-ctors .U = i .U
+  m-ctors .El = i .El
+  m-ctors .Nat = i .Nat
+  m-ctors .zero = ITT.zeroz i
+  m-ctors .succ = ITT.succz i
+  m-ctors .elim-Nat = ITT.elim-Natz i
+  m-ctors .elim-Nat-zero {ms = ms} = ITT.elim-Nat-zeroz i {ms = ms}
+  m-ctors .elim-Nat-succ {ms = ms} = ITT.elim-Nat-succz i {ms = ms}
 
   m : MLTT {ℓ} {ℓ'}
   m .sorts = m-sorts
   m .ctors = m-ctors
 
 
-
 -- LC model of ITT
-
 -- Erases irrelevant stuff.
-
 module LC-ITT {ℓ} {ℓ'} (l : LC {ℓ'}) where
   open LC
   open ITT 

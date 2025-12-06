@@ -206,7 +206,7 @@ elim-Vect-consz = {! !} -- same again
 -- For relevant neutrals, we have an extra form ↑_ for application heads.
 -- These two coercions do not appear anywhere else in the normal forms.
 --
--- In an implementation we can share a single data structure for the two forms
+-- In the implementation we can share a single data structure for the two forms
 -- (like in 2LTT).
 
 -- Irrelevance marker in contexts:
@@ -220,13 +220,12 @@ elim-Vect-consz = {! !} -- same again
 -- Also note that #∈ Γ is a proposition, furthermore it is a decidable
 -- proposition.
 --
--- In an implementation of elaboration to this core language, it suffices to
--- have a boolean flag in the context to remember whether it is an irrelevant
--- context or not. This way it doesn't mess with the deBrujin indices/levels of
--- actual variables. As a result, we get free weakening/strengthening by # in
--- syntax *and* values. Relevant and irrelevant bindings can share deBrujin
--- indices/levels. Besides the types of each binding, the context must now
--- record the mode of each binding as well.
+-- During elaboration it suffices to have a boolean flag in the context to
+-- remember whether it is an irrelevant context or not. This way it doesn't mess
+-- with the deBrujin indices/levels of actual variables. As a result, we get
+-- free weakening/strengthening by # in syntax *and* values. Relevant and
+-- irrelevant bindings can share deBrujin indices/levels. Besides the types of
+-- each binding, the context must now record the mode of each binding as well.
 
 -- Surface language
 --
@@ -235,34 +234,20 @@ elim-Vect-consz = {! !} -- same again
 -- for binder types (Π, Σ) and on let bindings. The rest can be inferred; in
 -- particular, when we elaborate variables, we can insert [_] or ↑_ if needed.
 
--- Metavariable handling
+-- Metavariable handling notes
+--
+-- (WIP, I am not fully sure about all the details yet.)
 --
 -- An example metavariable spine might now look like
 --
 -- ?m p x y [z] (↑w)
 --
 -- where p is an additional boolean flag denoting if this context is irrelevant.
+-- When we create a metavariable, p is true if the context is irrelevant.
 --
 -- If p is true, then we can invert [z] with ↑z' and ↑w with [w'].
 --
 -- If p is false, then we cannot invert [z] because writing ↑z' is only
 -- valid if the context is irrelevant. But we can still invert ↑w with [w'].
 --
--- Sometimes, we will get problems that look like
---
--- [?m sp] =? t
---   or
--- ↑(?m sp) =? t
---
--- 1. In the former case, we can reduce it to
---
--- ?m sp =? ↑t
---
--- only if p is true in the context (in other words, if it appears in sp).]
--- If p is not true, then we can try to create a new meta ?m' sp', solve it with
--- [?m sp] then try to attack ?m' sp' =? t. **ACTUALLY THIS IS WRONG**
---
--- 2. In the latter case, we can always reduce it to
---
--- ?m sp =? [t]
-
+-- Need to figure out when to do meta promotion from irrelevant to relevant.

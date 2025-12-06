@@ -260,7 +260,7 @@ elim-Vect-consz = {! !} -- same again
 --
 -- only if p is true in the context (in other words, if it appears in sp).]
 -- If p is not true, then we can try to create a new meta ?m' sp', solve it with
--- [?m sp] then try to attack ?m' sp' =? t.
+-- [?m sp] then try to attack ?m' sp' =? t. **ACTUALLY THIS IS WRONG**
 --
 -- 2. In the latter case, we can always reduce it to
 --

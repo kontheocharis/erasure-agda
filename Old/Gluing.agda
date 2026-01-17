@@ -41,6 +41,12 @@ data _or_ (P Q : Prop) : Prop where
   inl : P → P or Q
   inr : Q → P or Q
 
+record _and_ (P Q : Prop) : Prop where
+  constructor ⟨_,_⟩
+  field
+    fst : P
+    snd : Q
+
 open _true
 
 data _⋆_ (P : Prop) (M : Type ℓ) : Type ℓ where

@@ -1,4 +1,4 @@
-name: irrelevance-agda
+name: erasure-agda
 depend: standard-library cubical
 include: .
 flags:

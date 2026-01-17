@@ -5,6 +5,7 @@ open import Agda.Primitive
 open import Cubical.Foundations.Prelude
 open import Cubical.Foundations.Equiv
 open import Cubical.Data.Unit
+open import Cubical.Data.Sigma
 open import Cubical.Data.Nat hiding (zero)
 
 open import Theories
@@ -22,117 +23,10 @@ open ITT
 open ITT-sorts 
 open ITT-ctors
 
--- MLTT model of ITT
-module MLTT-ITT {ℓ} {ℓ'} (m : MLTT {ℓ} {ℓ'}) where
-  open MLTT
-  open ITT 
-  open ITT-sorts 
-  open ITT-ctors
-
-  i-sorts : ITT-sorts {lzero} {ℓ} {ℓ'}
-  i-sorts .# = ⊤
-  i-sorts .Ty = m .Ty
-  i-sorts .Tm j A = m .Tm A
-  [ i-sorts ] x = x tt
-  (↑[ i-sorts ] x) x₁ = x₁
-  [↑[ i-sorts ]]-id = refl
-  ↑[[ i-sorts ]]-id = refl
-
-  i-ctors : ITT-ctors i-sorts
-  i-ctors .Π j A B = m .Π A B
-  i-ctors .lam {z} f = m .lam f
-  i-ctors .lam {ω} f = m .lam f
-  i-ctors .app {z} = m .app 
-  i-ctors .app {ω} = m .app
-  i-ctors .lam-app {z} = m .lam-app
-  i-ctors .lam-app {ω} = m .lam-app
-  i-ctors .app-lam {z} = m .app-lam
-  i-ctors .app-lam {ω} = m .app-lam
-  i-ctors .U = m .U
-  i-ctors .El = m .El
-  i-ctors .Nat = m .Nat
-  i-ctors .zero = m .zero
-  i-ctors .succ = m .succ
-  i-ctors .elim-Nat = m .elim-Nat
-  i-ctors .elim-Nat-zero = m .elim-Nat-zero
-  i-ctors .elim-Nat-succ = m .elim-Nat-succ
-
-  i : ITT {lzero} {ℓ} {ℓ'}
-  i .sorts = i-sorts
-  i .ctors = i-ctors
-
--- ITT model of MLTT using irrelevant terms
-module ITT-MLTT1 {ℓ} {ℓ'} (i : ITT {lzero} {ℓ} {ℓ'}) where
-  open ITT
-  open MLTT 
-  open MLTT-sorts 
-  open MLTT-ctors
-
-  m-sorts : MLTT-sorts {ℓ} {ℓ'}
-  m-sorts .Ty = i .Ty
-  m-sorts .Tm A = i .Tm z A
-
-  m-ctors : MLTT-ctors m-sorts
-  m-ctors .Π = i .Π z -- z or ω doesn't matter here
-  m-ctors .lam x = ITT.lamz i x
-  m-ctors .app x y = ITT.appz i x y
-  m-ctors .lam-app = ITT.lamz-appz i
-  m-ctors .app-lam = ITT.appz-lamz i
-  m-ctors .U = i .U
-  m-ctors .El = i .El
-  m-ctors .Nat = i .Nat
-  m-ctors .zero = ITT.zeroz i
-  m-ctors .succ = ITT.succz i
-  m-ctors .elim-Nat = ITT.elim-Natz i
-  m-ctors .elim-Nat-zero {ms = ms} = ITT.elim-Nat-zeroz i {ms = ms}
-  m-ctors .elim-Nat-succ {ms = ms} = ITT.elim-Nat-succz i {ms = ms}
-
-  m : MLTT {ℓ} {ℓ'}
-  m .sorts = m-sorts
-  m .ctors = m-ctors
 
 
 -- LC model of ITT
 -- Erases irrelevant stuff.
-module LC-ITT {ℓ} {ℓ'} (l : LC {ℓ'}) where
-  open LC
-  open ITT 
-  open ITT-sorts 
-  open ITT-ctors
-
-
-  i-sorts : ITT-sorts {lzero} {ℓ} {ℓ'}
-  i-sorts .# = ⊥
-  i-sorts .Ty = Unit*
-  i-sorts .Tm z tt* = Unit*
-  i-sorts .Tm ω tt* = l .Λ
-  [ i-sorts ] _ = tt*
-  i-sorts .↑[_]_ = λ ()
-  [↑[ i-sorts ]]-id = refl
-  ↑[[ i-sorts ]]-id = propFunExt λ ()
-
-  i-ctors : ITT-ctors i-sorts
-  i-ctors .Π j A B = tt*
-  i-ctors .lam {z} f = f tt*
-  i-ctors .lam {ω} f = l .lambda f
-  i-ctors .app {z} f x = f
-  i-ctors .app {ω} f x = l .apply f x
-  i-ctors .lam-app {z} = refl
-  i-ctors .lam-app {ω} = l .eta _
-  i-ctors .app-lam {z} = refl
-  i-ctors .app-lam {ω} = l .beta _ _
-  i-ctors .U = tt*
-  i-ctors .El _ = tt*
-  i-ctors .Nat = tt*
-  i-ctors .zero = zeroΛ l
-  i-ctors .succ x = succΛ l x
-  i-ctors .elim-Nat X ze su n = recΛ l ze su n 
-  i-ctors .elim-Nat-zero = recΛβ-zero l
-  i-ctors .elim-Nat-succ = recΛβ-succ l
-
-  i : ITT {lzero} {ℓ} {ℓ'}
-  i .sorts = i-sorts
-  i .ctors = i-ctors
 
 -- Fam(Set) model of ITT
 --
@@ -156,6 +50,14 @@ module FamSet-ITT (P : Prop) where
   open ITT-sorts 
   open ITT-ctors
 
+  postulate
+    SetE : Set2
+    E : SetE → Set1
+    ΠE : (A : SetE) → (E A → SetE) → SetE
+    λE : ∀ {A B} → ((a : E A) → E (B a)) → E (ΠE A B)
+    apE : ∀ {A B} → E (ΠE A B) → ((a : E A) → E (B a))
+    βE : ∀ {A B x} → λE {A} {B} (apE x) ≡ x
+    ηE : ∀ {A B f x} → apE {A} {B} (λE f) x ≡ f x
 
   i-sorts : ITT-sorts {lzero} {lsuc (lsuc lzero)} {lsuc lzero}
   i-sorts .# = P
@@ -194,88 +96,27 @@ module FamSet-ITT (P : Prop) where
   i .ctors = i-ctors
 
 
--- Canonicity model of ITT
 
--- This is a displayed model, so we must work in a glued category. Specifically,
--- there is a functor Γ : I → Set from the syntax of I to closed terms. This is
--- usually what is used for canonicity. However, this is not sufficient for us.
--- Instead we want to build a functor Γ : I → Fam(Set), since we saw that the
--- standard model of ITT lives there. We send a type A to its set of irrelevant
--- closed terms a, and the family of relevant closed terms that project down to
--- a. We then extend this functor to Γ! : Psh I → Fam(Set) by the free
--- cocompletion. Gluing along this yields Fam(Set)/Γ!. Luckily, this is also a
--- presheaf topos (Carboni and Johnson 1995, Sterling and Harper 2020)
+-- Code extraction correctness model
+module code-extraction-correct-ITT {ℓ} {ℓ'} where
+  open LC
+  open ITT 
+  open ITT-sorts 
+  open ITT-ctors
 
--- module canon-ITT (P : Prop) (Ψ : Prop) where
---   open ITT 
---   open ITT-sorts 
---   open ITT-ctors
+  postulate
+    synE : Prop -- open (code Extraction) from the gluing
+    synS : Prop -- open (Standard model) from the gluing
+    ϕ : Prop   -- open from the base topos which is Set→
 
+  postulate
+    SE : synE → ITT {lzero} {ℓ} {ℓ'}
+    SS : synS → ITT {lzero} {ℓ} {ℓ'}
 
---   -- here we have the syntax of ITT that restricts to the irrelevant fragment.
---   -- In other words, when P is true, then # is true in the syntax. (Sterling and
---   -- Harper, sec 3.3)
---   syn : Ψ → ITT {lzero} {lsuc (lsuc lzero)} {lsuc lzero}
---   res : (ψ : Ψ) → P true ≡ (syn ψ .sorts .#) true
---   res-prop : (ψ : Ψ) → P ≡ (syn ψ .sorts .#)
-
---   _⇒# : (ψ : Ψ) → P → syn ψ .sorts .#
---   (ψ ⇒#) p = (transport (res ψ) ⟦ p ⟧) .fact
-
---   #⇒_ : (ψ : Ψ) → syn ψ .sorts .# → P
---   (#⇒ ψ) p = (transport (sym (res ψ)) ⟦ p ⟧) .fact
-
---   -- We need to make a displayed model over the syntax
---   i-sorts : [ ITT-sorts {lzero} {lsuc (lsuc lzero)} {lsuc lzero} ∣ ψ ∈ Ψ ↪ syn ψ .sorts ]
---   i-sorts .fst .# = P
---   i-sorts .fst .Ty = G[ A ∈ (λ ψ → syn ψ .Ty) ] [ Set1 ∣ ψ ∈ Ψ ↪ syn ψ .Tm ω (A ψ) ]
---   i-sorts .fst .Tm ω A = A .snd .fst
---   i-sorts .fst .Tm z A
---     = G[ a ∈ (λ ψ → syn ψ .Tm z (A .fst ψ)) ]
---       [ (P → A .snd .fst) ∣ ψ ∈ Ψ ↪
---         (λ p → give ψ
---           (λ _ → syn ψ .Tm ω (A .fst ψ)) (A .snd)
---           (syn ψ .↑[_]_ ((ψ ⇒#) p) (a ψ))  ) ]
---   [ i-sorts .fst ] {A} x
---     = (λ ψ → syn ψ .[_] λ h → give' ψ (λ _ → syn ψ .Tm ω (A .fst ψ)) (A .snd) (x ((#⇒ ψ) h)))
---     , x
---     ,  λ ψ → propFunExt (λ p → {! !}) 
---     -- ,  λ ψ → {! propFunExt (λ p → sym (give-give' ψ (λ _ → syn ψ .Tm ω (A .fst ψ)) (A .snd) ?)) !}
---   (↑[ i-sorts .fst ] x) x₁ = x₁ .snd .fst x
---   [↑[ i-sorts .fst ]]-id = {! !}
---   ↑[[ i-sorts .fst ]]-id = refl
---   i-sorts .snd ψ i .# = (res-prop ψ) i 
---   i-sorts .snd ψ i .Ty = G-collapses ψ {(λ ψ → syn ψ .Ty)}
---                   {λ A → [ Set1 ∣ ψ ∈ Ψ ↪ syn ψ .Tm ω (A ψ) ]} {{ext-⋆}} i
---   i-sorts .snd ψ i .Tm ω A = {! A .snd!}
---   i-sorts .snd ψ i .Tm z A = {! !}
---   [ i-sorts .snd ψ i ] = {!!}
---   i-sorts .snd ψ i .↑[_]_ = {!!}
---   [↑[ i-sorts .snd ψ i ]]-id = {!!}
---   ↑[[ i-sorts .snd ψ i ]]-id = {!!}
-
---   i-ctors : [ ITT-ctors (* i-sorts) ∣ ψ ∈ Ψ ↪ *coe ψ ITT-ctors i-sorts (syn ψ .ctors)  ]
---   i-ctors .fst = {!!}
---   i-ctors .snd = {!!}
-
---   i : [ ITT {lzero} {lsuc (lsuc lzero)} {lsuc lzero} ∣ Ψ ↪ syn ]
---   i .fst .sorts = * i-sorts
---   i .fst .ctors = * i-ctors 
---   i .snd ψ i .sorts = (i-sorts ＠ ψ) i 
---   i .snd ψ i .ctors = {! !}
-
-
--- -- Code extraction model
--- -- ...
-
-
--- -- Category is Set/<id, Γ>
--- module code-extraction-correct-ITT (ϕΓ : Prop) (ϕid : Prop) where
---   open LC
---   open ITT 
---   open ITT-sorts 
---   open ITT-ctors
-
+  postulate
+    ϕE# : (e : synE) → ϕ → SE e .#
+    ϕS# : (s : synS) → ϕ → SS s .#
+  
 
 --   -- here we have the syntax of ITT that restricts to the irrelevant fragment.
 --   -- In other words, when P is true, then # is true in the syntax. (Sterling and

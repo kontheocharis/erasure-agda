@@ -162,3 +162,12 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
 
         Πβ' : ap' (lam' t) ≡ t
         Πη' : lam' (ap' t) ≡ t
+
+
+record CwFwE : Set where
+  field
+    sorts : CwFwE-sorts
+  open in-CwFwE-sorts
+  field
+    core : CwFwE-core sorts
+    

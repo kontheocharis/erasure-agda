@@ -210,62 +210,49 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) where
     vᴰ : Tmᴰ _ _ _ v
     πᴰ : #∈ᴰ _ π
 
-  infix 4 _≡Subᴰ[_]_
-  _≡Subᴰ[_]_ : ∀ {Γᴰ : Conᴰ Γ} {Δᴰ : Conᴰ Δ} {σ τ : Sub Γ Δ}
-    → Subᴰ Γᴰ Δᴰ σ → σ ≡ τ → Subᴰ Γᴰ Δᴰ τ → Prop
-  _≡Subᴰ[_]_ {Γᴰ = Γᴰ} {Δᴰ = Δᴰ} σᴰ p τᴰ = coe (cong (Subᴰ Γᴰ Δᴰ) p) σᴰ ≡ τᴰ
+  opaque
+    ap-Subᴰ : ∀ {Γᴰ : Conᴰ Γ} {Δᴰ : Conᴰ Δ} {σ τ : Sub Γ Δ}
+      → σ ≡ τ → Subᴰ Γᴰ Δᴰ σ ≡ Subᴰ Γᴰ Δᴰ τ
+    ap-Subᴰ refl = refl
 
-  infix 4 _≡Tyᴰ[_]_
-  _≡Tyᴰ[_]_ : ∀ {Γᴰ : Conᴰ Γ} {A B : Ty Γ}
-    → Tyᴰ Γᴰ A → A ≡ B → Tyᴰ Γᴰ B → Prop
-  _≡Tyᴰ[_]_ {Γᴰ = Γᴰ} Aᴰ p Bᴰ = coe (cong (Tyᴰ Γᴰ) p) Aᴰ ≡ Bᴰ
+    ap-Tyᴰ : ∀ {Γᴰ : Conᴰ Γ} {A B : Ty Γ}
+      → A ≡ B → Tyᴰ Γᴰ A ≡ Tyᴰ Γᴰ B
+    ap-Tyᴰ refl = refl
 
-  infix 4 _≡#∈ᴰ[_]_
-  _≡#∈ᴰ[_]_ : ∀ {Γᴰ : Conᴰ Γ} {π ρ : #∈ Γ}
-    → #∈ᴰ Γᴰ π → π ≡ ρ → #∈ᴰ Γᴰ ρ → Prop
-  _≡#∈ᴰ[_]_ {Γᴰ = Γᴰ} πᴰ p ρᴰ = coe (cong (#∈ᴰ Γᴰ) p) πᴰ ≡ ρᴰ
+    ap-#∈ᴰ : ∀ {Γᴰ : Conᴰ Γ} {π ρ : #∈ Γ}
+      → π ≡ ρ → #∈ᴰ Γᴰ π ≡ #∈ᴰ Γᴰ ρ
+    ap-#∈ᴰ refl = refl
 
-  infix 4 _≡Tmᴰ[_,_,_]_
-  _≡Tmᴰ[_,_,_]_ : ∀ {Γᴰ : Conᴰ Γ} {A B : Ty Γ} {Aᴰ : Tyᴰ Γᴰ A} {Bᴰ : Tyᴰ Γᴰ B}
-      {t : Tm Γ i A} {u : Tm Γ i B}
-    → Tmᴰ Γᴰ i Aᴰ t
-    → (p : A ≡ B)
-    → Aᴰ ≡[ cong (Tyᴰ Γᴰ) p ] Bᴰ
-    → t ≡[ cong (Tm Γ i) p ] u
-    → Tmᴰ Γᴰ i Bᴰ u
-    → Prop
-  _≡Tmᴰ[_,_,_]_ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} {t = t} tᴰ p pᴰ q uᴰ = {!!}
-    -- coe (cong2' {I = Ty _} {A = Tyᴰ Γᴰ} {B = Tm _ _} (Tmᴰ Γᴰ _) p pᴰ q) tᴰ ≡ uᴰ
-
-  -- Displayed symmetry for Tyᴰ
-  symTyᴰ : ∀ {Γᴰ : Conᴰ Γ} {A B : Ty Γ} {Aᴰ : Tyᴰ Γᴰ A} {Bᴰ : Tyᴰ Γᴰ B}
-    → (p : A ≡ B)
-    → Aᴰ ≡Tyᴰ[ p ] Bᴰ
-    → Bᴰ ≡Tyᴰ[ sym p ] Aᴰ
-  symTyᴰ {Γᴰ = Γᴰ} p = {!!}
+    ap-Tmᴰ : ∀ {Γᴰ : Conᴰ Γ} {A B : Ty Γ} {Aᴰ : Tyᴰ Γᴰ A} {Bᴰ : Tyᴰ Γᴰ B}
+        {t : Tm Γ i A} {u : Tm Γ i B}
+      → (p : A ≡ B)
+      → Aᴰ ≡[ ap-Tyᴰ p ] Bᴰ
+      → t ≡[ ap-Tm p ] u
+      → Tmᴰ Γᴰ i Aᴰ t ≡ Tmᴰ Γᴰ i Bᴰ u
+    ap-Tmᴰ refl refl refl = refl
 
   record CwFwEᴰ-core (c : CwFwE-core) : Set where
     open CwFwE-core c
     field
       idᴰ : Subᴰ Γᴰ Γᴰ id
       _∘ᴰ_ : Subᴰ Δᴰ Θᴰ σ → Subᴰ Γᴰ Δᴰ τ → Subᴰ Γᴰ Θᴰ (σ ∘ τ)
-      assocᴰ : ρᴰ ∘ᴰ (σᴰ ∘ᴰ τᴰ) ≡Subᴰ[ assoc ] (ρᴰ ∘ᴰ σᴰ) ∘ᴰ τᴰ
-      ∘idᴰ : idᴰ ∘ᴰ σᴰ ≡Subᴰ[ ∘id ] σᴰ
-      id∘ᴰ : σᴰ ∘ᴰ idᴰ ≡Subᴰ[ id∘ ] σᴰ
+      assocᴰ : ρᴰ ∘ᴰ (σᴰ ∘ᴰ τᴰ) ≡[ ap-Subᴰ assoc ] (ρᴰ ∘ᴰ σᴰ) ∘ᴰ τᴰ
+      ∘idᴰ : idᴰ ∘ᴰ σᴰ ≡[ ap-Subᴰ ∘id ] σᴰ
+      id∘ᴰ : σᴰ ∘ᴰ idᴰ ≡[ ap-Subᴰ id∘ ] σᴰ
 
       ∙ᴰ : Conᴰ ∙
       εᴰ : Subᴰ Γᴰ ∙ᴰ ε
-      ∃!εᴰ : εᴰ {Γᴰ = Γᴰ} ≡Subᴰ[ ∃!ε ] σᴰ
+      ∃!εᴰ : εᴰ {Γᴰ = Γᴰ} ≡[ ap-Subᴰ ∃!ε ] σᴰ
 
       _[_]Tᴰ : Tyᴰ Δᴰ A → Subᴰ Γᴰ Δᴰ σ → Tyᴰ Γᴰ (A [ σ ]T)
       _[_]ᴰ : Tmᴰ Δᴰ i Aᴰ t → (σᴰ : Subᴰ Γᴰ Δᴰ σ) → Tmᴰ Γᴰ i (Aᴰ [ σᴰ ]Tᴰ) (t [ σ ])
       _[_]#ᴰ : #∈ᴰ Δᴰ π → Subᴰ Γᴰ Δᴰ σ → #∈ᴰ Γᴰ (π [ σ ]#)
-      [id]Tᴰ : Aᴰ [ idᴰ ]Tᴰ ≡Tyᴰ[ [id]T ] Aᴰ
-      [id]ᴰ : (tᴰ [ idᴰ ]ᴰ) ≡Tmᴰ[ [id]T , [id]Tᴰ , [id] ] tᴰ
-      [id]#ᴰ : πᴰ [ idᴰ ]#ᴰ ≡#∈ᴰ[ [id]# ] πᴰ
-      [∘]Tᴰ : Aᴰ [ σᴰ ∘ᴰ τᴰ ]Tᴰ ≡Tyᴰ[ [∘]T ] (Aᴰ [ σᴰ ]Tᴰ) [ τᴰ ]Tᴰ
-      [∘]ᴰ : (tᴰ [ σᴰ ∘ᴰ τᴰ ]ᴰ) ≡Tmᴰ[ [∘]T , [∘]Tᴰ , [∘] ] ((tᴰ [ σᴰ ]ᴰ) [ τᴰ ]ᴰ)
-      [∘]#ᴰ : πᴰ [ σᴰ ∘ᴰ τᴰ ]#ᴰ ≡#∈ᴰ[ [∘]# ] (πᴰ [ σᴰ ]#ᴰ) [ τᴰ ]#ᴰ
+      [id]Tᴰ : Aᴰ [ idᴰ ]Tᴰ ≡[ ap-Tyᴰ [id]T ] Aᴰ
+      [id]ᴰ : (tᴰ [ idᴰ ]ᴰ) ≡[ ap-Tmᴰ [id]T [id]Tᴰ [id] ] tᴰ
+      [id]#ᴰ : πᴰ [ idᴰ ]#ᴰ ≡[ ap-#∈ᴰ [id]# ] πᴰ
+      [∘]Tᴰ : Aᴰ [ σᴰ ∘ᴰ τᴰ ]Tᴰ ≡[ ap-Tyᴰ [∘]T ] (Aᴰ [ σᴰ ]Tᴰ) [ τᴰ ]Tᴰ
+      [∘]ᴰ : (tᴰ [ σᴰ ∘ᴰ τᴰ ]ᴰ) ≡[ ap-Tmᴰ [∘]T [∘]Tᴰ [∘] ] ((tᴰ [ σᴰ ]ᴰ) [ τᴰ ]ᴰ)
+      [∘]#ᴰ : πᴰ [ σᴰ ∘ᴰ τᴰ ]#ᴰ ≡[ ap-#∈ᴰ [∘]# ] (πᴰ [ σᴰ ]#ᴰ) [ τᴰ ]#ᴰ
 
     -- coeTmᴰ : ∀ {Aᴰ : Tyᴰ Γᴰ A} {Bᴰ : Tyᴰ Γᴰ B} (p : A ≡ B)
     --   → Aᴰ ≡Tyᴰ[ p ] Bᴰ → Tmᴰ Γᴰ i Aᴰ t → Tmᴰ Γᴰ i Bᴰ (coeTm p t)

@@ -5,6 +5,8 @@ open import Agda.Primitive
 open import Utils
 open import Mode
 
+-- Model
+
 record CwFwE-sorts : Set where
   field
     -- Sorts
@@ -64,6 +66,9 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
 
     ap-[]T : σ ≡ τ → A [ σ ]T ≡ A [ τ ]T
     ap-[]T = core-utils.ap-[]T _[_]T
+
+    ap'-[]T : A ≡ B → A [ σ ]T ≡ B [ σ ]T
+    ap'-[]T = core-utils.ap'-[]T _[_]T
 
     field
       p : Sub (Γ ▷[ i ] A) Γ
@@ -126,10 +131,10 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
 
     [pz][⁺]≡[⁺][pz] : (A [ σ ⁺ ]T) [ pz {Γ} {i} ]T ≡ (A [ pz ]T) [ σ ⁺ ]T
     [pz][⁺]≡[⁺][pz] {A = A} {Γ = Γ} {σ = σ} {i = z} =
-       trans (cong ((A [ σ ⁺ ]T) [_]T) p,q)
-       (trans [id]T ((cong (λ A → A [ σ ⁺ ]T) (sym (trans (ap-[]T p,q) [id]T)))))
+       trans (ap-[]T p,q)
+       (trans [id]T ((ap'-[]T (sym (trans (ap-[]T p,q) [id]T)))))
     [pz][⁺]≡[⁺][pz] {A = A} {Γ = Γ} {σ = σ} {i = ω} =
-      trans (sym [∘]T) (trans (cong (A [_]T) pz∘⁺≡⁺∘pz) [∘]T)
+      trans (sym [∘]T) (trans (ap-[]T pz∘⁺≡⁺∘pz) [∘]T)
 
   module in-CwFwE-core (c : CwFwE-core) where
     open CwFwE-core c
@@ -183,6 +188,8 @@ record CwFwE : Set where
   open in-CwFwE-sorts
   field
     core : CwFwE-core sorts
+
+-- Displayed model
     
 record CwFwEᴰ-sorts (s : CwFwE-sorts) : Set where
   open CwFwE-sorts s

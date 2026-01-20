@@ -24,8 +24,16 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
     π : #∈ _
 
   opaque
-    ap-Tm : ∀ {Γ : Con} {i : Mode} {A B : Ty Γ} → A ≡ B → Tm Γ i A ≡ Tm Γ i B
+    ap-Tm : A ≡ B → Tm Γ i A ≡ Tm Γ i B
     ap-Tm refl = refl
+
+  private module core-utils (_[_]T : (A : Ty Δ) → (σ : Sub Γ Δ) → Ty Γ) where
+    opaque
+      ap-[]T : σ ≡ τ → A [ σ ]T ≡ A [ τ ]T
+      ap-[]T refl = refl
+      
+      ap'-[]T : A ≡ B → A [ σ ]T ≡ B [ σ ]T
+      ap'-[]T refl = refl
 
   record CwFwE-core : Set where
     field
@@ -51,13 +59,18 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       
       -- Context extension for terms
       _▷[_]_ : (Γ : Con) → Mode → (A : Ty Γ) → Con
+
+    ap-[]T : σ ≡ τ → A [ σ ]T ≡ A [ τ ]T
+    ap-[]T = core-utils.ap-[]T _[_]T
+
+    field
       p : Sub (Γ ▷[ i ] A) Γ
       q : Tm (Γ ▷[ i ] A) i (A [ p ]T)
       _,,_ : (σ : Sub Γ Δ) → (t : Tm Γ i (A [ σ ]T)) → Sub Γ (Δ ▷[ i ] A)
       ,∘ : {t : Tm Γ i (A [ σ ]T)} → (σ ,, t) ∘ ρ ≡ (σ ∘ ρ) ,, coe (ap-Tm (sym [∘]T)) (t [ ρ ])
       p,q : p {Γ} {i} {A} ,, q ≡ id
       p∘, : {t : Tm Γ i (A [ σ ]T)} → p ∘ (σ ,, t) ≡ σ
-      q[,] : q [ σ ,, t ] ≡[ ap-Tm (trans (sym [∘]T) (cong (A [_]T) p∘,)) ] t
+      q[,] : q [ σ ,, t ] ≡[ ap-Tm (trans (sym [∘]T) (ap-[]T p∘,)) ] t
 
       -- Context extension for #
       _▷# : (Γ : Con) → Con
@@ -85,7 +98,7 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
 
       -- This type is ugly
       ↓[] : (↓ t) [ σ ] ≡ ↓
-        (coe (ap-Tm (trans (sym [∘]T) (trans (cong (A [_]T) p∘,#) [∘]T)))
+        (coe (ap-Tm (trans (sym [∘]T) (trans (ap-[]T p∘,#) [∘]T)))
         (t [ σ ⁺# ]))  
       -- Luckily the other direction is derivable (and I will not derive it)
 
@@ -112,7 +125,7 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
     [pz][⁺]≡[⁺][pz] : (A [ σ ⁺ ]T) [ pz {Γ} {i} ]T ≡ (A [ pz ]T) [ σ ⁺ ]T
     [pz][⁺]≡[⁺][pz] {A = A} {Γ = Γ} {σ = σ} {i = z} =
        trans (cong ((A [ σ ⁺ ]T) [_]T) p,q)
-       (trans [id]T ((cong (λ A → A [ σ ⁺ ]T) (sym (trans (cong (_ [_]T) p,q) [id]T)))))
+       (trans [id]T ((cong (λ A → A [ σ ⁺ ]T) (sym (trans (ap-[]T p,q) [id]T)))))
     [pz][⁺]≡[⁺][pz] {A = A} {Γ = Γ} {σ = σ} {i = ω} =
       trans (sym [∘]T) (trans (cong (A [_]T) pz∘⁺≡⁺∘pz) [∘]T)
 
@@ -126,7 +139,7 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
 
         lam : (f : Tm (Γ ▷[ i ] A) ω (B [ pz ]T)) → Tm Γ ω (Π i A B)
         lam[] : (lam {i = i} t) [ σ ]
-          ≡[ cong (Tm _ _) Π[] ] lam (coe (ap-Tm (sym [pz][⁺]≡[⁺][pz])) (t [ σ ⁺ ]))
+          ≡[ ap-Tm Π[] ] lam (coe (ap-Tm (sym [pz][⁺]≡[⁺][pz])) (t [ σ ⁺ ]))
 
         ap : (f : Tm Γ ω (Π i A B)) → Tm (Γ ▷[ i ] A) ω (B [ pz ]T)
 
@@ -139,10 +152,10 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
         U[] : U [ σ ]T ≡ U
 
         El : (t : Tm Γ z U) → Ty Γ
-        El[] : (El t) [ σ ]T ≡ El (subst (Tm _ _) U[] (t [ σ ]))
+        El[] : (El t) [ σ ]T ≡ El (coe (ap-Tm U[]) (t [ σ ]))
 
         code : (A : Ty Γ) → Tm Γ z U
-        code[] : (code A) [ σ ] ≡[ cong (Tm _ _) U[] ] code (A [ σ ]T)
+        code[] : (code A) [ σ ] ≡[ ap-Tm U[] ] code (A [ σ ]T)
 
         El-code : El (code A) ≡ A
         code-El : code (El t) ≡ t
@@ -154,7 +167,7 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
         Π'[] : (Π' A B) [ σ ]T ≡ Π' (A [ σ ]T) (B [ σ ⁺ ]T)
 
         lam' : (f : Tm (Γ ▷[ ω ] A) ω B) → Tm Γ ω (Π' A B)
-        lam'[] : (lam' t) [ σ ] ≡[ cong (Tm _ _) Π'[] ] lam' (t [ σ ⁺ ])
+        lam'[] : (lam' t) [ σ ] ≡[ ap-Tm Π'[] ] lam' (t [ σ ⁺ ])
 
         ap' : (f : Tm Γ ω (Π' A B)) → Tm (Γ ▷[ ω ] A) ω B
 

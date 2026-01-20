@@ -32,7 +32,7 @@ infix 4 _≡_
 data _≡_ {A : Set ℓ} (x : A) : A → Prop ℓ where
   instance refl : x ≡ x
 
-variable
+private variable
   p q : A ≡ A'
 
 record _≃_ (A : Set ℓ) (B : Set ℓ) : Set ℓ where
@@ -80,8 +80,9 @@ opaque
 --
 -- We don't add computation rules for the equality type---since it is inductively
 -- defined that would break things.
-Π : (A : Set ℓ) → (B : A → Set ℓ') → Set (ℓ ⊔ ℓ')
-Π A B = (a : A) → B a
+private
+  Π : (A : Set ℓ) → (B : A → Set ℓ') → Set (ℓ ⊔ ℓ')
+  Π A B = (a : A) → B a
 
 postulate
   coe-Σ : (Σ A B ≡ Σ A' B') → (ΣProp (A ≡ A') (λ p → ∀ x → B x ≡ B' (coe p x)))

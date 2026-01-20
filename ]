@@ -6,9 +6,6 @@ open import Data.Product
 open import Agda.Builtin.Sigma
 open import Data.Empty renaming (⊥ to Empty)
 
--- Acknowledgements to Szumi Xie for many proof irrelevant equality utilities:
--- https://github.com/szumixie/single-subst/blob/main/TT/Lib.agda
-
 private variable
   ℓ ℓ' : Level
   A A' : Set ℓ
@@ -143,10 +140,4 @@ opaque
 
   transᴰ : x ≡[ p ] y → y ≡[ q ] z → x ≡[ trans p q ] z
   transᴰ {p = refl} {q = refl} refl m = m
-
-  dep : x ≡ y → x ≡[ refl ] y
-  dep p = p
-
-  undep : x ≡[ refl ] y → x ≡ y
-  undep p = p
 

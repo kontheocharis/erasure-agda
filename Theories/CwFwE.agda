@@ -400,6 +400,17 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
         Πη'ᴰ : lam'ᴰ (ap'ᴰ tᴰ) ≡[ ap-Tmᴰ refl reflᴰ (dep Πη') ] tᴰ
 
 
+record CwFwEᴰ (base : CwFwE) : Set where
+  open CwFwE base
+  field
+    sortsᴰ : CwFwEᴰ-sorts sorts
+  open in-CwFwEᴰ-sorts sortsᴰ core
+  field
+    coreᴰ : CwFwEᴰ-core
+
+
+-- Syntax
+
 module CwFwE-syntax where
   postulate
     syn : CwFwE
@@ -407,5 +418,32 @@ module CwFwE-syntax where
   open CwFwE syn
   open CwFwE-sorts sorts
   open in-CwFwE-sorts.CwFwE-core core
+  open in-CwFwE-sorts.in-CwFwE-core sorts core
+
+  -- Eliminator
+  module elim (methods : CwFwEᴰ syn) where
+    open CwFwEᴰ methods
+    open CwFwEᴰ-sorts sortsᴰ
+    open in-CwFwEᴰ-sorts.CwFwEᴰ-core coreᴰ
+    open in-CwFwEᴰ-sorts.in-CwFwEᴰ-core sortsᴰ core coreᴰ
+
+    variable
+      Γ Δ Θ : Con
+      σ τ ρ : Sub Γ Δ
+      A B C : Ty Γ
+      t u v : Tm Γ i A
+      π ξ : #∈ Γ
+
+    postulate
+       Con⟦_⟧ : (Γ : Con) → Conᴰ Γ
+       Ty⟦_⟧ : (A : Ty Γ) → Tyᴰ Con⟦ Γ ⟧ A
+
+       ∙ˢ : Con⟦ ∙ ⟧ ≡ ∙ᴰ
+       ▷ˢ : Con⟦ Γ ▷[ i ] A ⟧ ≡ (Con⟦ Γ ⟧) ▷ᴰ[ i ] Ty⟦ A ⟧
+
+       -- Subˢ : (σ : Sub Γ Δ) → Subᴰ (Conˢ Γ) (Conˢ Δ) σ
+       -- Tyˢ : (A : Ty Γ) → Tyᴰ (Conˢ Γ) A
+       -- #∈ˢ : (π : #∈ Γ) → #∈ᴰ (Conˢ Γ) π
+       -- Tmˢ : (t : Tm Γ i A) → Tmᴰ (Conˢ Γ) i (Tyˢ A) t
 
   

@@ -29,15 +29,13 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
     ap-Tm : A ≡ B → Tm Γ i A ≡ Tm Γ i B
     ap-Tm refl = refl
 
-  private module core-utils (_[_]T : (A : Ty Δ) → (σ : Sub Γ Δ) → Ty Γ) where
+  module core-utils (_[_]T : (A : Ty Δ) → (σ : Sub Γ Δ) → Ty Γ) where
     opaque
-      unfolding coe
-
-      ap-[]T : σ ≡ τ → A [ σ ]T ≡ A [ τ ]T
-      ap-[]T refl = refl
+      ap-[]T₀-impl : σ ≡ τ → A [ σ ]T ≡ A [ τ ]T
+      ap-[]T₀-impl refl = refl
       
-      ap'-[]T : A ≡ B → A [ σ ]T ≡ B [ σ ]T
-      ap'-[]T refl = refl
+      ap-[]T₁-impl : A ≡ B → A [ σ ]T ≡ B [ σ ]T
+      ap-[]T₁-impl refl = refl
 
   record CwFwE-core : Set where
     field
@@ -64,20 +62,20 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       -- Context extension for terms
       _▷[_]_ : (Γ : Con) → Mode → (A : Ty Γ) → Con
 
-    ap-[]T : σ ≡ τ → A [ σ ]T ≡ A [ τ ]T
-    ap-[]T = core-utils.ap-[]T _[_]T
+    ap-[]T₀ : σ ≡ τ → A [ σ ]T ≡ A [ τ ]T
+    ap-[]T₀ = core-utils.ap-[]T₀-impl _[_]T
 
-    ap'-[]T : A ≡ B → A [ σ ]T ≡ B [ σ ]T
-    ap'-[]T = core-utils.ap'-[]T _[_]T
+    ap-[]T₁ : A ≡ B → A [ σ ]T ≡ B [ σ ]T
+    ap-[]T₁ = core-utils.ap-[]T₁-impl _[_]T
 
     field
       p : Sub (Γ ▷[ i ] A) Γ
       q : Tm (Γ ▷[ i ] A) i (A [ p ]T)
       _,,_ : (σ : Sub Γ Δ) → (t : Tm Γ i (A [ σ ]T)) → Sub Γ (Δ ▷[ i ] A)
-      ,∘ : {t : Tm Γ i (A [ σ ]T)} → (σ ,, t) ∘ ρ ≡ (σ ∘ ρ) ,, coe (ap-Tm (sym [∘]T)) (t [ ρ ])
+      ,∘ : (σ ,, t) ∘ ρ ≡ (σ ∘ ρ) ,, coe (ap-Tm (sym [∘]T)) (t [ ρ ])
       p,q : p {Γ} {i} {A} ,, q ≡ id
-      p∘, : {t : Tm Γ i (A [ σ ]T)} → p ∘ (σ ,, t) ≡ σ
-      q[,] : q [ σ ,, t ] ≡[ ap-Tm (trans (sym [∘]T) (ap-[]T p∘,)) ] t
+      p∘, : p ∘ (σ ,, t) ≡ σ
+      q[,] : q [ σ ,, t ] ≡[ ap-Tm (trans (sym [∘]T) (ap-[]T₀ p∘,)) ] t
 
       -- Context extension for #
       _▷# : (Γ : Con) → Con
@@ -105,7 +103,7 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
 
       -- This type is ugly
       ↓[] : (↓ t) [ σ ] ≡ ↓
-        (coe (ap-Tm (trans (sym [∘]T) (trans (ap-[]T p∘,#) [∘]T)))
+        (coe (ap-Tm (trans (sym [∘]T) (trans (ap-[]T₀ p∘,#) [∘]T)))
         (t [ σ ⁺# ]))  
       -- Luckily the other direction is derivable (and I will not derive it)
 
@@ -131,10 +129,10 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
 
     [pz][⁺]≡[⁺][pz] : (A [ σ ⁺ ]T) [ pz {Γ} {i} ]T ≡ (A [ pz ]T) [ σ ⁺ ]T
     [pz][⁺]≡[⁺][pz] {A = A} {Γ = Γ} {σ = σ} {i = z} =
-       trans (ap-[]T p,q)
-       (trans [id]T ((ap'-[]T (sym (trans (ap-[]T p,q) [id]T)))))
+       trans (ap-[]T₀ p,q)
+       (trans [id]T ((ap-[]T₁ (sym (trans (ap-[]T₀ p,q) [id]T)))))
     [pz][⁺]≡[⁺][pz] {A = A} {Γ = Γ} {σ = σ} {i = ω} =
-      trans (sym [∘]T) (trans (ap-[]T pz∘⁺≡⁺∘pz) [∘]T)
+      trans (sym [∘]T) (trans (ap-[]T₀ pz∘⁺≡⁺∘pz) [∘]T)
 
   module in-CwFwE-core (c : CwFwE-core) where
     open CwFwE-core c
@@ -190,6 +188,7 @@ record CwFwE : Set where
     core : CwFwE-core sorts
 
 -- Displayed model
+
     
 record CwFwEᴰ-sorts (s : CwFwE-sorts) : Set where
   open CwFwE-sorts s
@@ -200,10 +199,12 @@ record CwFwEᴰ-sorts (s : CwFwE-sorts) : Set where
     #∈ᴰ : ∀ {Γ} → Conᴰ Γ → #∈ Γ → Set
     Tmᴰ : ∀ {Γ A} → (Γᴰ : Conᴰ Γ) → (i : Mode) → Tyᴰ Γᴰ A → Tm Γ i A → Set
 
-module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) where
+module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwFwE-sorts.CwFwE-core s) where
   open CwFwE-sorts s
   open CwFwEᴰ-sorts sᴰ
   open in-CwFwE-sorts s
+  open CwFwE-core c
+  open in-CwFwE-core c
   variable
     Γᴰ Δᴰ Θᴰ : Conᴰ Γ
     σᴰ τᴰ ρᴰ : Subᴰ Γᴰ Δᴰ σ
@@ -234,8 +235,18 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) where
       → Tmᴰ Γᴰ i Aᴰ t ≡ Tmᴰ Γᴰ i Bᴰ u
     ap-Tmᴰ refl refl refl = refl
 
-  record CwFwEᴰ-core (c : CwFwE-core) : Set where
-    open CwFwE-core c
+  module core-utilsᴰ
+    (_[_]Tᴰ : ∀ {Γ Δ A σ} {Γᴰ : Conᴰ Γ} {Δᴰ : Conᴰ Δ}
+      → Tyᴰ Δᴰ A → Subᴰ Γᴰ Δᴰ σ → Tyᴰ Γᴰ (A [ σ ]T))
+    where
+    opaque
+      unfolding ap-Subᴰ ap-Tyᴰ
+
+      ap-[]T₀ᴰ : (p : σ ≡ τ) → σᴰ ≡[ ap-Subᴰ p ] τᴰ
+        → Aᴰ [ σᴰ ]Tᴰ ≡[ ap-Tyᴰ (ap-[]T₀ p) ] (Aᴰ [ τᴰ ]Tᴰ)
+      ap-[]T₀ᴰ refl refl = refl
+
+  record CwFwEᴰ-core : Set where
     field
       idᴰ : Subᴰ Γᴰ Γᴰ id
       _∘ᴰ_ : Subᴰ Δᴰ Θᴰ σ → Subᴰ Γᴰ Δᴰ τ → Subᴰ Γᴰ Θᴰ (σ ∘ τ)
@@ -257,6 +268,10 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) where
       [∘]ᴰ : (tᴰ [ σᴰ ∘ᴰ τᴰ ]ᴰ) ≡[ ap-Tmᴰ [∘]T [∘]Tᴰ [∘] ] ((tᴰ [ σᴰ ]ᴰ) [ τᴰ ]ᴰ)
       [∘]#ᴰ : πᴰ [ σᴰ ∘ᴰ τᴰ ]#ᴰ ≡[ ap-#∈ᴰ [∘]# ] (πᴰ [ σᴰ ]#ᴰ) [ τᴰ ]#ᴰ
 
+    ap-[]T₀ᴰ : (p : σ ≡ τ) → σᴰ ≡[ ap-Subᴰ p ] τᴰ
+      → Aᴰ [ σᴰ ]Tᴰ ≡[ ap-Tyᴰ (ap-[]T₀ p) ] Aᴰ [ τᴰ ]Tᴰ
+    ap-[]T₀ᴰ = core-utilsᴰ.ap-[]T₀ᴰ _[_]Tᴰ
+
     field
       _▷ᴰ[_]_ : (Γᴰ : Conᴰ Γ) → (i : Mode) → Tyᴰ Γᴰ A → Conᴰ (Γ ▷[ i ] A)
       pᴰ : Subᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) Γᴰ p
@@ -264,8 +279,8 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) where
       _,,ᴰ_ : (σᴰ : Subᴰ Γᴰ Δᴰ σ) → Tmᴰ Γᴰ i (Aᴰ [ σᴰ ]Tᴰ) t → Subᴰ Γᴰ (Δᴰ ▷ᴰ[ i ] Aᴰ) (σ ,, t)
       ,∘ᴰ : (σᴰ ,,ᴰ tᴰ) ∘ᴰ ρᴰ ≡[ ap-Subᴰ ,∘ ]
           (σᴰ ∘ᴰ ρᴰ) ,,ᴰ coe (ap-Tmᴰ (sym [∘]T) (symᴰ [∘]Tᴰ) refl) (tᴰ [ ρᴰ ]ᴰ)
-      -- p,qᴰ : pᴰ {Γᴰ = Γᴰ} {i = i} {Aᴰ = Aᴰ} ,,ᴰ qᴰ ≡[ ap-Subᴰ p,q ] idᴰ
-      -- p∘,ᴰ : {tᴰ : Tmᴰ Γᴰ i (Aᴰ [ σᴰ ]Tᴰ) t} → pᴰ ∘ᴰ (σᴰ ,,ᴰ tᴰ) ≡[ ap-Subᴰ p∘, ] σᴰ
+      p,qᴰ : pᴰ {Γᴰ = Γᴰ} {i = i} {Aᴰ = Aᴰ} ,,ᴰ qᴰ ≡[ ap-Subᴰ p,q ] idᴰ
+      p∘,ᴰ : pᴰ ∘ᴰ (σᴰ ,,ᴰ tᴰ) ≡[ ap-Subᴰ p∘, ] σᴰ
       -- q[,]ᴰ : {Γᴰ : Conᴰ Γ} {Δᴰ : Conᴰ Δ} {Aᴰ : Tyᴰ Δᴰ A}
       --         {σᴰ : Subᴰ Γᴰ Δᴰ σ} {tᴰ : Tmᴰ Γᴰ i (Aᴰ [ σᴰ ]Tᴰ) t}
       --   → qᴰ [ σᴰ ,,ᴰ tᴰ ]ᴰ

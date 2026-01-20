@@ -14,6 +14,8 @@ private variable
   C : P → Set ℓ'
   x y z : A
 
+-- Prop primitives
+
 data ⊤ : Prop where
     tt : ⊤
 
@@ -25,12 +27,14 @@ exfalso ()
 exfalso-prop : ⊥ → P
 exfalso-prop ()
 
-⊥-elim-prop : Empty → P
-⊥-elim-prop ()
+exfalso-empty-prop : Empty → P
+exfalso-empty-prop ()
 
 infix 4 _≡_
 data _≡_ {A : Set ℓ} (x : A) : A → Prop ℓ where
   instance refl : x ≡ x
+
+{-# BUILTIN REWRITE _≡_ #-}
 
 private variable
   p q : A ≡ A'
@@ -59,12 +63,16 @@ record ΣProp {a b} (A : Prop a) (B : A → Prop b) : Prop (a ⊔ b) where
 
 open ΣProp public
 
-{-# BUILTIN REWRITE _≡_ #-}
+-- Some fragment of OTT
 
 postulate
-  coe : A ≡ A' → A → A'
+  coe₀ : A ≡ A' → A → A'
   funext : ∀ {f g : (x : A) → B x} → (∀ x → f x ≡ g x) → f ≡ g
   propfunext : ∀ {f g : (x : P) → C x} → (∀ x → f x ≡ g x) → f ≡ g
+
+opaque
+  coe : A ≡ A' → A → A'
+  coe = coe₀
 
 opaque
   cong : (f : A → A') → x ≡ y → f x ≡ f y
@@ -76,14 +84,12 @@ opaque
   trans : x ≡ y → y ≡ z → x ≡ z
   trans refl p = p
 
--- Some fragment of OTT
---
--- We don't add computation rules for the equality type---since it is inductively
--- defined that would break things.
 private
   Π : (A : Set ℓ) → (B : A → Set ℓ') → Set (ℓ ⊔ ℓ')
   Π A B = (a : A) → B a
 
+-- We don't add computation rules for the equality type---since it is inductively
+-- defined that would break things.
 postulate
   coe-Σ : (Σ A B ≡ Σ A' B') → (ΣProp (A ≡ A') (λ p → ∀ x → B x ≡ B' (coe p x)))
   coe-pair :
@@ -103,28 +109,29 @@ postulate
 -- Adding this as the last rule because it's the most general. Otherwise
 -- the typechecker dies
 postulate
-  coe-eq : coe refl x ≡ x
-  {-# REWRITE coe-eq #-}
+  coe₀-eq : coe₀ refl x ≡ x
+  {-# REWRITE coe₀-eq #-}
+
+-- Equality helpers
 
 subst : (P : A → Set ℓ) (p : x ≡ y) → P x → P y
 subst P p a = coe (cong P p) a
-
-_∣_≡[_]_ : ∀ (F : A → Set ℓ') {a} (f : F a) {b} (p : a ≡ b) (g : F b) → Prop ℓ'
-_∣_≡[_]_ F f p g = subst F p f ≡ g
 
 infix 4 _≡[_]_
 
 _≡[_]_ : ∀ {ℓ} {A A' : Set ℓ} (a : A) (p : A ≡ A') (b : A') → Prop ℓ
 _≡[_]_ a p b = coe p a ≡ b
 
-Σ≡ : {p₁ p₂ : Σ A B} (p : p₁ .proj₁ ≡ p₂ .proj₁) → subst B p (p₁ .proj₂) ≡ (p₂ .proj₂) → p₁ ≡ p₂
-Σ≡ refl refl = refl
-
-≡Σ : {p₁ p₂ : Σ A B} (p : p₁ ≡ p₂)
-  → ΣProp (p₁ .proj₁ ≡ p₂ .proj₁) (λ p → subst B p (p₁ .proj₂) ≡ (p₂ .proj₂))
-≡Σ refl = refl ,P refl
-
 opaque
+  unfolding coe
+
+  Σ≡ : {p₁ p₂ : Σ A B} (p : p₁ .proj₁ ≡ p₂ .proj₁) → subst B p (p₁ .proj₂) ≡ (p₂ .proj₂) → p₁ ≡ p₂
+  Σ≡ refl refl = refl
+
+  ≡Σ : {p₁ p₂ : Σ A B} (p : p₁ ≡ p₂)
+    → ΣProp (p₁ .proj₁ ≡ p₂ .proj₁) (λ p → subst B p (p₁ .proj₂) ≡ (p₂ .proj₂))
+  ≡Σ refl = refl ,P refl
+
   symᴰ : x ≡[ p ] y → y ≡[ sym p ] x
   symᴰ {p = refl} refl = refl
 

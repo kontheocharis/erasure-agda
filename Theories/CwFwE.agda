@@ -18,10 +18,10 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
   open CwFwE-sorts s
   variable
     Γ Δ Θ : Con
-    σ τ ρ : Sub _ _
-    A B C : Ty _
-    t u v : Tm _ _ _
-    π : #∈ _
+    σ τ ρ : Sub Γ Δ
+    A B C : Ty Γ
+    t u v : Tm Γ i A
+    π : #∈ Γ
 
   opaque
     ap-Tm : A ≡ B → Tm Γ i A ≡ Tm Γ i B
@@ -29,6 +29,8 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
 
   private module core-utils (_[_]T : (A : Ty Δ) → (σ : Sub Γ Δ) → Ty Γ) where
     opaque
+      unfolding coe
+
       ap-[]T : σ ≡ τ → A [ σ ]T ≡ A [ τ ]T
       ap-[]T refl = refl
       
@@ -196,21 +198,15 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) where
   open CwFwEᴰ-sorts sᴰ
   open in-CwFwE-sorts s
   variable
-    Γᴰ : Conᴰ Γ
-    Δᴰ : Conᴰ Δ
-    Θᴰ : Conᴰ Θ
-    σᴰ : Subᴰ _ _ σ
-    τᴰ : Subᴰ _ _ τ
-    ρᴰ : Subᴰ _ _ ρ
-    Aᴰ : Tyᴰ _ A
-    Bᴰ : Tyᴰ _ B
-    Cᴰ : Tyᴰ _ C
-    tᴰ : Tmᴰ _ _ _ t
-    uᴰ : Tmᴰ _ _ _ u
-    vᴰ : Tmᴰ _ _ _ v
-    πᴰ : #∈ᴰ _ π
+    Γᴰ Δᴰ Θᴰ : Conᴰ Γ
+    σᴰ τᴰ ρᴰ : Subᴰ Γᴰ Δᴰ σ
+    Aᴰ Bᴰ Cᴰ : Tyᴰ Γᴰ A
+    tᴰ uᴰ vᴰ : Tmᴰ Γᴰ i Aᴰ t
+    πᴰ : #∈ᴰ Γᴰ π
 
   opaque
+    unfolding coe
+
     ap-Subᴰ : ∀ {Γᴰ : Conᴰ Γ} {Δᴰ : Conᴰ Δ} {σ τ : Sub Γ Δ}
       → σ ≡ τ → Subᴰ Γᴰ Δᴰ σ ≡ Subᴰ Γᴰ Δᴰ τ
     ap-Subᴰ refl = refl
@@ -254,38 +250,22 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) where
       [∘]ᴰ : (tᴰ [ σᴰ ∘ᴰ τᴰ ]ᴰ) ≡[ ap-Tmᴰ [∘]T [∘]Tᴰ [∘] ] ((tᴰ [ σᴰ ]ᴰ) [ τᴰ ]ᴰ)
       [∘]#ᴰ : πᴰ [ σᴰ ∘ᴰ τᴰ ]#ᴰ ≡[ ap-#∈ᴰ [∘]# ] (πᴰ [ σᴰ ]#ᴰ) [ τᴰ ]#ᴰ
 
-    -- coeTmᴰ : ∀ {Aᴰ : Tyᴰ Γᴰ A} {Bᴰ : Tyᴰ Γᴰ B} (p : A ≡ B)
-    --   → Aᴰ ≡Tyᴰ[ p ] Bᴰ → Tmᴰ Γᴰ i Aᴰ t → Tmᴰ Γᴰ i Bᴰ (coeTm p t)
-    -- coeTmᴰ p pᴰ tᴰ = coe (cong2' {I = Ty _} {A = Tyᴰ _} {B = Tm _ _} (Tmᴰ _ _) p pᴰ refl) tᴰ
-
-    -- -- Convert displayed substitution equality to displayed type equality via substitution
-    -- congTyᴰ[] : ∀ {A : Ty Δ} {Γᴰ : Conᴰ Γ} {Δᴰ : Conᴰ Δ} {Aᴰ : Tyᴰ Δᴰ A}
-    --               {σᴰ : Subᴰ Γᴰ Δᴰ σ} {τᴰ : Subᴰ Γᴰ Δᴰ τ}
-    --   → (p : σ ≡ τ)
-    --   → σᴰ ≡Subᴰ[ p ] τᴰ
-    --   → Aᴰ [ σᴰ ]Tᴰ ≡Tyᴰ[ cong (A [_]T) p ] Aᴰ [ τᴰ ]Tᴰ
-    -- congTyᴰ[] {A = A} {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} p pᴰ =
-    --   {!!}
-
-    -- field
-    --   _▷ᴰ[_]_ : (Γᴰ : Conᴰ Γ) → (i : Mode) → Tyᴰ Γᴰ A → Conᴰ (Γ ▷[ i ] A)
-    --   pᴰ : Subᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) Γᴰ p
-    --   qᴰ : Tmᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) i (Aᴰ [ pᴰ ]Tᴰ) q
-    --   _,,ᴰ_ : (σᴰ : Subᴰ Γᴰ Δᴰ σ) → Tmᴰ Γᴰ i (Aᴰ [ σᴰ ]Tᴰ) t → Subᴰ Γᴰ (Δᴰ ▷ᴰ[ i ] Aᴰ) (σ ,, t)
-    --   ,∘ᴰ : {Γᴰ : Conᴰ Γ} {Δᴰ : Conᴰ Δ} {Aᴰ : Tyᴰ Δᴰ A} {Θᴰ : Conᴰ Θ}
-    --         {σᴰ : Subᴰ Γᴰ Δᴰ σ} {ρᴰ : Subᴰ Θᴰ Γᴰ ρ}
-    --         {tᴰ : Tmᴰ Γᴰ i (Aᴰ [ σᴰ ]Tᴰ) t}
-    --     → (σᴰ ,,ᴰ tᴰ) ∘ᴰ ρᴰ ≡Subᴰ[ ,∘ ]
-    --       (σᴰ ∘ᴰ ρᴰ) ,,ᴰ coeTmᴰ (sym [∘]T) (symTyᴰ [∘]T [∘]Tᴰ) (tᴰ [ ρᴰ ]ᴰ)
-    --   p,qᴰ : pᴰ {Γᴰ = Γᴰ} {i = i} {Aᴰ = Aᴰ} ,,ᴰ qᴰ ≡Subᴰ[ p,q ] idᴰ
-    --   p∘,ᴰ : {tᴰ : Tmᴰ Γᴰ i (Aᴰ [ σᴰ ]Tᴰ) t} → pᴰ ∘ᴰ (σᴰ ,,ᴰ tᴰ) ≡Subᴰ[ p∘, ] σᴰ
-    --   q[,]ᴰ : {Γᴰ : Conᴰ Γ} {Δᴰ : Conᴰ Δ} {Aᴰ : Tyᴰ Δᴰ A}
-    --           {σᴰ : Subᴰ Γᴰ Δᴰ σ} {tᴰ : Tmᴰ Γᴰ i (Aᴰ [ σᴰ ]Tᴰ) t}
-    --     → qᴰ [ σᴰ ,,ᴰ tᴰ ]ᴰ
-    --       ≡Tmᴰ[ trans (sym [∘]T) (cong (A [_]T) p∘,)
-    --           , trans ({! symTyᴰ [∘]T [∘]Tᴰ!}) ({!!})
-    --           , q[,] ]
-    --       tᴰ
+    field
+      _▷ᴰ[_]_ : (Γᴰ : Conᴰ Γ) → (i : Mode) → Tyᴰ Γᴰ A → Conᴰ (Γ ▷[ i ] A)
+      pᴰ : Subᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) Γᴰ p
+      qᴰ : Tmᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) i (Aᴰ [ pᴰ ]Tᴰ) q
+      _,,ᴰ_ : (σᴰ : Subᴰ Γᴰ Δᴰ σ) → Tmᴰ Γᴰ i (Aᴰ [ σᴰ ]Tᴰ) t → Subᴰ Γᴰ (Δᴰ ▷ᴰ[ i ] Aᴰ) (σ ,, t)
+      ,∘ᴰ : (σᴰ ,,ᴰ tᴰ) ∘ᴰ ρᴰ ≡[ ap-Subᴰ ,∘ ]
+          (σᴰ ∘ᴰ ρᴰ) ,,ᴰ coe (ap-Tmᴰ (sym [∘]T) (symᴰ [∘]Tᴰ) refl) (tᴰ [ ρᴰ ]ᴰ)
+      -- p,qᴰ : pᴰ {Γᴰ = Γᴰ} {i = i} {Aᴰ = Aᴰ} ,,ᴰ qᴰ ≡[ ap-Subᴰ p,q ] idᴰ
+      -- p∘,ᴰ : {tᴰ : Tmᴰ Γᴰ i (Aᴰ [ σᴰ ]Tᴰ) t} → pᴰ ∘ᴰ (σᴰ ,,ᴰ tᴰ) ≡[ ap-Subᴰ p∘, ] σᴰ
+      -- q[,]ᴰ : {Γᴰ : Conᴰ Γ} {Δᴰ : Conᴰ Δ} {Aᴰ : Tyᴰ Δᴰ A}
+      --         {σᴰ : Subᴰ Γᴰ Δᴰ σ} {tᴰ : Tmᴰ Γᴰ i (Aᴰ [ σᴰ ]Tᴰ) t}
+      --   → qᴰ [ σᴰ ,,ᴰ tᴰ ]ᴰ
+      --     ≡[ ap-Tmᴰ (trans (sym [∘]T) (ap-[]T p∘,))
+      --               (transᴰ (symᴰ [∘]Tᴰ) {!!})
+      --               q[,] ]
+      --     tᴰ
 
     --   _▷#ᴰ : Conᴰ Γ → Conᴰ (Γ ▷#)
     --   p#ᴰ : Subᴰ (Γᴰ ▷#ᴰ) Γᴰ p#

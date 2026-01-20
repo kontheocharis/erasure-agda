@@ -240,6 +240,10 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
         → Aᴰ [ σᴰ ]Tᴰ ≡[ ap-Tyᴰ (ap-[]T₀ p) ] (Aᴰ [ τᴰ ]Tᴰ)
       ap-[]T₀ᴰ refl refl = refl
 
+      ap-[]T₁ᴰ : (p : A ≡ B) → Aᴰ ≡[ ap-Tyᴰ p ] Bᴰ
+        → Aᴰ [ σᴰ ]Tᴰ ≡[ ap-Tyᴰ (ap-[]T₁ p) ] (Bᴰ [ σᴰ ]Tᴰ)
+      ap-[]T₁ᴰ refl refl = refl
+
   record CwFwEᴰ-core : Set where
     field
       idᴰ : Subᴰ Γᴰ Γᴰ id
@@ -265,6 +269,10 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
     ap-[]T₀ᴰ : (p : σ ≡ τ) → σᴰ ≡[ ap-Subᴰ p ] τᴰ
       → Aᴰ [ σᴰ ]Tᴰ ≡[ ap-Tyᴰ (ap-[]T₀ p) ] Aᴰ [ τᴰ ]Tᴰ
     ap-[]T₀ᴰ = core-utilsᴰ.ap-[]T₀ᴰ _[_]Tᴰ
+
+    ap-[]T₁ᴰ : (p : A ≡ B) → Aᴰ ≡[ ap-Tyᴰ p ] Bᴰ
+      → Aᴰ [ σᴰ ]Tᴰ ≡[ ap-Tyᴰ (ap-[]T₁ p) ] Bᴰ [ σᴰ ]Tᴰ
+    ap-[]T₁ᴰ = core-utilsᴰ.ap-[]T₁ᴰ _[_]Tᴰ
 
     field
       _▷ᴰ[_]_ : (Γᴰ : Conᴰ Γ) → (i : Mode) → Tyᴰ Γᴰ A → Conᴰ (Γ ▷[ i ] A)
@@ -310,70 +318,86 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
       ↑↓ᴰ : ↑ᴰ (↓ᴰ tᴰ) ≡[ ap-Tmᴰ refl reflᴰ (dep ↑↓) ] tᴰ
       ↓↑ᴰ : ↓ᴰ (↑ᴰ tᴰ) ≡[ ap-Tmᴰ refl reflᴰ (dep ↓↑) ] tᴰ
 
-    -- pz'ᴰ : Subᴰ (Γᴰ ▷ᴰ[ ω ] Aᴰ) (Γᴰ ▷ᴰ[ z ] Aᴰ) pz'
-    -- pz'ᴰ = pᴰ ,,ᴰ ↓ᴰ (qᴰ [ p#ᴰ ]ᴰ)
+    pz'ᴰ : Subᴰ (Γᴰ ▷ᴰ[ ω ] Aᴰ) (Γᴰ ▷ᴰ[ z ] Aᴰ) pz'
+    pz'ᴰ = pᴰ ,,ᴰ ↓ᴰ (qᴰ [ p#ᴰ ]ᴰ)
 
-    -- field
-    --   pz∘⁺≡⁺∘pz'ᴰ : (_⁺ᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} σᴰ) ∘ᴰ pz'ᴰ {Γᴰ = Γᴰ}
-    --     ≡[ cong (Subᴰ (Γᴰ ▷ᴰ[ ω ] (Aᴰ [ σᴰ ]Tᴰ)) (Δᴰ ▷ᴰ[ z ] Aᴰ)) pz∘⁺≡⁺∘pz' ]
-    --     pz'ᴰ ∘ᴰ (σᴰ ⁺ᴰ)
+    field
+      pz∘⁺≡⁺∘pz'ᴰ : (_⁺ᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} σᴰ) ∘ᴰ pz'ᴰ {Γᴰ = Γᴰ}
+        ≡[ ap-Subᴰ pz∘⁺≡⁺∘pz' ]
+        pz'ᴰ ∘ᴰ (σᴰ ⁺ᴰ)
 
-    -- ↓*ᴰ : Tmᴰ Γᴰ i Aᴰ t → Tmᴰ Γᴰ z Aᴰ (↓* t)
-    -- ↓*ᴰ {i = z} tᴰ = tᴰ
-    -- ↓*ᴰ {i = ω} tᴰ = ↓ᴰ (tᴰ [ p#ᴰ ]ᴰ)
+    ↓*ᴰ : Tmᴰ Γᴰ i Aᴰ t → Tmᴰ Γᴰ z Aᴰ (↓* t)
+    ↓*ᴰ {i = z} tᴰ = tᴰ
+    ↓*ᴰ {i = ω} tᴰ = ↓ᴰ (tᴰ [ p#ᴰ ]ᴰ)
 
-    -- pzᴰ : Subᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) (Γᴰ ▷ᴰ[ z ] Aᴰ) pz
-    -- pzᴰ = pᴰ ,,ᴰ ↓*ᴰ qᴰ
+    pzᴰ : Subᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) (Γᴰ ▷ᴰ[ z ] Aᴰ) pz
+    pzᴰ = pᴰ ,,ᴰ ↓*ᴰ qᴰ
 
-    -- pz∘⁺≡⁺∘pzᴰ : (_⁺ᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} σᴰ) ∘ᴰ pzᴰ {Γᴰ = Γᴰ} {i = ω}
-    --   ≡[ cong (Subᴰ (Γᴰ ▷ᴰ[ ω ] (Aᴰ [ σᴰ ]Tᴰ)) (Δᴰ ▷ᴰ[ z ] Aᴰ)) pz∘⁺≡⁺∘pz ]
-    --   pzᴰ ∘ᴰ (σᴰ ⁺ᴰ)
-    -- pz∘⁺≡⁺∘pzᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} {σᴰ = σᴰ} = pz∘⁺≡⁺∘pz'ᴰ
+    pz∘⁺≡⁺∘pzᴰ : (_⁺ᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} σᴰ) ∘ᴰ pzᴰ {Γᴰ = Γᴰ} {i = ω}
+      ≡[ ap-Subᴰ pz∘⁺≡⁺∘pz ]
+      pzᴰ ∘ᴰ (σᴰ ⁺ᴰ)
+    pz∘⁺≡⁺∘pzᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} {σᴰ = σᴰ} = pz∘⁺≡⁺∘pz'ᴰ
 
-  -- module in-CwFwE-core (c : CwFwE-core) where
-  --   open CwFwE-core c
+    [pz][⁺]≡[⁺][pz]ᴰ : (Aᴰ [ σᴰ ⁺ᴰ ]Tᴰ) [ pzᴰ {Γᴰ = Γᴰ} {i = i} ]Tᴰ
+      ≡[ ap-Tyᴰ [pz][⁺]≡[⁺][pz] ]
+      (Aᴰ [ pzᴰ ]Tᴰ) [ σᴰ ⁺ᴰ ]Tᴰ
+    [pz][⁺]≡[⁺][pz]ᴰ {Aᴰ = Aᴰ} {Γᴰ = Γᴰ} {σᴰ = σᴰ} {i = z} =
+      transᴰ {p = ap-Tyᴰ (ap-[]T₀ p,q)} (ap-[]T₀ᴰ p,q p,qᴰ)
+      (transᴰ {p = ap-Tyᴰ [id]T} [id]Tᴰ
+      (ap-[]T₁ᴰ (sym (trans (ap-[]T₀ p,q) [id]T))
+                (symᴰ (transᴰ {p = ap-Tyᴰ (ap-[]T₀ p,q)} (ap-[]T₀ᴰ p,q p,qᴰ) [id]Tᴰ))))
+    [pz][⁺]≡[⁺][pz]ᴰ {Aᴰ = Aᴰ} {Γᴰ = Γᴰ} {σᴰ = σᴰ} {i = ω} =
+      transᴰ {p = ap-Tyᴰ (sym [∘]T)} (symᴰ [∘]Tᴰ)
+      (transᴰ {p = ap-Tyᴰ (ap-[]T₀ pz∘⁺≡⁺∘pz)} (ap-[]T₀ᴰ pz∘⁺≡⁺∘pz pz∘⁺≡⁺∘pzᴰ) [∘]Tᴰ)
 
-  --   record Π-structure  : Set where
-  --     field
-  --       Π : (i : Mode) → (A : Ty Γ) → (B : Ty (Γ ▷[ z ] A)) → Ty Γ
-  --       Π[] : (Π i A B) [ σ ]T ≡ Π i (A [ σ ]T) (B [ σ ⁺ ]T)
+  module in-CwFwEᴰ-core (cᴰ : CwFwEᴰ-core) where
+    open CwFwEᴰ-core cᴰ
 
-  --       lam : (f : Tm (Γ ▷[ i ] A) ω (B [ pz ]T)) → Tm Γ ω (Π i A B)
-  --       lam[] : (lam {i = i} t) [ σ ]
-  --         ≡[ cong (Tm _ _) Π[] ] lam (coeTm (sym [pz][⁺]≡[⁺][pz]) (t [ σ ⁺ ]))
+    record Π-structureᴰ (ps : Π-structure) : Set where
+      open Π-structure ps
+      field
+        Πᴰ : (i : Mode) → (Aᴰ : Tyᴰ Γᴰ A) → (Bᴰ : Tyᴰ (Γᴰ ▷ᴰ[ z ] Aᴰ) B) → Tyᴰ Γᴰ (Π i A B)
+        Π[]ᴰ : (Πᴰ i Aᴰ Bᴰ) [ σᴰ ]Tᴰ ≡[ ap-Tyᴰ Π[] ] Πᴰ i (Aᴰ [ σᴰ ]Tᴰ) (Bᴰ [ σᴰ ⁺ᴰ ]Tᴰ)
 
-  --       ap : (f : Tm Γ ω (Π i A B)) → Tm (Γ ▷[ i ] A) ω (B [ pz ]T)
+        lamᴰ : (tᴰ : Tmᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) ω (Bᴰ [ pzᴰ ]Tᴰ) t) → Tmᴰ Γᴰ ω (Πᴰ i Aᴰ Bᴰ) (lam t)
+        lam[]ᴰ : (lamᴰ {i = i} tᴰ) [ σᴰ ]ᴰ
+          ≡[ ap-Tmᴰ Π[] Π[]ᴰ lam[] ]
+          lamᴰ (coe (ap-Tmᴰ (sym [pz][⁺]≡[⁺][pz]) (symᴰ [pz][⁺]≡[⁺][pz]ᴰ) refl) (tᴰ [ σᴰ ⁺ᴰ ]ᴰ))
 
-  --       Πβ : ap {i = i} (lam t) ≡ t
-  --       Πη : lam {i = i} (ap t) ≡ t
+        apᴰ : (tᴰ : Tmᴰ Γᴰ ω (Πᴰ i Aᴰ Bᴰ) t) → Tmᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) ω (Bᴰ [ pzᴰ ]Tᴰ) (ap t)
 
-  --   record U-structure : Set where
-  --     field
-  --       U : Ty Γ
-  --       U[] : U [ σ ]T ≡ U
+        Πβᴰ : apᴰ {i = i} (lamᴰ tᴰ) ≡[ ap-Tmᴰ refl reflᴰ (dep Πβ) ] tᴰ
+        Πηᴰ : lamᴰ {i = i} (apᴰ tᴰ) ≡[ ap-Tmᴰ refl reflᴰ (dep Πη) ] tᴰ
 
-  --       El : (t : Tm Γ z U) → Ty Γ
-  --       El[] : (El t) [ σ ]T ≡ El (subst (Tm _ _) U[] (t [ σ ]))
+    record U-structureᴰ (us : U-structure) : Set where
+      open U-structure us
+      field
+        Uᴰ : Tyᴰ Γᴰ U
+        U[]ᴰ : Uᴰ [ σᴰ ]Tᴰ ≡[ ap-Tyᴰ U[] ] Uᴰ
 
-  --       code : (A : Ty Γ) → Tm Γ z U
-  --       code[] : (code A) [ σ ] ≡[ cong (Tm _ _) U[] ] code (A [ σ ]T)
+        Elᴰ : (tᴰ : Tmᴰ Γᴰ z Uᴰ t) → Tyᴰ Γᴰ (El t)
+        El[]ᴰ : (Elᴰ tᴰ) [ σᴰ ]Tᴰ ≡[ ap-Tyᴰ El[] ] Elᴰ (coe (ap-Tmᴰ U[] U[]ᴰ refl) (tᴰ [ σᴰ ]ᴰ))
 
-  --       El-code : El (code A) ≡ A
-  --       code-El : code (El t) ≡ t
+        codeᴰ : (Aᴰ : Tyᴰ Γᴰ A) → Tmᴰ Γᴰ z Uᴰ (code A)
+        code[]ᴰ : (codeᴰ Aᴰ) [ σᴰ ]ᴰ ≡[ ap-Tmᴰ U[] U[]ᴰ code[] ] codeᴰ (Aᴰ [ σᴰ ]Tᴰ)
 
-  --   -- Π whose bound type is relevant
-  --   record Π'-structure  : Set where
-  --     field
-  --       Π' : (A : Ty Γ) → (B : Ty (Γ ▷[ ω ] A)) → Ty Γ
-  --       Π'[] : (Π' A B) [ σ ]T ≡ Π' (A [ σ ]T) (B [ σ ⁺ ]T)
+        El-codeᴰ : Elᴰ (codeᴰ Aᴰ) ≡[ ap-Tyᴰ El-code ] Aᴰ
+        code-Elᴰ : codeᴰ (Elᴰ tᴰ) ≡[ ap-Tmᴰ refl reflᴰ (dep code-El) ] tᴰ
 
-  --       lam' : (f : Tm (Γ ▷[ ω ] A) ω B) → Tm Γ ω (Π' A B)
-  --       lam'[] : (lam' t) [ σ ] ≡[ cong (Tm _ _) Π'[] ] lam' (t [ σ ⁺ ])
+    -- Π whose bound type is relevant
+    record Π'-structureᴰ (ps : Π'-structure) : Set where
+      open Π'-structure ps
+      field
+        Π'ᴰ : (Aᴰ : Tyᴰ Γᴰ A) → (Bᴰ : Tyᴰ (Γᴰ ▷ᴰ[ ω ] Aᴰ) B) → Tyᴰ Γᴰ (Π' A B)
+        Π'[]ᴰ : (Π'ᴰ Aᴰ Bᴰ) [ σᴰ ]Tᴰ ≡[ ap-Tyᴰ Π'[] ] Π'ᴰ (Aᴰ [ σᴰ ]Tᴰ) (Bᴰ [ σᴰ ⁺ᴰ ]Tᴰ)
 
-  --       ap' : (f : Tm Γ ω (Π' A B)) → Tm (Γ ▷[ ω ] A) ω B
+        lam'ᴰ : (tᴰ : Tmᴰ (Γᴰ ▷ᴰ[ ω ] Aᴰ) ω Bᴰ t) → Tmᴰ Γᴰ ω (Π'ᴰ Aᴰ Bᴰ) (lam' t)
+        lam'[]ᴰ : (lam'ᴰ tᴰ) [ σᴰ ]ᴰ ≡[ ap-Tmᴰ Π'[] Π'[]ᴰ lam'[] ] lam'ᴰ (tᴰ [ σᴰ ⁺ᴰ ]ᴰ)
 
-  --       Πβ' : ap' (lam' t) ≡ t
-  --       Πη' : lam' (ap' t) ≡ t
+        ap'ᴰ : (tᴰ : Tmᴰ Γᴰ ω (Π'ᴰ Aᴰ Bᴰ) t) → Tmᴰ (Γᴰ ▷ᴰ[ ω ] Aᴰ) ω Bᴰ (ap' t)
+
+        Πβ'ᴰ : ap'ᴰ (lam'ᴰ tᴰ) ≡[ ap-Tmᴰ refl reflᴰ (dep Πβ') ] tᴰ
+        Πη'ᴰ : lam'ᴰ (ap'ᴰ tᴰ) ≡[ ap-Tmᴰ refl reflᴰ (dep Πη') ] tᴰ
 
 
 module CwFwE-syntax where

@@ -19,10 +19,10 @@ record CwFwE-sorts : Set where
 module in-CwFwE-sorts (s : CwFwE-sorts) where
   open CwFwE-sorts s
   variable
-    Γ Γ' Δ Δ' Θ : Con
-    σ τ ρ : Sub Γ Δ
-    A A' B C : Ty Γ
-    t u v : Tm Γ i A
+    Γ Γ' Δ Δ' Θ Θ' : Con
+    σ σ' τ τ' ρ : Sub Γ Δ
+    A A' B B' C : Ty Γ
+    t t' u u' v : Tm Γ i A
     π ξ : #∈ Γ
 
   opaque
@@ -57,12 +57,6 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       ap-[]T₁-impl : A ≡ B → A [ σ ]T ≡ B [ σ ]T
       ap-[]T₁-impl refl = refl
 
-      ap-[]₀-impl : (p : σ ≡ τ) → t [ σ ] ≡[ ap-Tm (ap-[]T₀-impl p) ] t [ τ ]
-      ap-[]₀-impl refl = refl
-
-      ap-[]₁-impl : ∀ {t : Tm Γ i A} {u : Tm Γ i B} (p : A ≡ B) → t ≡[ ap-Tm p ] u → t [ σ ] ≡[ ap-Tm (ap-[]T₁-impl p) ] u [ σ ]
-      ap-[]₁-impl refl refl = refl
-
   record CwFwE-core : Set where
     field
       id : Sub Γ Γ
@@ -93,12 +87,6 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
 
     ap-[]T₁ : A ≡ B → A [ σ ]T ≡ B [ σ ]T
     ap-[]T₁ = core-utils.ap-[]T₁-impl _[_]T _[_]
-
-    ap-[]₀ : (p : σ ≡ τ) → t [ σ ] ≡[ ap-Tm (ap-[]T₀ p) ] t [ τ ]
-    ap-[]₀ = core-utils.ap-[]₀-impl _[_]T _[_]
-
-    ap-[]₁ : ∀ {t : Tm Γ i A} {u : Tm Γ i B} (p : A ≡ B) → t ≡[ ap-Tm p ] u → t [ σ ] ≡[ ap-Tm (ap-[]T₁ p) ] u [ σ ]
-    ap-[]₁ = core-utils.ap-[]₁-impl _[_]T _[_]
 
     field
       p : Sub (Γ ▷[ i ] A) Γ

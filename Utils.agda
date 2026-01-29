@@ -150,3 +150,6 @@ opaque
   undep : x ≡[ refl ] y → x ≡ y
   undep p = p
 
+  splitl : x ≡[ trans p q ] y → coe p x ≡[ q ] y
+  splitl {p = refl} q = q
+

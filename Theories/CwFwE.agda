@@ -44,13 +44,24 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
     ap-Tmᶜ refl refl = refl
 
 
-  module core-utils (_[_]T : ∀ {Γ Δ} → (A : Ty Δ) → (σ : Sub Γ Δ) → Ty Γ) where
+  module core-utils
+    (_[_]T : ∀ {Γ Δ} → (A : Ty Δ) → (σ : Sub Γ Δ) → Ty Γ)
+    (_[_] : ∀ {Γ Δ i A} → (a : Tm Δ i A) → (σ : Sub Γ Δ) → Tm Γ i (A [ σ ]T))
+    where
     opaque
+      unfolding coe
+
       ap-[]T₀-impl : σ ≡ τ → A [ σ ]T ≡ A [ τ ]T
       ap-[]T₀-impl refl = refl
       
       ap-[]T₁-impl : A ≡ B → A [ σ ]T ≡ B [ σ ]T
       ap-[]T₁-impl refl = refl
+
+      ap-[]₀-impl : (p : σ ≡ τ) → t [ σ ] ≡[ ap-Tm (ap-[]T₀-impl p) ] t [ τ ]
+      ap-[]₀-impl refl = refl
+
+      ap-[]₁-impl : ∀ {t : Tm Γ i A} {u : Tm Γ i B} (p : A ≡ B) → t ≡[ ap-Tm p ] u → t [ σ ] ≡[ ap-Tm (ap-[]T₁-impl p) ] u [ σ ]
+      ap-[]₁-impl refl refl = refl
 
   record CwFwE-core : Set where
     field
@@ -78,10 +89,16 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       _▷[_]_ : (Γ : Con) → Mode → (A : Ty Γ) → Con
 
     ap-[]T₀ : σ ≡ τ → A [ σ ]T ≡ A [ τ ]T
-    ap-[]T₀ = core-utils.ap-[]T₀-impl _[_]T
+    ap-[]T₀ = core-utils.ap-[]T₀-impl _[_]T _[_]
 
     ap-[]T₁ : A ≡ B → A [ σ ]T ≡ B [ σ ]T
-    ap-[]T₁ = core-utils.ap-[]T₁-impl _[_]T
+    ap-[]T₁ = core-utils.ap-[]T₁-impl _[_]T _[_]
+
+    ap-[]₀ : (p : σ ≡ τ) → t [ σ ] ≡[ ap-Tm (ap-[]T₀ p) ] t [ τ ]
+    ap-[]₀ = core-utils.ap-[]₀-impl _[_]T _[_]
+
+    ap-[]₁ : ∀ {t : Tm Γ i A} {u : Tm Γ i B} (p : A ≡ B) → t ≡[ ap-Tm p ] u → t [ σ ] ≡[ ap-Tm (ap-[]T₁ p) ] u [ σ ]
+    ap-[]₁ = core-utils.ap-[]₁-impl _[_]T _[_]
 
     field
       p : Sub (Γ ▷[ i ] A) Γ
@@ -624,97 +641,73 @@ module CwFwE-uniform (m : CwFwE) (n : CwFwE) where
   nᴰ-sorts .#∈ᴰ Γ _ = #∈ Γ
   nᴰ-sorts .Tmᴰ Γ i A _ = Tm Γ i A
 
-
   nᴰ-core : CwFwEᴰ-core nᴰ-sorts core 
   nᴰ-core .idᴰ = id
   nᴰ-core ._∘ᴰ_ = _∘_
-  nᴰ-core .assocᴰ {ρᴰ = ρᴰ} {σᴰ = σᴰ} {τᴰ = τᴰ} = lem
-    where
-      opaque
-        unfolding coe
-        lem : ∀ {p} → (ρᴰ ∘ (σᴰ ∘ τᴰ)) ≡[ p ] ((ρᴰ ∘ σᴰ) ∘ τᴰ)
-        lem = assoc
-  nᴰ-core .∘idᴰ {σᴰ = σᴰ} = lem
-    where
-      opaque
-        unfolding coe
-        lem : ∀ {p} → (σᴰ ∘ id) ≡[ p ] σᴰ
-        lem = ∘id
-  nᴰ-core .id∘ᴰ {σᴰ = σᴰ} = lem
-    where
-      opaque
-        unfolding coe
-        lem : ∀ {p} → (id ∘ σᴰ) ≡[ p ] σᴰ
-        lem = id∘
+  nᴰ-core .assocᴰ = dep assoc
+  nᴰ-core .∘idᴰ = dep ∘id
+  nᴰ-core .id∘ᴰ = dep id∘
   nᴰ-core .∙ᴰ = ∙
   nᴰ-core .εᴰ = ε
-  nᴰ-core .∃!εᴰ {σᴰ = σᴰ} = lem
-    where
-      opaque
-        unfolding coe
-        lem : ε ≡[ refl ] σᴰ
-        lem =  ∃!ε
+  nᴰ-core .∃!εᴰ = dep ∃!ε
   nᴰ-core ._[_]Tᴰ =  _[_]T
   nᴰ-core ._[_]ᴰ = _[_]
   nᴰ-core ._[_]#ᴰ = _[_]#
-  -- nᴰ-core .[id]Tᴰ = [id]T
-  -- nᴰ-core .[id]ᴰ = [id]
-  -- nᴰ-core .[id]#ᴰ = [id]#
-  -- nᴰ-core .[∘]Tᴰ = [∘]T
-  -- nᴰ-core .[∘]ᴰ = [∘]
-  -- nᴰ-core .[∘]#ᴰ = [∘]#
+  nᴰ-core .[id]Tᴰ = dep [id]T
+  nᴰ-core .[id]ᴰ = [id]
+  nᴰ-core .[id]#ᴰ = dep [id]#
+  nᴰ-core .[∘]Tᴰ = dep [∘]T
+  nᴰ-core .[∘]ᴰ = [∘]
+  nᴰ-core .[∘]#ᴰ = dep [∘]#
   nᴰ-core ._▷ᴰ[_]_ = _▷[_]_
   nᴰ-core .pᴰ = p
   nᴰ-core .qᴰ = q
   nᴰ-core ._,,ᴰ_ = _,,_
-  -- nᴰ-core .,∘ᴰ = ,∘
-  -- nᴰ-core .p,qᴰ = p,q
-  -- nᴰ-core .p∘,ᴰ = p∘,
-  -- nᴰ-core .q[,]ᴰ = q[,]
+  nᴰ-core .,∘ᴰ = dep ,∘
+  nᴰ-core .p,qᴰ = dep p,q
+  nᴰ-core .p∘,ᴰ = dep p∘,
+  nᴰ-core .q[,]ᴰ = q[,]
   nᴰ-core ._▷#ᴰ = _▷#
   nᴰ-core .p#ᴰ = p#
   nᴰ-core .q#ᴰ = q#
   nᴰ-core ._,#ᴰ_ = _,#_
-  -- nᴰ-core .,#∘ᴰ = ,#∘
-  -- nᴰ-core .p,#qᴰ = p,#q
-  -- nᴰ-core .p∘,#ᴰ = p∘,#
-  -- nᴰ-core .q[,#]ᴰ = q[,#]
+  nᴰ-core .,#∘ᴰ = dep ,#∘
+  nᴰ-core .p,#qᴰ = dep p,#q
+  nᴰ-core .p∘,#ᴰ = dep p∘,#
+  nᴰ-core .q[,#]ᴰ = dep q[,#]
   nᴰ-core .↓ᴰ = ↓
   nᴰ-core .↑ᴰ = ↑
-  -- nᴰ-core .↓[]ᴰ = ↓[]
-  -- nᴰ-core .↑↓ᴰ = ↑↓
-  -- nᴰ-core .↓↑ᴰ = ↓↑
-  -- nᴰ-core .pz∘⁺≡⁺∘pz'ᴰ = pz∘⁺≡⁺∘pz'
+  nᴰ-core .↓[]ᴰ = dep ↓[]
+  nᴰ-core .↑↓ᴰ = dep ↑↓
+  nᴰ-core .↓↑ᴰ = dep ↓↑
+  nᴰ-core .pz∘⁺≡⁺∘pz'ᴰ = dep pz∘⁺≡⁺∘pz'
 
   opaque
-    unfolding nᴰ-core pzᴰ ↓*ᴰ
+    unfolding pzᴰ ↓*ᴰ
 
     nᴰ-Π-str : Π-structureᴰ nᴰ-sorts core nᴰ-core Π-str
-    -- nᴰ-Π-str .Πᴰ = Π
-    -- nᴰ-Π-str .Π[]ᴰ = Π[]
-    -- nᴰ-Π-str .lamᴰ {i = z} =  lam {i = z} 
-    -- nᴰ-Π-str .lamᴰ {i = ω} =  lam {i = ω} 
-    -- nᴰ-Π-str .lam[]ᴰ {i = z} = lam[]
-    -- nᴰ-Π-str .apᴰ {i = z} = ap
-    -- nᴰ-Π-str .Πβᴰ {i = z} = Πβ
-    -- nᴰ-Π-str .Πηᴰ {i = z} = Πη
-    -- nᴰ-Π-str .lam[]ᴰ {i = ω} = lam[]
-    -- nᴰ-Π-str .apᴰ {i = ω} = ap
-    -- nᴰ-Π-str .Πβᴰ {i = ω} = Πβ
-    -- nᴰ-Π-str .Πηᴰ {i = ω} = Πη
+    nᴰ-Π-str .Πᴰ = Π
+    nᴰ-Π-str .Π[]ᴰ = dep Π[]
+    nᴰ-Π-str .lamᴰ {i = z} =  lam {i = z} 
+    nᴰ-Π-str .lamᴰ {i = ω} =  lam {i = ω} 
+    nᴰ-Π-str .lam[]ᴰ {i = z} = lam[]
+    nᴰ-Π-str .apᴰ {i = z} = ap
+    nᴰ-Π-str .Πβᴰ {i = z} = dep Πβ
+    nᴰ-Π-str .Πηᴰ {i = z} = dep Πη
+    nᴰ-Π-str .lam[]ᴰ {i = ω} = lam[]
+    nᴰ-Π-str .apᴰ {i = ω} = ap
+    nᴰ-Π-str .Πβᴰ {i = ω} = dep Πβ
+    nᴰ-Π-str .Πηᴰ {i = ω} = dep Πη
 
-  opaque
-    unfolding nᴰ-core
-
-    nᴰ-U-str : U-structureᴰ nᴰ-sorts core nᴰ-core U-str
-    -- nᴰ-U-str .Uᴰ = U
-    -- nᴰ-U-str .U[]ᴰ = U[]
-    -- nᴰ-U-str .Elᴰ = El
-    -- nᴰ-U-str .El[]ᴰ = El[]
-    -- nᴰ-U-str .codeᴰ = code
-    -- nᴰ-U-str .code[]ᴰ = code[]
-    -- nᴰ-U-str .El-codeᴰ = El-code
-    -- nᴰ-U-str .code-Elᴰ = code-El
+  nᴰ-U-str : U-structureᴰ nᴰ-sorts core nᴰ-core U-str
+  nᴰ-U-str .Uᴰ = U
+  nᴰ-U-str .U[]ᴰ = dep U[]
+  nᴰ-U-str .Elᴰ = El
+  nᴰ-U-str .El[]ᴰ = dep El[]
+  nᴰ-U-str .codeᴰ = code
+  nᴰ-U-str .code[]ᴰ = code[]
+  nᴰ-U-str .El-codeᴰ = dep El-code
+  nᴰ-U-str .code-Elᴰ = dep code-El
 
   nᴰ : CwFwEᴰ m
   nᴰ .CwFwEᴰ.sortsᴰ = nᴰ-sorts

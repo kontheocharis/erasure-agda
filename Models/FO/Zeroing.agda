@@ -101,65 +101,58 @@ module need-nothing where
   nn-sorts .Tmᴰ (↑↑Γ , pΓ) z pA a = (⟦ a ⟧ᵗ [ ↑↑Γ ] ≡[ ap-Tm (pA .witness) ] a) true
   nn-sorts .Tmᴰ _ ω _ _ = 𝟙
 
-  opaque
-    unfolding CwFwE-uniform.nᴰ-core ap-⟦⟧ᶜ
-
-    nn-ctors : CwFwEᴰ-core nn-sorts core
-    nn-ctors .idᴰ {Γ} {Γᴰ = Γᴰ} = lem -- 
-      where
-        opaque
-          unfolding CwFwE-uniform.nᴰ-core ap-⟦⟧ᶜ
-          lem : ((idᴰ nᴰ-core {Γ = Γ} {Γᴰ = ⟦ Γ ⟧ᶜ} ∘ Γᴰ .proj₁) ≡ (Γᴰ .proj₁ ∘ id)) true
-          lem = by (trans id∘ (sym ∘id))
-
-    -- nn-ctors ._∘ᴰ_ {σ = σ} {τ = τ} pσ pτ
-    --   = by (trans (sym assoc) (trans (cong (⟦ σ ⟧ˢ ∘_) (pτ .witness))
-    --     (trans assoc (trans (cong (_∘ τ) (pσ .witness)) (sym assoc)))))
-    -- nn-ctors .assocᴰ = refl
-    -- nn-ctors .∘idᴰ = refl
-    -- nn-ctors .id∘ᴰ = refl
-    -- nn-ctors .∙ᴰ =  id , by refl , by refl
-    -- nn-ctors .εᴰ = by (trans (sym ∃!ε) (sym id∘))
-    -- nn-ctors .∃!εᴰ = refl
-    -- nn-ctors ._[_]Tᴰ {Δᴰ = (↑↑Δ , pΔ)} {Γᴰ = (↑↑Γ , pΓ)} {σ = σ} pA pσ
-    --   = {! !} --
-    --   -- by (trans (sym [∘]T) (trans (ap-[]T₀ (pσ .witness))
-    --   --   (trans [∘]T (ap-[]T₁ (pA .witness)))) )
-    -- _[_]ᴰ nn-ctors {Δᴰ = (↑↑Δ , pΔ)} {i = z} {Γᴰ = (↑↑Γ , pΓ)} pa pσ
-    --   = {!!} -- by (trans (symᴰ [∘]) {! !})
-    -- _[_]ᴰ nn-ctors {i = ω} = λ _ _ → tt
-    -- nn-ctors ._[_]#ᴰ = λ _ _ → tt
-    -- nn-ctors .[id]Tᴰ = refl
-    -- nn-ctors .[id]ᴰ {i = z} = refl
-    -- nn-ctors .[id]ᴰ {i = ω} = refl
-    -- nn-ctors .[id]#ᴰ = refl
-    -- nn-ctors .[∘]Tᴰ = refl
-    -- nn-ctors .[∘]ᴰ {i = z} = refl
-    -- nn-ctors .[∘]ᴰ {i = ω} = refl
-    -- nn-ctors .[∘]#ᴰ = refl
-    -- (nn-ctors ▷ᴰ[ ↑↑ , idemp , pΓ ] z) pA = ((↑↑ ∘ p) ,, {! q!})  , {!!} , {!!}
-    -- (nn-ctors ▷ᴰ[ Γᴰ ] ω) A = {!!}
-    -- nn-ctors .pᴰ = {! !}
-    -- nn-ctors .qᴰ = {!!}
-    -- nn-ctors ._,,ᴰ_ = {! !}
-    -- nn-ctors .,∘ᴰ = {! !}
-    -- nn-ctors .p,qᴰ = {!!}
-    -- nn-ctors .p∘,ᴰ = {!!}
-    -- nn-ctors .q[,]ᴰ = {!!}
-    -- nn-ctors ▷#ᴰ = {!!}
-    -- nn-ctors .p#ᴰ = {!!}
-    -- nn-ctors .q#ᴰ = {!!}
-    -- nn-ctors ._,#ᴰ_ = {!!}
-    -- nn-ctors .,#∘ᴰ = {!!}
-    -- nn-ctors .p,#qᴰ = {!!}
-    -- nn-ctors .p∘,#ᴰ = {!!}
-    -- nn-ctors .q[,#]ᴰ = {!!}
-    -- nn-ctors .↓ᴰ = {!!}
-    -- nn-ctors .↑ᴰ = {!!}
-    -- nn-ctors .↓[]ᴰ = {!!}
-    -- nn-ctors .↑↓ᴰ = {!!}
-    -- nn-ctors .↓↑ᴰ = {!!}
-    -- nn-ctors .pz∘⁺≡⁺∘pz'ᴰ = {!!}
+  
+  nn-ctors : CwFwEᴰ-core nn-sorts core
+  nn-ctors .idᴰ = by (trans id∘ (sym ∘id))
+  nn-ctors ._∘ᴰ_ {σ = σ} {τ = τ} pσ pτ
+    = by (trans (sym assoc) (trans (cong (⟦ σ ⟧ˢ ∘_) (pτ .witness))
+      (trans assoc (trans (cong (_∘ τ) (pσ .witness)) (sym assoc)))))
+  nn-ctors .assocᴰ = refl
+  nn-ctors .∘idᴰ = refl
+  nn-ctors .id∘ᴰ = refl
+  nn-ctors .∙ᴰ =  id , by refl , by (dep refl)
+  nn-ctors .εᴰ = by (trans (sym ∃!ε) (sym id∘))
+  nn-ctors .∃!εᴰ = refl
+  nn-ctors ._[_]Tᴰ {Δᴰ = (↑↑Δ , pΔ)} {Γᴰ = (↑↑Γ , pΓ)} {σ = σ} pA pσ
+    = by (trans (sym [∘]T) (trans (ap-[]T₀ (pσ .witness))
+      (trans [∘]T (ap-[]T₁ (pA .witness)))))
+  _[_]ᴰ nn-ctors {Δᴰ = (↑↑Δ , pΔ)} {i = z} {Aᴰ = pA} {Γᴰ = (↑↑Γ , pΓ)}  pa pσ
+    = by (transᴰ {p = ap-Tm (sym [∘]T)} (symᴰ [∘])
+      (transᴰ {p = ap-Tm (ap-[]T₀ (pσ .witness))} (ap-[]₀ (pσ .witness))
+      (transᴰ {p = ap-Tm [∘]T} [∘] (ap-[]₁ (pA .witness) (pa .witness)))))
+  _[_]ᴰ nn-ctors {i = ω} = λ _ _ → tt
+  nn-ctors ._[_]#ᴰ = λ _ _ → tt
+  nn-ctors .[id]Tᴰ = refl
+  nn-ctors .[id]ᴰ {i = z} = refl
+  nn-ctors .[id]ᴰ {i = ω} = refl
+  nn-ctors .[id]#ᴰ = refl
+  nn-ctors .[∘]Tᴰ = refl
+  nn-ctors .[∘]ᴰ {i = z} = refl
+  nn-ctors .[∘]ᴰ {i = ω} = refl
+  nn-ctors .[∘]#ᴰ = refl
+  (nn-ctors ▷ᴰ[ ↑↑ , idemp , pΓ ] z) pA = ((↑↑ ∘ p) ,, {! q!})  , {!!} , {!!}
+  (nn-ctors ▷ᴰ[ Γᴰ ] ω) A = {!!}
+  nn-ctors .pᴰ = {! !}
+  nn-ctors .qᴰ = {!!}
+  nn-ctors ._,,ᴰ_ = {! !}
+  nn-ctors .,∘ᴰ = {! !}
+  nn-ctors .p,qᴰ = {!!}
+  nn-ctors .p∘,ᴰ = {!!}
+  nn-ctors .q[,]ᴰ = {!!}
+  nn-ctors ▷#ᴰ = {!!}
+  nn-ctors .p#ᴰ = {!!}
+  nn-ctors .q#ᴰ = {!!}
+  nn-ctors ._,#ᴰ_ = {!!}
+  nn-ctors .,#∘ᴰ = {!!}
+  nn-ctors .p,#qᴰ = {!!}
+  nn-ctors .p∘,#ᴰ = {!!}
+  nn-ctors .q[,#]ᴰ = {!!}
+  nn-ctors .↓ᴰ = {!!}
+  nn-ctors .↑ᴰ = {!!}
+  nn-ctors .↓[]ᴰ = {!!}
+  nn-ctors .↑↓ᴰ = {!!}
+  nn-ctors .↓↑ᴰ = {!!}
+  nn-ctors .pz∘⁺≡⁺∘pz'ᴰ = {!!}
 
   nn : CwFwEᴰ syn
   nn .sortsᴰ = nn-sorts

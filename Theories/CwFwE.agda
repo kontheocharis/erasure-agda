@@ -597,3 +597,110 @@ module CwFwE-syntax where
 
        ⟦code⟧ : ⟦ code A ⟧ᵗ ≡ codeᴰ ⟦ A ⟧ᵀ
        {-# REWRITE ⟦code⟧ #-}
+
+
+module CwFwE-uniform (m : CwFwE) (n : CwFwE) where
+
+  open CwFwE m
+  open CwFwE-sorts sorts
+  open in-CwFwE-sorts sorts
+  open CwFwE-core core
+  open in-CwFwE-core core
+  open Π-structure Π-str
+  open U-structure U-str
+
+  open CwFwEᴰ
+  open CwFwEᴰ-sorts
+  open in-CwFwEᴰ-sorts
+  open CwFwEᴰ-core
+  open in-CwFwEᴰ-core
+  open Π-structureᴰ
+  open U-structureᴰ
+
+  nᴰ-sorts : CwFwEᴰ-sorts sorts
+  nᴰ-sorts .Conᴰ _ = Con
+  nᴰ-sorts .Subᴰ Γ Δ _ = Sub Γ Δ
+  nᴰ-sorts .Tyᴰ Γ _ = Ty Γ
+  nᴰ-sorts .#∈ᴰ Γ _ = #∈ Γ
+  nᴰ-sorts .Tmᴰ Γ i A _ = Tm Γ i A
+
+  opaque
+    unfolding coe
+
+    nᴰ-core : CwFwEᴰ-core nᴰ-sorts core 
+    nᴰ-core .idᴰ = id
+    nᴰ-core ._∘ᴰ_ = _∘_
+    nᴰ-core .assocᴰ =  assoc
+    nᴰ-core .∘idᴰ = ∘id
+    nᴰ-core .id∘ᴰ = id∘
+    nᴰ-core .∙ᴰ = ∙
+    nᴰ-core .εᴰ = ε
+    nᴰ-core .∃!εᴰ = ∃!ε
+    nᴰ-core ._[_]Tᴰ =  _[_]T
+    nᴰ-core ._[_]ᴰ = _[_]
+    nᴰ-core ._[_]#ᴰ = _[_]#
+    nᴰ-core .[id]Tᴰ = [id]T
+    nᴰ-core .[id]ᴰ = [id]
+    nᴰ-core .[id]#ᴰ = [id]#
+    nᴰ-core .[∘]Tᴰ = [∘]T
+    nᴰ-core .[∘]ᴰ = [∘]
+    nᴰ-core .[∘]#ᴰ = [∘]#
+    nᴰ-core ._▷ᴰ[_]_ = _▷[_]_
+    nᴰ-core .pᴰ = p
+    nᴰ-core .qᴰ = q
+    nᴰ-core ._,,ᴰ_ = _,,_
+    nᴰ-core .,∘ᴰ = ,∘
+    nᴰ-core .p,qᴰ = p,q
+    nᴰ-core .p∘,ᴰ = p∘,
+    nᴰ-core .q[,]ᴰ = q[,]
+    nᴰ-core ._▷#ᴰ = _▷#
+    nᴰ-core .p#ᴰ = p#
+    nᴰ-core .q#ᴰ = q#
+    nᴰ-core ._,#ᴰ_ = _,#_
+    nᴰ-core .,#∘ᴰ = ,#∘
+    nᴰ-core .p,#qᴰ = p,#q
+    nᴰ-core .p∘,#ᴰ = p∘,#
+    nᴰ-core .q[,#]ᴰ = q[,#]
+    nᴰ-core .↓ᴰ = ↓
+    nᴰ-core .↑ᴰ = ↑
+    nᴰ-core .↓[]ᴰ = ↓[]
+    nᴰ-core .↑↓ᴰ = ↑↓
+    nᴰ-core .↓↑ᴰ = ↓↑
+    nᴰ-core .pz∘⁺≡⁺∘pz'ᴰ = pz∘⁺≡⁺∘pz'
+
+  opaque
+    unfolding nᴰ-core pzᴰ ↓*ᴰ
+
+    nᴰ-Π-str : Π-structureᴰ nᴰ-sorts core nᴰ-core Π-str
+    nᴰ-Π-str .Πᴰ = Π
+    nᴰ-Π-str .Π[]ᴰ = Π[]
+    nᴰ-Π-str .lamᴰ {i = z} =  lam {i = z} 
+    nᴰ-Π-str .lamᴰ {i = ω} =  lam {i = ω} 
+    nᴰ-Π-str .lam[]ᴰ {i = z} = lam[]
+    nᴰ-Π-str .apᴰ {i = z} = ap
+    nᴰ-Π-str .Πβᴰ {i = z} = Πβ
+    nᴰ-Π-str .Πηᴰ {i = z} = Πη
+    nᴰ-Π-str .lam[]ᴰ {i = ω} = lam[]
+    nᴰ-Π-str .apᴰ {i = ω} = ap
+    nᴰ-Π-str .Πβᴰ {i = ω} = Πβ
+    nᴰ-Π-str .Πηᴰ {i = ω} = Πη
+
+  opaque
+    unfolding nᴰ-core
+
+    nᴰ-U-str : U-structureᴰ nᴰ-sorts core nᴰ-core U-str
+    nᴰ-U-str .Uᴰ = U
+    nᴰ-U-str .U[]ᴰ = U[]
+    nᴰ-U-str .Elᴰ = El
+    nᴰ-U-str .El[]ᴰ = El[]
+    nᴰ-U-str .codeᴰ = code
+    nᴰ-U-str .code[]ᴰ = code[]
+    nᴰ-U-str .El-codeᴰ = El-code
+    nᴰ-U-str .code-Elᴰ = code-El
+
+  nᴰ : CwFwEᴰ m
+  nᴰ .CwFwEᴰ.sortsᴰ = nᴰ-sorts
+  nᴰ .CwFwEᴰ.coreᴰ = nᴰ-core
+  nᴰ .CwFwEᴰ.Π-strᴰ = nᴰ-Π-str 
+  nᴰ .CwFwEᴰ.U-strᴰ = nᴰ-U-str
+

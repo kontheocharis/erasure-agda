@@ -2,7 +2,6 @@ module Models.FO.Zeroing where
 
 open import Utils
 open import Theories.CwFwE
-open import Theories.QCwF
 open import Data.Unit renaming (⊤ to 𝟙)
 open import Data.Product
 open import Mode

@@ -161,6 +161,9 @@ opaque
   mergel : coe p x ≡[ q ] y → x ≡[ trans p q ] y
   mergel {p = refl} q = q
 
+  merger : x ≡[ trans q (sym p) ] y → x ≡[ q ] coe p y
+  merger {p = refl} q = q
+
   switch : x ≡[ sym p ] y → x ≡ coe p y
   switch {p = refl} refl = refl
 

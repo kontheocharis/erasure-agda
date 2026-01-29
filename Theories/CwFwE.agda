@@ -57,8 +57,8 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       id : Sub Γ Γ
       _∘_ : (σ : Sub Δ Θ) → (τ : Sub Γ Δ) → Sub Γ Θ
       assoc : ρ ∘ (σ ∘ τ) ≡ (ρ ∘ σ) ∘ τ
-      ∘id : id ∘ σ ≡ σ
-      id∘ : σ ∘ id ≡ σ
+      id∘ : id ∘ σ ≡ σ
+      ∘id : σ ∘ id ≡ σ
 
       ∙ : Con
       ε : Sub Γ ∙
@@ -280,11 +280,11 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
 
   record CwFwEᴰ-core : Set where
     field
-      idᴰ : Subᴰ Γᴰ Γᴰ id
+      idᴰ : {Γᴰ : Conᴰ Γ} → Subᴰ Γᴰ Γᴰ id
       _∘ᴰ_ : Subᴰ Δᴰ Θᴰ σ → Subᴰ Γᴰ Δᴰ τ → Subᴰ Γᴰ Θᴰ (σ ∘ τ)
       assocᴰ : ρᴰ ∘ᴰ (σᴰ ∘ᴰ τᴰ) ≡[ ap-Subᴰ assoc ] (ρᴰ ∘ᴰ σᴰ) ∘ᴰ τᴰ
-      ∘idᴰ : idᴰ ∘ᴰ σᴰ ≡[ ap-Subᴰ ∘id ] σᴰ
-      id∘ᴰ : σᴰ ∘ᴰ idᴰ ≡[ ap-Subᴰ id∘ ] σᴰ
+      id∘ᴰ : idᴰ ∘ᴰ σᴰ ≡[ ap-Subᴰ id∘ ] σᴰ
+      ∘idᴰ : σᴰ ∘ᴰ idᴰ ≡[ ap-Subᴰ ∘id ] σᴰ
 
       ∙ᴰ : Conᴰ ∙
       εᴰ : Subᴰ Γᴰ ∙ᴰ ε
@@ -294,10 +294,10 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
       _[_]ᴰ : Tmᴰ Δᴰ i Aᴰ t → (σᴰ : Subᴰ Γᴰ Δᴰ σ) → Tmᴰ Γᴰ i (Aᴰ [ σᴰ ]Tᴰ) (t [ σ ])
       _[_]#ᴰ : #∈ᴰ Δᴰ π → Subᴰ Γᴰ Δᴰ σ → #∈ᴰ Γᴰ (π [ σ ]#)
       [id]Tᴰ : Aᴰ [ idᴰ ]Tᴰ ≡[ ap-Tyᴰ [id]T ] Aᴰ
-      [id]ᴰ : (tᴰ [ idᴰ ]ᴰ) ≡[ ap-Tmᴰ [id]T [id]Tᴰ [id] ] tᴰ
+      [id]ᴰ : {tᴰ : Tmᴰ Δᴰ i Aᴰ t} → (tᴰ [ idᴰ ]ᴰ) ≡[ ap-Tmᴰ [id]T [id]Tᴰ [id] ] tᴰ
       [id]#ᴰ : πᴰ [ idᴰ ]#ᴰ ≡[ ap-#∈ᴰ [id]# ] πᴰ
       [∘]Tᴰ : Aᴰ [ σᴰ ∘ᴰ τᴰ ]Tᴰ ≡[ ap-Tyᴰ [∘]T ] (Aᴰ [ σᴰ ]Tᴰ) [ τᴰ ]Tᴰ
-      [∘]ᴰ : (tᴰ [ σᴰ ∘ᴰ τᴰ ]ᴰ) ≡[ ap-Tmᴰ [∘]T [∘]Tᴰ [∘] ] ((tᴰ [ σᴰ ]ᴰ) [ τᴰ ]ᴰ)
+      [∘]ᴰ : {tᴰ : Tmᴰ Δᴰ i Aᴰ t} → (tᴰ [ σᴰ ∘ᴰ τᴰ ]ᴰ) ≡[ ap-Tmᴰ [∘]T [∘]Tᴰ [∘] ] ((tᴰ [ σᴰ ]ᴰ) [ τᴰ ]ᴰ)
       [∘]#ᴰ : πᴰ [ σᴰ ∘ᴰ τᴰ ]#ᴰ ≡[ ap-#∈ᴰ [∘]# ] (πᴰ [ σᴰ ]#ᴰ) [ τᴰ ]#ᴰ
 
     ap-[]T₀ᴰ : (p : σ ≡ τ) → σᴰ ≡[ ap-Subᴰ p ] τᴰ
@@ -440,7 +440,7 @@ module CwFwE-syntax where
   postulate
     syn : CwFwE
 
-  open CwFwE syn
+  open CwFwE syn public
   open CwFwE-sorts sorts public
   open in-CwFwE-sorts sorts public
   open in-CwFwE-sorts.CwFwE-core core public
@@ -624,79 +624,97 @@ module CwFwE-uniform (m : CwFwE) (n : CwFwE) where
   nᴰ-sorts .#∈ᴰ Γ _ = #∈ Γ
   nᴰ-sorts .Tmᴰ Γ i A _ = Tm Γ i A
 
-  opaque
-    unfolding coe
 
-    nᴰ-core : CwFwEᴰ-core nᴰ-sorts core 
-    nᴰ-core .idᴰ = id
-    nᴰ-core ._∘ᴰ_ = _∘_
-    nᴰ-core .assocᴰ =  assoc
-    nᴰ-core .∘idᴰ = ∘id
-    nᴰ-core .id∘ᴰ = id∘
-    nᴰ-core .∙ᴰ = ∙
-    nᴰ-core .εᴰ = ε
-    nᴰ-core .∃!εᴰ = ∃!ε
-    nᴰ-core ._[_]Tᴰ =  _[_]T
-    nᴰ-core ._[_]ᴰ = _[_]
-    nᴰ-core ._[_]#ᴰ = _[_]#
-    nᴰ-core .[id]Tᴰ = [id]T
-    nᴰ-core .[id]ᴰ = [id]
-    nᴰ-core .[id]#ᴰ = [id]#
-    nᴰ-core .[∘]Tᴰ = [∘]T
-    nᴰ-core .[∘]ᴰ = [∘]
-    nᴰ-core .[∘]#ᴰ = [∘]#
-    nᴰ-core ._▷ᴰ[_]_ = _▷[_]_
-    nᴰ-core .pᴰ = p
-    nᴰ-core .qᴰ = q
-    nᴰ-core ._,,ᴰ_ = _,,_
-    nᴰ-core .,∘ᴰ = ,∘
-    nᴰ-core .p,qᴰ = p,q
-    nᴰ-core .p∘,ᴰ = p∘,
-    nᴰ-core .q[,]ᴰ = q[,]
-    nᴰ-core ._▷#ᴰ = _▷#
-    nᴰ-core .p#ᴰ = p#
-    nᴰ-core .q#ᴰ = q#
-    nᴰ-core ._,#ᴰ_ = _,#_
-    nᴰ-core .,#∘ᴰ = ,#∘
-    nᴰ-core .p,#qᴰ = p,#q
-    nᴰ-core .p∘,#ᴰ = p∘,#
-    nᴰ-core .q[,#]ᴰ = q[,#]
-    nᴰ-core .↓ᴰ = ↓
-    nᴰ-core .↑ᴰ = ↑
-    nᴰ-core .↓[]ᴰ = ↓[]
-    nᴰ-core .↑↓ᴰ = ↑↓
-    nᴰ-core .↓↑ᴰ = ↓↑
-    nᴰ-core .pz∘⁺≡⁺∘pz'ᴰ = pz∘⁺≡⁺∘pz'
+  nᴰ-core : CwFwEᴰ-core nᴰ-sorts core 
+  nᴰ-core .idᴰ = id
+  nᴰ-core ._∘ᴰ_ = _∘_
+  nᴰ-core .assocᴰ {ρᴰ = ρᴰ} {σᴰ = σᴰ} {τᴰ = τᴰ} = lem
+    where
+      opaque
+        unfolding coe
+        lem : ∀ {p} → (ρᴰ ∘ (σᴰ ∘ τᴰ)) ≡[ p ] ((ρᴰ ∘ σᴰ) ∘ τᴰ)
+        lem = assoc
+  nᴰ-core .∘idᴰ {σᴰ = σᴰ} = lem
+    where
+      opaque
+        unfolding coe
+        lem : ∀ {p} → (σᴰ ∘ id) ≡[ p ] σᴰ
+        lem = ∘id
+  nᴰ-core .id∘ᴰ {σᴰ = σᴰ} = lem
+    where
+      opaque
+        unfolding coe
+        lem : ∀ {p} → (id ∘ σᴰ) ≡[ p ] σᴰ
+        lem = id∘
+  nᴰ-core .∙ᴰ = ∙
+  nᴰ-core .εᴰ = ε
+  nᴰ-core .∃!εᴰ {σᴰ = σᴰ} = lem
+    where
+      opaque
+        unfolding coe
+        lem : ε ≡[ refl ] σᴰ
+        lem =  ∃!ε
+  nᴰ-core ._[_]Tᴰ =  _[_]T
+  nᴰ-core ._[_]ᴰ = _[_]
+  nᴰ-core ._[_]#ᴰ = _[_]#
+  -- nᴰ-core .[id]Tᴰ = [id]T
+  -- nᴰ-core .[id]ᴰ = [id]
+  -- nᴰ-core .[id]#ᴰ = [id]#
+  -- nᴰ-core .[∘]Tᴰ = [∘]T
+  -- nᴰ-core .[∘]ᴰ = [∘]
+  -- nᴰ-core .[∘]#ᴰ = [∘]#
+  nᴰ-core ._▷ᴰ[_]_ = _▷[_]_
+  nᴰ-core .pᴰ = p
+  nᴰ-core .qᴰ = q
+  nᴰ-core ._,,ᴰ_ = _,,_
+  -- nᴰ-core .,∘ᴰ = ,∘
+  -- nᴰ-core .p,qᴰ = p,q
+  -- nᴰ-core .p∘,ᴰ = p∘,
+  -- nᴰ-core .q[,]ᴰ = q[,]
+  nᴰ-core ._▷#ᴰ = _▷#
+  nᴰ-core .p#ᴰ = p#
+  nᴰ-core .q#ᴰ = q#
+  nᴰ-core ._,#ᴰ_ = _,#_
+  -- nᴰ-core .,#∘ᴰ = ,#∘
+  -- nᴰ-core .p,#qᴰ = p,#q
+  -- nᴰ-core .p∘,#ᴰ = p∘,#
+  -- nᴰ-core .q[,#]ᴰ = q[,#]
+  nᴰ-core .↓ᴰ = ↓
+  nᴰ-core .↑ᴰ = ↑
+  -- nᴰ-core .↓[]ᴰ = ↓[]
+  -- nᴰ-core .↑↓ᴰ = ↑↓
+  -- nᴰ-core .↓↑ᴰ = ↓↑
+  -- nᴰ-core .pz∘⁺≡⁺∘pz'ᴰ = pz∘⁺≡⁺∘pz'
 
   opaque
     unfolding nᴰ-core pzᴰ ↓*ᴰ
 
     nᴰ-Π-str : Π-structureᴰ nᴰ-sorts core nᴰ-core Π-str
-    nᴰ-Π-str .Πᴰ = Π
-    nᴰ-Π-str .Π[]ᴰ = Π[]
-    nᴰ-Π-str .lamᴰ {i = z} =  lam {i = z} 
-    nᴰ-Π-str .lamᴰ {i = ω} =  lam {i = ω} 
-    nᴰ-Π-str .lam[]ᴰ {i = z} = lam[]
-    nᴰ-Π-str .apᴰ {i = z} = ap
-    nᴰ-Π-str .Πβᴰ {i = z} = Πβ
-    nᴰ-Π-str .Πηᴰ {i = z} = Πη
-    nᴰ-Π-str .lam[]ᴰ {i = ω} = lam[]
-    nᴰ-Π-str .apᴰ {i = ω} = ap
-    nᴰ-Π-str .Πβᴰ {i = ω} = Πβ
-    nᴰ-Π-str .Πηᴰ {i = ω} = Πη
+    -- nᴰ-Π-str .Πᴰ = Π
+    -- nᴰ-Π-str .Π[]ᴰ = Π[]
+    -- nᴰ-Π-str .lamᴰ {i = z} =  lam {i = z} 
+    -- nᴰ-Π-str .lamᴰ {i = ω} =  lam {i = ω} 
+    -- nᴰ-Π-str .lam[]ᴰ {i = z} = lam[]
+    -- nᴰ-Π-str .apᴰ {i = z} = ap
+    -- nᴰ-Π-str .Πβᴰ {i = z} = Πβ
+    -- nᴰ-Π-str .Πηᴰ {i = z} = Πη
+    -- nᴰ-Π-str .lam[]ᴰ {i = ω} = lam[]
+    -- nᴰ-Π-str .apᴰ {i = ω} = ap
+    -- nᴰ-Π-str .Πβᴰ {i = ω} = Πβ
+    -- nᴰ-Π-str .Πηᴰ {i = ω} = Πη
 
   opaque
     unfolding nᴰ-core
 
     nᴰ-U-str : U-structureᴰ nᴰ-sorts core nᴰ-core U-str
-    nᴰ-U-str .Uᴰ = U
-    nᴰ-U-str .U[]ᴰ = U[]
-    nᴰ-U-str .Elᴰ = El
-    nᴰ-U-str .El[]ᴰ = El[]
-    nᴰ-U-str .codeᴰ = code
-    nᴰ-U-str .code[]ᴰ = code[]
-    nᴰ-U-str .El-codeᴰ = El-code
-    nᴰ-U-str .code-Elᴰ = code-El
+    -- nᴰ-U-str .Uᴰ = U
+    -- nᴰ-U-str .U[]ᴰ = U[]
+    -- nᴰ-U-str .Elᴰ = El
+    -- nᴰ-U-str .El[]ᴰ = El[]
+    -- nᴰ-U-str .codeᴰ = code
+    -- nᴰ-U-str .code[]ᴰ = code[]
+    -- nᴰ-U-str .El-codeᴰ = El-code
+    -- nᴰ-U-str .code-Elᴰ = code-El
 
   nᴰ : CwFwEᴰ m
   nᴰ .CwFwEᴰ.sortsᴰ = nᴰ-sorts

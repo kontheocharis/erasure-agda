@@ -3,6 +3,7 @@ module Theories.CwFwE where
 
 open import Agda.Primitive
 open import Utils
+open import Data.Unit renaming (⊤ to 𝟙)
 open import Mode
 
 -- Model
@@ -602,6 +603,101 @@ module CwFwE-syntax where
 
        ⟦code⟧ : ⟦ code A ⟧ᵗ ≡ codeᴰ ⟦ A ⟧ᵀ
        {-# REWRITE ⟦code⟧ #-}
+
+-- Context eliminator
+module CwFwE-elim-Con
+  (open CwFwE-syntax)
+  (P : Con → Set)
+  (P∙ : P ∙)
+  (P▷[z] : ∀ Γ A → P Γ → P (Γ ▷[ z ] A))
+  (P▷[ω] : ∀ Γ A → P Γ → P (Γ ▷[ ω ] A))
+  (P▷# : ∀ Γ → P Γ → P (Γ ▷#))
+  where
+
+  open CwFwEᴰ
+  open CwFwEᴰ-sorts
+  open in-CwFwEᴰ-sorts
+  open CwFwEᴰ-core
+  open in-CwFwEᴰ-core
+  open Π-structureᴰ
+  open U-structureᴰ
+
+  nᴰ-sorts : CwFwEᴰ-sorts sorts
+  nᴰ-sorts .Conᴰ Γ = P Γ
+  nᴰ-sorts .Subᴰ _ _ _ = 𝟙
+  nᴰ-sorts .Tyᴰ _ _ = 𝟙
+  nᴰ-sorts .#∈ᴰ _ _ = 𝟙
+  nᴰ-sorts .Tmᴰ _ _ _ _ = 𝟙
+
+  nᴰ-core : CwFwEᴰ-core nᴰ-sorts core 
+  nᴰ-core .idᴰ = tt
+  nᴰ-core ._∘ᴰ_ = λ _ _ → tt
+  nᴰ-core .assocᴰ = refl
+  nᴰ-core .id∘ᴰ = refl
+  nᴰ-core .∘idᴰ = refl
+  nᴰ-core .∙ᴰ = P∙
+  nᴰ-core .εᴰ = tt
+  nᴰ-core .∃!εᴰ = refl
+  nᴰ-core ._[_]Tᴰ = λ _ _ → tt
+  nᴰ-core ._[_]ᴰ = λ _ σᴰ → tt
+  nᴰ-core ._[_]#ᴰ = λ _ _ → tt
+  nᴰ-core .[id]Tᴰ = refl
+  nᴰ-core .[id]ᴰ = refl
+  nᴰ-core .[id]#ᴰ = refl
+  nᴰ-core .[∘]Tᴰ = refl
+  nᴰ-core .[∘]ᴰ = refl
+  nᴰ-core .[∘]#ᴰ = refl
+  _▷ᴰ[_]_ nᴰ-core {Γ = Γ} {A = A} Γᴰ z _ = P▷[z] Γ A Γᴰ
+  _▷ᴰ[_]_ nᴰ-core {Γ = Γ} {A = A} Γᴰ ω _ = P▷[ω] Γ A Γᴰ
+  nᴰ-core .pᴰ = tt
+  nᴰ-core .qᴰ = tt
+  nᴰ-core ._,,ᴰ_ = λ σᴰ _ → tt
+  nᴰ-core .,∘ᴰ = refl
+  nᴰ-core .p,qᴰ = refl
+  nᴰ-core .p∘,ᴰ = refl
+  nᴰ-core .q[,]ᴰ = refl
+  nᴰ-core ._▷#ᴰ {Γ = Γ} = P▷# Γ
+  nᴰ-core .p#ᴰ = tt
+  nᴰ-core .q#ᴰ = tt
+  nᴰ-core ._,#ᴰ_ = λ _ _ → tt
+  nᴰ-core .,#∘ᴰ = refl
+  nᴰ-core .p,#qᴰ = refl
+  nᴰ-core .p∘,#ᴰ = refl
+  nᴰ-core .q[,#]ᴰ = refl
+  nᴰ-core .↓ᴰ = λ _ → tt
+  nᴰ-core .↑ᴰ = λ _ → tt
+  nᴰ-core .↓[]ᴰ = refl
+  nᴰ-core .↑↓ᴰ = refl
+  nᴰ-core .↓↑ᴰ = refl
+  nᴰ-core .pz∘⁺≡⁺∘pz'ᴰ = refl
+
+  nᴰ-Π-str : Π-structureᴰ nᴰ-sorts core nᴰ-core Π-str
+  nᴰ-Π-str .Πᴰ = λ i Aᴰ Bᴰ → tt
+  nᴰ-Π-str .Π[]ᴰ = refl
+  nᴰ-Π-str .lamᴰ = λ tᴰ → tt
+  nᴰ-Π-str .lam[]ᴰ = refl
+  nᴰ-Π-str .apᴰ = λ tᴰ → tt
+  nᴰ-Π-str .Πβᴰ = refl
+  nᴰ-Π-str .Πηᴰ = refl
+
+  nᴰ-U-str : U-structureᴰ nᴰ-sorts core nᴰ-core U-str
+  nᴰ-U-str .Uᴰ = tt
+  nᴰ-U-str .U[]ᴰ = refl
+  nᴰ-U-str .Elᴰ = λ tᴰ → tt
+  nᴰ-U-str .El[]ᴰ = refl
+  nᴰ-U-str .codeᴰ = λ Aᴰ → tt
+  nᴰ-U-str .code[]ᴰ = refl
+  nᴰ-U-str .El-codeᴰ = refl
+  nᴰ-U-str .code-Elᴰ = refl
+
+  nᴰ : CwFwEᴰ syn
+  nᴰ .CwFwEᴰ.sortsᴰ = nᴰ-sorts
+  nᴰ .CwFwEᴰ.coreᴰ = nᴰ-core
+  nᴰ .CwFwEᴰ.Π-strᴰ = nᴰ-Π-str 
+  nᴰ .CwFwEᴰ.U-strᴰ = nᴰ-U-str
+
+  ⟦_⟧ : (Γ : Con) → P Γ
+  ⟦_⟧ Γ = CwFwE-elim.⟦_⟧ᶜ nᴰ Γ
 
 
 module CwFwE-uniform (m : CwFwE) (n : CwFwE) where

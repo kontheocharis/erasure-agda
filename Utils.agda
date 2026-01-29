@@ -37,6 +37,10 @@ infix 4 _≡_
 data _≡_ {A : Set ℓ} (x : A) : A → Prop ℓ where
   instance refl : x ≡ x
 
+infix 4 _＝_
+data _＝_ {P : Prop ℓ} (x : P) : P → Prop ℓ where
+  instance reflP : x ＝ x
+
 {-# BUILTIN REWRITE _≡_ #-}
 
 private variable
@@ -76,6 +80,7 @@ postulate
 opaque
   coe : A ≡ A' → A → A'
   coe = coe₀
+
 
 opaque
   cong : (f : A → A') → x ≡ y → f x ≡ f y
@@ -152,6 +157,9 @@ opaque
 
   splitl : x ≡[ trans p q ] y → coe p x ≡[ q ] y
   splitl {p = refl} q = q
+
+  mergel : coe p x ≡[ q ] y → x ≡[ trans p q ] y
+  mergel {p = refl} q = q
 
   switch : x ≡[ sym p ] y → x ≡ coe p y
   switch {p = refl} refl = refl

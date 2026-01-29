@@ -1,4 +1,4 @@
-{-# OPTIONS --type-in-type #-}
+{-# OPTIONS --type-in-type --allow-unsolved-metas #-}
 module Theories.CwFwE where
 
 open import Agda.Primitive
@@ -43,6 +43,9 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
 
     ap-Tmᶜ : (e : Γ ≡ Γ') → A ≡[ ap-Tyᶜ e ] A' → Tm Γ i A ≡ Tm Γ' i A'
     ap-Tmᶜ refl refl = refl
+
+    ap-Tmᶜ' : (e : Γ ≡ Γ') → i ≡ j →  A ≡[ ap-Tyᶜ e ] A' → Tm Γ i A ≡ Tm Γ' j A'
+    ap-Tmᶜ' refl refl refl = refl
 
 
   module core-utils
@@ -145,7 +148,7 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
 
       ↓*[] : {t : Tm Γ i A} → (↓* t) [ σ ] ≡ ↓* (t [ σ ])
       ↓*[] {i = z} = refl
-      ↓*[] {i = ω} = trans ↓[] (cong ↓ ({! transᴰ (transᴰ (symᴰ [∘]) (ap-[]₀ p∘,#)) [∘]!}))
+      ↓*[] {i = ω} = trans ↓[] (cong ↓ ({! transᴰ (symᴰ [∘]) (ap-[]₀ p∘,#)!}))
 
       pz : Sub (Γ ▷[ i ] A) (Γ ▷[ z ] A)
       pz = p ,, ↓* q
@@ -274,6 +277,14 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
       → Tmᴰ Γᴰ i Aᴰ t ≡ Tmᴰ Δᴰ i Bᴰ u
     ap-Tmᴰᶜ refl refl refl refl refl = refl
 
+    ap-Tmᴰᶜ' : (pΓ : Γ ≡ Δ) → (pA : A ≡[ ap-Tyᶜ pΓ ] B)
+      → (pΓᴰ : Γᴰ ≡[ ap-Conᴰᶜ pΓ ] Δᴰ)
+      → (pi : i ≡ j)
+      → Aᴰ ≡[ ap-Tyᴰᶜ pΓ pΓᴰ pA ] Bᴰ
+      → t ≡[ ap-Tmᶜ' pΓ pi pA ] u
+      → Tmᴰ Γᴰ i Aᴰ t ≡ Tmᴰ Δᴰ j Bᴰ u
+    ap-Tmᴰᶜ' refl refl refl refl refl refl = refl
+
   module core-utilsᴰ
     (_[_]Tᴰ : ∀ {Γ Δ A σ} {Γᴰ : Conᴰ Γ} {Δᴰ : Conᴰ Δ}
       → Tyᴰ Δᴰ A → Subᴰ Γᴰ Δᴰ σ → Tyᴰ Γᴰ (A [ σ ]T))
@@ -327,7 +338,7 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
           (σᴰ ∘ᴰ ρᴰ) ,,ᴰ coe (ap-Tmᴰ (sym [∘]T) (symᴰ [∘]Tᴰ) refl) (tᴰ [ ρᴰ ]ᴰ)
       p,qᴰ : pᴰ {Γᴰ = Γᴰ} {i = i} {Aᴰ = Aᴰ} ,,ᴰ qᴰ ≡[ ap-Subᴰ p,q ] idᴰ
       p∘,ᴰ : pᴰ ∘ᴰ (σᴰ ,,ᴰ tᴰ) ≡[ ap-Subᴰ p∘, ] σᴰ
-      q[,]ᴰ : qᴰ [ σᴰ ,,ᴰ tᴰ ]ᴰ
+      q[,]ᴰ : {tᴰ : Tmᴰ Γᴰ i (Aᴰ [ σᴰ ]Tᴰ) t} → qᴰ [ σᴰ ,,ᴰ tᴰ ]ᴰ
           ≡[ ap-Tmᴰ (trans (sym [∘]T) (ap-[]T₀ p∘,))
                     (transᴰ {p = ap-Tyᴰ (sym [∘]T)} (symᴰ [∘]Tᴰ) (ap-[]T₀ᴰ p∘, p∘,ᴰ))
                     q[,] ]
@@ -465,8 +476,9 @@ module CwFwE-syntax where
 
     #∈-inj : #∈ Γ ≡ #∈ Γ' → Γ ≡ Γ'
 
-    Tm-injᶜ : Tm Γ i A ≡ Tm Γ' i A' → Γ ≡ Γ'
-    Tm-injᵀ : (e : Tm Γ i A ≡ Tm Γ' i A') → A ≡[ ap-Tyᶜ (Tm-injᶜ e) ] A'
+    Tm-injᶜ : Tm Γ i A ≡ Tm Γ' j A' → Γ ≡ Γ'
+    Tm-injᵀ : (e : Tm Γ i A ≡ Tm Γ' j A') → A ≡[ ap-Tyᶜ (Tm-injᶜ e) ] A'
+    Tm-injⁱ : (e : Tm Γ i A ≡ Tm Γ' j A') → i ≡ j
 
   -- Eliminator
   module CwFwE-elim (methods : CwFwEᴰ syn) where
@@ -509,9 +521,9 @@ module CwFwE-syntax where
           ≡ coe (ap-#∈ᴰᶜ (#∈-inj p) (ap-⟦⟧ᶜ (#∈-inj p)) refl) ⟦ π ⟧̂#
        {-# REWRITE ⟦coe⟧̂# #-}
 
-       ⟦coe⟧ᵗ : ∀ (p : Tm Γ i A ≡ Tm Γ' i A') →
+       ⟦coe⟧ᵗ : ∀ (p : Tm Γ i A ≡ Tm Γ' j A') →
         ⟦ coe p t ⟧ᵗ
-          ≡ coe (ap-Tmᴰᶜ (Tm-injᶜ p) (Tm-injᵀ p) (ap-⟦⟧ᶜ (Tm-injᶜ p)) (ap-⟦⟧ᵀ (Tm-injᶜ p) (Tm-injᵀ p)) refl) ⟦ t ⟧ᵗ
+          ≡ coe (ap-Tmᴰᶜ' (Tm-injᶜ p)  (Tm-injᵀ p) (ap-⟦⟧ᶜ (Tm-injᶜ p)) (Tm-injⁱ p) (ap-⟦⟧ᵀ (Tm-injᶜ p) (Tm-injᵀ p)) refl) ⟦ t ⟧ᵗ
        {-# REWRITE ⟦coe⟧ᵗ #-}
 
     postulate

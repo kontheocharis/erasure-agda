@@ -153,3 +153,6 @@ opaque
   splitl : x ≡[ trans p q ] y → coe p x ≡[ q ] y
   splitl {p = refl} q = q
 
+  switch : x ≡[ sym p ] y → x ≡ coe p y
+  switch {p = refl} refl = refl
+

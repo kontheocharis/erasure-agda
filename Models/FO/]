@@ -70,7 +70,7 @@ module _ (e : CwFwE)  where
   ze .U-str = {!!}
 
   zeᴰ : CwFwEᴰ e
-  zeᴰ = CwFwE-uniform.nᴰ e ze 
+  zeᴰ = CwFwE-uniform.nᴰ e ze
 
 
 module need-nothing where
@@ -105,9 +105,7 @@ module need-nothing where
   nn-sorts .Tmᴰ (↑↑Γ , iΓ , pΓ) z (iA , pA) a =
     Σ[ ia ∈ (⟦ ⟦ a ⟧ᵗ ⟧ᵗ ≡[ ap-Tmᶜ (iΓ .witness) (iA .witness) ] ⟦ a ⟧ᵗ) true ]
     (⟦ a ⟧ᵗ [ ↑↑Γ ] ≡[ ap-Tm (pA .witness) ] a) true
-  nn-sorts .Tmᴰ (↑↑Γ , iΓ , pΓ) ω (iA , pA) a =
-    Σ[ ia ∈ (⟦ ⟦ a ⟧ᵗ ⟧ᵗ ≡[ ap-Tmᶜ (iΓ .witness) (iA .witness) ] ⟦ a ⟧ᵗ) true ]
-    (⟦ a ⟧ᵗ [ ↑↑Γ ] ≡[ ap-Tm (pA .witness) ] (↓* a)) true
+  nn-sorts .Tmᴰ _ ω _ _ = 𝟙
 
   -- various congruence rules
   opaque
@@ -162,7 +160,6 @@ module need-nothing where
       → (σ ,, t) ≡[ ap-Subᶜ p (ap-▷[] q prA ) ] (σ' ,, t')
     ap-,, refl refl refl refl refl = refl
 
-
   nn-ctors : CwFwEᴰ-core nn-sorts core
   nn-ctors .idᴰ {Γ = Γ} {Γᴰ = (↑↑Γ , iΓ , pΓ)} = by (ap-id (iΓ .witness)) , by (trans id∘ (sym ∘id))
   nn-ctors ._∘ᴰ_ {Δᴰ = (_ , iΔ , _)} {Θᴰ = (_ , iΘ , _)} {σ = σ} {Γᴰ = (_ , iΓ , _)} {τ = τ} (iσ , pσ) (iτ , pτ)
@@ -184,55 +181,49 @@ module need-nothing where
       , by (transᴰ {p = ap-Tm (sym [∘]T)} (symᴰ [∘])
       (transᴰ {p = ap-Tm (ap-[]T₀ (pσ .witness))} (ap-[]₀ (pσ .witness))
       (transᴰ {p = ap-Tm [∘]T} [∘] (ap-[]₁ (pA .witness) (pa .witness)))))
-  nn-ctors ._[_]ᴰ {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = ω} {Aᴰ = (iA , pA)} {Γᴰ = (↑↑Γ , iΓ , pΓ)} (ia , pa) (iσ , pσ)
-    = by (ap-[] (iΓ .witness) (iΔ .witness) (iA .witness) (iσ .witness) (ia .witness))
-      , by (transᴰ {p = ap-Tm (sym [∘]T)} (symᴰ [∘])
-      (transᴰ {p = ap-Tm (ap-[]T₀ (pσ .witness))} (ap-[]₀ (pσ .witness))
-      (transᴰ {p = ap-Tm [∘]T} [∘] (trans (ap-[]₁ (pA .witness) (pa .witness)) {! ↓!}))))
-  -- nn-ctors ._[_]#ᴰ = λ _ _ → tt
-  -- nn-ctors .[id]Tᴰ = refl
-  -- nn-ctors .[id]ᴰ {i = z} = refl
-  -- nn-ctors .[id]ᴰ {i = ω} = refl
-  -- nn-ctors .[id]#ᴰ = refl
-  -- nn-ctors .[∘]Tᴰ = refl
-  -- nn-ctors .[∘]ᴰ {i = z} = refl
-  -- nn-ctors .[∘]ᴰ {i = ω} = refl
-  -- nn-ctors .[∘]#ᴰ = refl
-  -- (nn-ctors ▷ᴰ[ ↑↑ , iΓ , pΓ ] z) (iA , pA)
-  --   = ((↑↑ ∘ p) ,, coe (ap-Tm (sym (trans [∘]T (ap-[]T₁ (pA .witness))))) q) 
-  --     , by (ap-▷[] (iΓ .witness) (iA .witness))
-  --     , by (trans (ap-,, refl (iΓ .witness)
-  --     (trans (ap-∘ refl (iΓ .witness) refl (pΓ .witness) refl) (trans id∘ (ap-p refl  reflᴰ)))
-  --     (iA .witness) ({! !})) p,q)
-  -- (nn-ctors ▷ᴰ[ ↑↑ , iΓ , pΓ ] ω) (iA , pA)
-  --   = ((↑↑ ∘ p) ,, {!!})
-  --     , by (ap-▷[] (iΓ .witness) (iA .witness))
-  --     , {!!}
-  -- nn-ctors .pᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {Aᴰ = (iA , pA)}
-  --   = by (ap-p (iΓ .witness) (iA .witness))
-  --     , {! !}
-  -- nn-ctors .qᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {i = z} {Aᴰ = (iA , pA)}
-  --   = by (ap-q (iΓ .witness) (iA .witness))
-  --     , {! !}
-  -- nn-ctors .qᴰ {i = ω} = tt
-  -- _,,ᴰ_ nn-ctors {i = z} σᴰ x =  by (ap-,, {!!} {!!} {!!} {!!} {!!}) , {!!}
-  -- _,,ᴰ_ nn-ctors {Γᴰ = (↑↑Γ , iΓ , pΓ)} {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = ω} (iσ , pσ) _
-  --   = by (ap-,, {!!} {!!} {!!} {!!} {!!}) , {!!}
-  -- nn-ctors .,∘ᴰ = refl
-  -- nn-ctors .p,qᴰ = refl
-  -- nn-ctors .p∘,ᴰ = refl
-  -- nn-ctors .q[,]ᴰ = {! !}
-  -- nn-ctors ._▷#ᴰ (↑↑ , iΓ , pΓ)
-  --   = (↑↑ ∘ p#) , iΓ , by (trans (cong (coe _) ∘id) (pΓ .witness))
-  -- nn-ctors .p#ᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} = by (ap-id (iΓ .witness)) , by id∘
-  -- nn-ctors .q#ᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} = tt
-  -- _,#ᴰ_ nn-ctors {Γᴰ = ↑↑Γ , iΓ , pΓ} {Δᴰ = ↑↑Δ , iΔ , pΔ} {σ = σ} (iσ , pσ) tt
-  --   = iσ , by (trans (pσ .witness) (trans {! cong!} assoc))
-  -- nn-ctors .,#∘ᴰ = refl
-  -- nn-ctors .p,#qᴰ = refl
-  -- nn-ctors .p∘,#ᴰ = refl
-  -- nn-ctors .q[,#]ᴰ = refl
-  -- nn-ctors .↓ᴰ x = by ({! !}) , by {! !}
+  nn-ctors ._[_]ᴰ {i = ω} = λ _ _ → tt
+  nn-ctors ._[_]#ᴰ = λ _ _ → tt
+  nn-ctors .[id]Tᴰ = refl
+  nn-ctors .[id]ᴰ {i = z} = refl
+  nn-ctors .[id]ᴰ {i = ω} = refl
+  nn-ctors .[id]#ᴰ = refl
+  nn-ctors .[∘]Tᴰ = refl
+  nn-ctors .[∘]ᴰ {i = z} = refl
+  nn-ctors .[∘]ᴰ {i = ω} = refl
+  nn-ctors .[∘]#ᴰ = refl
+  (nn-ctors ▷ᴰ[ ↑↑ , iΓ , pΓ ] z) (iA , pA)
+    = ((↑↑ ∘ p) ,, coe (ap-Tm (sym (trans [∘]T (ap-[]T₁ (pA .witness))))) q) 
+      , by (ap-▷[] (iΓ .witness) (iA .witness))
+      , by (trans (ap-,, refl (iΓ .witness)
+      (trans (ap-∘ refl (iΓ .witness) refl (pΓ .witness) refl) (trans id∘ (ap-p refl  reflᴰ)))
+      (iA .witness) ({! !})) p,q)
+  (nn-ctors ▷ᴰ[ ↑↑ , iΓ , pΓ ] ω) (iA , pA)
+    = ((↑↑ ∘ p) ,, coe (ap-Tm (sym (trans [∘]T (ap-[]T₁ (pA .witness))))) q)
+      , by (ap-▷[] (iΓ .witness) (iA .witness))
+      , {!!}
+  nn-ctors .pᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {Aᴰ = (iA , pA)}
+    = by (ap-p (iΓ .witness) (iA .witness))
+      , {! !}
+  nn-ctors .qᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {i = z} {Aᴰ = (iA , pA)}
+    = by (ap-q (iΓ .witness) (iA .witness))
+      , {! !}
+  nn-ctors .qᴰ {i = ω} = tt
+  _,,ᴰ_ nn-ctors {i = z} σᴰ x =  by (ap-,, {!!} {!!} {!!} {!!} {!!}) , {!!}
+  _,,ᴰ_ nn-ctors {Γᴰ = (↑↑Γ , iΓ , pΓ)} {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = ω} (iσ , pσ) _
+    = by (ap-,, {!!} {!!} {!!} {!!} {!!}) , {!!}
+  nn-ctors .,∘ᴰ = {! !}
+  -- nn-ctors .p,qᴰ = {!!}
+  -- nn-ctors .p∘,ᴰ = {!!}
+  -- nn-ctors .q[,]ᴰ = {!!}
+  -- nn-ctors ▷#ᴰ = {!!}
+  -- nn-ctors .p#ᴰ = {!!}
+  -- nn-ctors .q#ᴰ = {!!}
+  -- nn-ctors ._,#ᴰ_ = {!!}
+  -- nn-ctors .,#∘ᴰ = {!!}
+  -- nn-ctors .p,#qᴰ = {!!}
+  -- nn-ctors .p∘,#ᴰ = {!!}
+  -- nn-ctors .q[,#]ᴰ = {!!}
+  -- nn-ctors .↓ᴰ = {!!}
   -- nn-ctors .↑ᴰ = {!!}
   -- nn-ctors .↓[]ᴰ = {!!}
   -- nn-ctors .↑↓ᴰ = {!!}
@@ -246,43 +237,43 @@ module need-nothing where
   nn .U-strᴰ = {!!}
 
 
-  -- ⟦↑↑⟧≡↑↑ : {Γ : Con}
-  --   → (let (↑↑Γ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn (Γ))
-  --   → (let (↑↑⟦Γ⟧ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn (⟦ Γ ⟧ᶜ))
-  --   → ⟦ ↑↑Γ ⟧ˢ ≡ ↑↑⟦Γ⟧
-  -- ⟦↑↑⟧≡↑↑ {Γ} = (CwFwE-elim-Con.⟦_⟧
-  --   (λ Γ → (let (↑↑Γ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn (Γ))
-  --   → (let (↑↑⟦Γ⟧ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn (⟦ Γ ⟧ᶜ))
-  --   → (⟦ ↑↑Γ ⟧ˢ ≡ ↑↑⟦Γ⟧) true)
-  --   (by refl)
-  --   -- (λ Γ A pr → by (cong (λ σ → ((σ ∘ p) ,, coe (ap-Tmᶜ refl {! !}) q)) (pr .witness)))
-  --   -- (λ Γ A pr → by (cong (λ σ → ((σ ∘ p) ,, coe (ap-Tmᶜ refl {! !}) q)) (pr .witness)))
-  --   {!!} Γ) .witness
+  ⟦↑↑⟧≡↑↑ : {Γ : Con}
+    → (let (↑↑Γ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn (Γ))
+    → (let (↑↑⟦Γ⟧ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn (⟦ Γ ⟧ᶜ))
+    → ⟦ ↑↑Γ ⟧ˢ ≡ ↑↑⟦Γ⟧
+  ⟦↑↑⟧≡↑↑ {Γ} = (CwFwE-elim-Con.⟦_⟧
+    (λ Γ → (let (↑↑Γ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn (Γ))
+    → (let (↑↑⟦Γ⟧ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn (⟦ Γ ⟧ᶜ))
+    → (⟦ ↑↑Γ ⟧ˢ ≡ ↑↑⟦Γ⟧) true)
+    (by refl)
+    (λ Γ A pr → by (cong (λ σ → ((σ ∘ p) ,, coe (ap-Tmᶜ refl {! !}) q)) (pr .witness)))
+    (λ Γ A pr → by (cong (λ σ → ((σ ∘ p) ,, coe (ap-Tmᶜ refl {! !}) q)) (pr .witness)))
+    {!!} Γ) .witness
 
-  -- opaque
-  --   unfolding coe
+  opaque
+    unfolding coe
 
-  --   types-need-nothing : Ty Γ ≃ Ty ⟦ Γ ⟧ᶜ
-  --   types-need-nothing .to = ⟦_⟧ᵀ
-  --   types-need-nothing {Γ = Γ} .from A =
-  --     let (↑↑ , iΓ , pΓ) = CwFwE-elim.⟦_⟧ᶜ nn Γ in
-  --     let (iA , pA) = CwFwE-elim.⟦_⟧ᵀ nn A in (A [ ↑↑ ]T)
-  --   types-need-nothing {Γ = Γ} .to-from A =
-  --     let (↑↑ , iΓ , pΓ) = CwFwE-elim.⟦_⟧ᶜ nn Γ in
-  --     let (iA , pA) = CwFwE-elim.⟦_⟧ᵀ nn A in
-  --     let (i↑↑ , p↑↑) =  CwFwE-elim.⟦_⟧ˢ nn ↑↑ in
-  --     trans (ap-[]T₀ (⟦↑↑⟧≡↑↑ {Γ = Γ})) (pA .witness)  
-  --   types-need-nothing {Γ = Γ} .from-to A =
-  --     let (iA , pA) = CwFwE-elim.⟦_⟧ᵀ nn A in pA .witness
+    types-need-nothing : Ty Γ ≃ Ty ⟦ Γ ⟧ᶜ
+    types-need-nothing .to = ⟦_⟧ᵀ
+    types-need-nothing {Γ = Γ} .from A =
+      let (↑↑ , iΓ , pΓ) = CwFwE-elim.⟦_⟧ᶜ nn Γ in
+      let (iA , pA) = CwFwE-elim.⟦_⟧ᵀ nn A in (A [ ↑↑ ]T)
+    types-need-nothing {Γ = Γ} .to-from A =
+      let (↑↑ , iΓ , pΓ) = CwFwE-elim.⟦_⟧ᶜ nn Γ in
+      let (iA , pA) = CwFwE-elim.⟦_⟧ᵀ nn A in
+      let (i↑↑ , p↑↑) =  CwFwE-elim.⟦_⟧ˢ nn ↑↑ in
+      trans (ap-[]T₀ (⟦↑↑⟧≡↑↑ {Γ = Γ})) (pA .witness)  
+    types-need-nothing {Γ = Γ} .from-to A =
+      let (iA , pA) = CwFwE-elim.⟦_⟧ᵀ nn A in pA .witness
 
-  --   erased-terms-need-nothing : Tm Γ z A ≃ Tm ⟦ Γ ⟧ᶜ z ⟦ A ⟧ᵀ
-  --   erased-terms-need-nothing .to = ⟦_⟧ᵗ
-  --   erased-terms-need-nothing {Γ = Γ} {A = A} .from a =
-  --     let (↑↑ , iΓ , pΓ) = CwFwE-elim.⟦_⟧ᶜ nn Γ in
-  --     let (iA , pA) = CwFwE-elim.⟦_⟧ᵀ nn A in
-  --     let (ia , pa) = CwFwE-elim.⟦_⟧ᵗ nn a in
-  --     let (i↑↑ , p↑↑) =  CwFwE-elim.⟦_⟧ˢ nn ↑↑ in
-  --     coe (ap-Tm (pA .witness)) (a [ ↑↑ ])
-  --   erased-terms-need-nothing {Γ = Γ} .to-from a =
-  --     {!!}
-  --   erased-terms-need-nothing {Γ = Γ} .from-to a = {!!}
+    erased-terms-need-nothing : Tm Γ z A ≃ Tm ⟦ Γ ⟧ᶜ z ⟦ A ⟧ᵀ
+    erased-terms-need-nothing .to = ⟦_⟧ᵗ
+    erased-terms-need-nothing {Γ = Γ} {A = A} .from a =
+      let (↑↑ , iΓ , pΓ) = CwFwE-elim.⟦_⟧ᶜ nn Γ in
+      let (iA , pA) = CwFwE-elim.⟦_⟧ᵀ nn A in
+      let (ia , pa) = CwFwE-elim.⟦_⟧ᵗ nn a in
+      let (i↑↑ , p↑↑) =  CwFwE-elim.⟦_⟧ˢ nn ↑↑ in
+      coe (ap-Tm (pA .witness)) (a [ ↑↑ ])
+    erased-terms-need-nothing {Γ = Γ} .to-from a =
+      {!!}
+    erased-terms-need-nothing {Γ = Γ} .from-to a = {!!}

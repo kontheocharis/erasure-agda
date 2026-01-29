@@ -143,6 +143,10 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       ↓* {i = z} t = t
       ↓* {i = ω} t = ↓ (t [ p# ])
 
+      ↓*[] : {t : Tm Γ i A} → (↓* t) [ σ ] ≡ ↓* (t [ σ ])
+      ↓*[] {i = z} = refl
+      ↓*[] {i = ω} = trans ↓[] (cong ↓ ({! transᴰ (transᴰ (symᴰ [∘]) (ap-[]₀ p∘,#)) [∘]!}))
+
       pz : Sub (Γ ▷[ i ] A) (Γ ▷[ z ] A)
       pz = p ,, ↓* q
 
@@ -702,7 +706,7 @@ module CwFwE-elim-Con
 
 module CwFwE-uniform (m : CwFwE) (n : CwFwE) where
 
-  open CwFwE m
+  open CwFwE n
   open CwFwE-sorts sorts
   open in-CwFwE-sorts sorts
   open CwFwE-core core
@@ -718,14 +722,14 @@ module CwFwE-uniform (m : CwFwE) (n : CwFwE) where
   open Π-structureᴰ
   open U-structureᴰ
 
-  nᴰ-sorts : CwFwEᴰ-sorts sorts
+  nᴰ-sorts : CwFwEᴰ-sorts (m .CwFwE.sorts)
   nᴰ-sorts .Conᴰ _ = Con
   nᴰ-sorts .Subᴰ Γ Δ _ = Sub Γ Δ
   nᴰ-sorts .Tyᴰ Γ _ = Ty Γ
   nᴰ-sorts .#∈ᴰ Γ _ = #∈ Γ
   nᴰ-sorts .Tmᴰ Γ i A _ = Tm Γ i A
 
-  nᴰ-core : CwFwEᴰ-core nᴰ-sorts core 
+  nᴰ-core : CwFwEᴰ-core nᴰ-sorts (m .CwFwE.core)
   nᴰ-core .idᴰ = id
   nᴰ-core ._∘ᴰ_ = _∘_
   nᴰ-core .assocᴰ = dep assoc
@@ -769,7 +773,7 @@ module CwFwE-uniform (m : CwFwE) (n : CwFwE) where
   opaque
     unfolding pzᴰ ↓*ᴰ
 
-    nᴰ-Π-str : Π-structureᴰ nᴰ-sorts core nᴰ-core Π-str
+    nᴰ-Π-str : Π-structureᴰ nᴰ-sorts (m .CwFwE.core) nᴰ-core (m .CwFwE.Π-str)
     nᴰ-Π-str .Πᴰ = Π
     nᴰ-Π-str .Π[]ᴰ = dep Π[]
     nᴰ-Π-str .lamᴰ {i = z} =  lam {i = z} 
@@ -783,7 +787,7 @@ module CwFwE-uniform (m : CwFwE) (n : CwFwE) where
     nᴰ-Π-str .Πβᴰ {i = ω} = dep Πβ
     nᴰ-Π-str .Πηᴰ {i = ω} = dep Πη
 
-  nᴰ-U-str : U-structureᴰ nᴰ-sorts core nᴰ-core U-str
+  nᴰ-U-str : U-structureᴰ nᴰ-sorts (m .CwFwE.core) nᴰ-core (m .CwFwE.U-str)
   nᴰ-U-str .Uᴰ = U
   nᴰ-U-str .U[]ᴰ = dep U[]
   nᴰ-U-str .Elᴰ = El

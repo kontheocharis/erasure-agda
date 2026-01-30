@@ -76,10 +76,10 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       _[_] : (t : Tm Δ i A) → (σ : Sub Γ Δ) → Tm Γ i (A [ σ ]T)
       _[_]# : (t : #∈ Δ) → (σ : Sub Γ Δ) → #∈ Γ
       [id]T : A [ id ]T ≡ A
-      [id] : (t [ id ]) ≡[ ap-Tm [id]T ] t
+      [id] : (t [ id ]) ≡[ ap-Tm {i = i} [id]T ] t
       [id]# : π [ id ]# ≡ π
       [∘]T : A [ σ ∘ τ ]T ≡ (A [ σ ]T) [ τ ]T
-      [∘] : t [ σ ∘ τ ] ≡[ ap-Tm [∘]T ] ((t [ σ ]) [ τ ])
+      [∘] : t [ σ ∘ τ ] ≡[ ap-Tm {i = i} [∘]T ] ((t [ σ ]) [ τ ])
       [∘]# : π [ σ ∘ τ ]# ≡ (π [ σ ]#) [ τ ]#
       
       -- Context extension for terms
@@ -95,10 +95,10 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       p : Sub (Γ ▷[ i ] A) Γ
       q : Tm (Γ ▷[ i ] A) i (A [ p ]T)
       _,,_ : (σ : Sub Γ Δ) → (t : Tm Γ i (A [ σ ]T)) → Sub Γ (Δ ▷[ i ] A)
-      ,∘ : (σ ,, t) ∘ ρ ≡ (σ ∘ ρ) ,, coe (ap-Tm (sym [∘]T)) (t [ ρ ])
+      ,∘ : (σ ,, t) ∘ ρ ≡ (σ ∘ ρ) ,, coe (ap-Tm {i = i} (sym [∘]T)) (t [ ρ ])
       p,q : p {Γ} {i} {A} ,, q ≡ id
-      p∘, : p ∘ (σ ,, t) ≡ σ
-      q[,] : q [ σ ,, t ] ≡[ ap-Tm (trans (sym [∘]T) (ap-[]T₀ p∘,)) ] t
+      p∘, : p {Γ} {i} {A} ∘ (σ ,, t) ≡ σ
+      q[,] : q [ σ ,, t ] ≡[ ap-Tm {i = i} (trans (sym [∘]T) (ap-[]T₀ p∘,)) ] t
 
       -- Context extension for #
       _▷# : (Γ : Con) → Con

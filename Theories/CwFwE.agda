@@ -158,6 +158,18 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       ↓*[] {i = z} = refl
       ↓*[] {i = ω} = trans ↓[] (cong ↓ (transᴰ (symᴰ [∘]) (transᴰ (ap-[]₀ p∘,#) [∘])))
 
+
+    opaque
+      unfolding ↓* coe
+      ap-↓* : (p : A ≡ B) → t ≡[ ap-Tm p ] u → ↓* t ≡[ ap-Tm p ] ↓* u
+      ap-↓* refl refl = refl
+
+    opaque
+      unfolding ↓*
+
+      ↓*q[,] : (↓* {i = i} q) [ σ ,, t ] ≡[ ap-Tm (trans (sym [∘]T) (ap-[]T₀ p∘,)) ] ↓* t
+      ↓*q[,] = transᴰ (dep ↓*[]) (ap-↓* (trans (sym [∘]T) (ap-[]T₀ p∘,)) q[,])
+
       pz : Sub (Γ ▷[ i ] A) (Γ ▷[ z ] A)
       pz = p ,, ↓* q
 
@@ -393,7 +405,7 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
         pz'ᴰ ∘ᴰ (σᴰ ⁺ᴰ)
 
     opaque
-      unfolding ↓*
+      unfolding ↓*  pz
 
       ↓*ᴰ : Tmᴰ Γᴰ i Aᴰ t → Tmᴰ Γᴰ z Aᴰ (↓* t)
       ↓*ᴰ {i = z} tᴰ = tᴰ

@@ -222,10 +222,20 @@ module need-nothing where
   nn-ctors .qᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {i = ω} {Aᴰ = (iA , pA)}
     = by (ap-q (iΓ .witness) (iA .witness))
       , by (transᴰ {q = ap-Tm (trans [∘]T (ap-[]T₁ (pA .witness)))} q[,] (splitl reflᴰ))
-  _,,ᴰ_ nn-ctors {Γᴰ = (↑↑Γ , iΓ , pΓ)} {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = z} {Aᴰ = (iA , pA)}  (iσ , pσ) (it , pt)
-    = by (ap-,, (iΓ .witness) (iΔ .witness) (iσ .witness) (iA .witness) (it .witness)) , {!!}
+  _,,ᴰ_ nn-ctors {Γᴰ = (↑↑Γ , iΓ , pΓ)} {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = z} {Aᴰ = (iA , pA)} (iσ , pσ) (it , pt)
+    = by (ap-,, (iΓ .witness) (iΔ .witness) (iσ .witness) (iA .witness) (it .witness))
+      ,  by (trans ,∘ (trans (undep (ap-,, refl refl
+        (dep (trans (pσ .witness) (sym (trans (sym assoc) (cong (↑↑Δ ∘_) p∘,))))) reflᴰ
+        (splitr (splitl (transᴰ (pt .witness) (symᴰ (transᴰ
+        (ap-[] refl refl (dep (trans [∘]T (ap-[]T₁ (pA .witness)))) reflᴰ (splitl reflᴰ)) q[,])))))))
+        (sym (,∘)))) 
   _,,ᴰ_ nn-ctors {Γᴰ = (↑↑Γ , iΓ , pΓ)} {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = ω} {Aᴰ = (iA , pA)}  (iσ , pσ) (it , pt)
-    = by (ap-,, (iΓ .witness) (iΔ .witness) (iσ .witness) (iA .witness) (it .witness)) , {!!}
+    = by (ap-,, (iΓ .witness) (iΔ .witness) (iσ .witness) (iA .witness) (it .witness))
+      ,  by (trans ,∘ (trans (undep (ap-,, refl refl
+        (dep (trans (pσ .witness) (sym (trans (sym assoc) (cong (↑↑Δ ∘_) p∘,))))) reflᴰ
+        (splitr (splitl (transᴰ (pt .witness) (symᴰ (transᴰ
+        (ap-[] refl refl (dep (trans [∘]T (ap-[]T₁ (pA .witness)))) reflᴰ (splitl reflᴰ)) ↓*q[,])))))))
+        (sym (,∘)))) 
   nn-ctors .,∘ᴰ = refl
   nn-ctors .p,qᴰ = refl
   nn-ctors .p∘,ᴰ = refl

@@ -1,4 +1,4 @@
-{-# OPTIONS --type-in-type --allow-unsolved-metas #-}
+{-# OPTIONS --type-in-type --lossy-unification #-}
 module Theories.CwFwE where
 
 open import Agda.Primitive
@@ -142,16 +142,27 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       pz∘⁺≡⁺∘pz' : (_⁺ {Γ} {A = A} σ) ∘ pz' {Γ} ≡ pz' ∘ (σ ⁺)
 
     opaque
+      unfolding coe
+      ap-[]₀ : (p : σ ≡ τ) → t [ σ ] ≡[ ap-Tm (ap-[]T₀ p) ] t [ τ ]
+      ap-[]₀ refl = refl
+
+      ap-[]₁ : ∀ {t : Tm Γ i A} {u : Tm Γ i B} (p : A ≡ B) → t ≡[ ap-Tm p ] u → t [ σ ] ≡[ ap-Tm (ap-[]T₁ p) ] u [ σ ]
+      ap-[]₁ refl refl = refl
+
+    opaque
       ↓* : Tm Γ i A → Tm Γ z A
       ↓* {i = z} t = t
       ↓* {i = ω} t = ↓ (t [ p# ])
 
       ↓*[] : {t : Tm Γ i A} → (↓* t) [ σ ] ≡ ↓* (t [ σ ])
       ↓*[] {i = z} = refl
-      ↓*[] {i = ω} = trans ↓[] (cong ↓ ({! transᴰ (symᴰ [∘]) (ap-[]₀ p∘,#)!}))
+      ↓*[] {i = ω} = trans ↓[] (cong ↓ (transᴰ (symᴰ [∘]) (transᴰ (ap-[]₀ p∘,#) [∘])))
 
       pz : Sub (Γ ▷[ i ] A) (Γ ▷[ z ] A)
       pz = p ,, ↓* q
+
+      p,↓*q : (p {Γ} {_} {A} ,, ↓* {i = z} q) ≡ id
+      p,↓*q = p,q
 
       pz∘⁺≡⁺∘pz : (_⁺ {Γ} {A = A} σ) ∘ pz {Γ} {ω} ≡ pz ∘ (σ ⁺)
       pz∘⁺≡⁺∘pz {Γ = Γ} {A = A} {σ = σ} = pz∘⁺≡⁺∘pz'
@@ -332,7 +343,7 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
     field
       _▷ᴰ[_]_ : (Γᴰ : Conᴰ Γ) → (i : Mode) → Tyᴰ Γᴰ A → Conᴰ (Γ ▷[ i ] A)
       pᴰ : Subᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) Γᴰ p
-      qᴰ : Tmᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) i (Aᴰ [ pᴰ ]Tᴰ) q
+      qᴰ : Tmᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) i (Aᴰ [ pᴰ ]Tᴰ) (q {Γ} {i} {A})
       _,,ᴰ_ : (σᴰ : Subᴰ Γᴰ Δᴰ σ) → Tmᴰ Γᴰ i (Aᴰ [ σᴰ ]Tᴰ) t → Subᴰ Γᴰ (Δᴰ ▷ᴰ[ i ] Aᴰ) (σ ,, t)
       ,∘ᴰ : (σᴰ ,,ᴰ tᴰ) ∘ᴰ ρᴰ ≡[ ap-Subᴰ ,∘ ]
           (σᴰ ∘ᴰ ρᴰ) ,,ᴰ coe (ap-Tmᴰ (sym [∘]T) (symᴰ [∘]Tᴰ) refl) (tᴰ [ ρᴰ ]ᴰ)
@@ -340,7 +351,7 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
       p∘,ᴰ : pᴰ ∘ᴰ (σᴰ ,,ᴰ tᴰ) ≡[ ap-Subᴰ p∘, ] σᴰ
       q[,]ᴰ : {tᴰ : Tmᴰ Γᴰ i (Aᴰ [ σᴰ ]Tᴰ) t} → qᴰ [ σᴰ ,,ᴰ tᴰ ]ᴰ
           ≡[ ap-Tmᴰ (trans (sym [∘]T) (ap-[]T₀ p∘,))
-                    (transᴰ {p = ap-Tyᴰ (sym [∘]T)} (symᴰ [∘]Tᴰ) (ap-[]T₀ᴰ p∘, p∘,ᴰ))
+                    (transᴰ (symᴰ [∘]Tᴰ) (ap-[]T₀ᴰ p∘, p∘,ᴰ))
                     q[,] ]
           tᴰ
 
@@ -367,8 +378,8 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
       ↑ᴰ : Tmᴰ Γᴰ z Aᴰ t → Tmᴰ (Γᴰ ▷#ᴰ) ω (Aᴰ [ p#ᴰ ]Tᴰ) (↑ t)
       ↓[]ᴰ : (↓ᴰ tᴰ) [ σᴰ ]ᴰ ≡[ ap-Tmᴰ refl reflᴰ (dep ↓[]) ]
         ↓ᴰ (coe (ap-Tmᴰ (trans (sym [∘]T) (trans (ap-[]T₀ p∘,#) [∘]T))
-                   (transᴰ {p = ap-Tyᴰ (sym [∘]T)} (symᴰ [∘]Tᴰ)
-                   (transᴰ {p = ap-Tyᴰ (ap-[]T₀ p∘,#)} (ap-[]T₀ᴰ p∘,# p∘,#ᴰ) [∘]Tᴰ)) refl)
+                   (transᴰ (symᴰ [∘]Tᴰ)
+                   (transᴰ (ap-[]T₀ᴰ p∘,# p∘,#ᴰ) [∘]Tᴰ)) refl)
                    (tᴰ [ σᴰ ⁺#ᴰ ]ᴰ))
       ↑↓ᴰ : ↑ᴰ (↓ᴰ tᴰ) ≡[ ap-Tmᴰ refl reflᴰ (dep ↑↓) ] tᴰ
       ↓↑ᴰ : ↓ᴰ (↑ᴰ tᴰ) ≡[ ap-Tmᴰ refl reflᴰ (dep ↓↑) ] tᴰ
@@ -390,6 +401,9 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
 
       pzᴰ : Subᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) (Γᴰ ▷ᴰ[ z ] Aᴰ) pz
       pzᴰ = pᴰ ,,ᴰ ↓*ᴰ qᴰ
+
+      p,↓*qᴰ : (pᴰ {Γᴰ = Γᴰ} {i = _} {Aᴰ = Aᴰ} ,,ᴰ ↓*ᴰ {i = z} qᴰ) ≡[ ap-Subᴰ p,↓*q ] idᴰ
+      p,↓*qᴰ = p,qᴰ
 
       pz∘⁺≡⁺∘pzᴰ : (_⁺ᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} σᴰ) ∘ᴰ pzᴰ {Γᴰ = Γᴰ} {i = ω}
         ≡[ ap-Subᴰ pz∘⁺≡⁺∘pz ]
@@ -468,8 +482,10 @@ module CwFwE-syntax where
   open in-CwFwE-sorts.in-CwFwE-core sorts core public
 
   -- Injectivity for syntax sorts
+
   postulate
     Sub-inj₀ : Sub Γ Δ ≡ Sub Γ' Δ' → Γ ≡ Γ'
+
     Sub-inj₁ : Sub Γ Δ ≡ Sub Γ' Δ' → Δ ≡ Δ'
 
     Ty-inj : Ty Γ ≡ Ty Γ' → Γ ≡ Γ'

@@ -82,15 +82,14 @@ opaque
   coe = coe₀
 
 
-opaque
-  cong : (f : A → A') → x ≡ y → f x ≡ f y
-  cong f refl = refl
+cong : (f : A → A') → x ≡ y → f x ≡ f y
+cong f refl = refl
 
-  sym : x ≡ y → y ≡ x
-  sym refl = refl
+sym : x ≡ y → y ≡ x
+sym refl = refl
 
-  trans : x ≡ y → y ≡ z → x ≡ z
-  trans refl p = p
+trans : x ≡ y → y ≡ z → x ≡ z
+trans refl p = p
 
 private
   Π : (A : Set ℓ) → (B : A → Set ℓ') → Set (ℓ ⊔ ℓ')
@@ -158,12 +157,9 @@ opaque
   splitl : x ≡[ trans p q ] y → coe p x ≡[ q ] y
   splitl {p = refl} q = q
 
-  mergel : coe p x ≡[ q ] y → x ≡[ trans p q ] y
-  mergel {p = refl} q = q
+  splitr : x ≡[ trans p (sym q) ] y → x ≡[ p ] coe q y
+  splitr {p = refl} {q = refl} refl = refl
 
-  merger : x ≡[ trans q (sym p) ] y → x ≡[ q ] coe p y
-  merger {p = refl} q = q
-
-  switch : x ≡[ sym p ] y → x ≡ coe p y
-  switch {p = refl} refl = refl
+  merger : x ≡[ p ] coe q y → x ≡[ trans p (sym q) ] y
+  merger {p = refl} {q = refl} refl = refl
 

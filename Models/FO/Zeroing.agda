@@ -1,4 +1,4 @@
-{-# OPTIONS --type-in-type #-}
+{-# OPTIONS --type-in-type --lossy-unification #-}
 module Models.FO.Zeroing where
 
 open import Utils
@@ -112,11 +112,6 @@ module need-nothing where
   -- various congruence rules
   opaque
     unfolding coe
-    ap-[]₀ : (p : σ ≡ τ) → t [ σ ] ≡[ ap-Tm (ap-[]T₀ p) ] t [ τ ]
-    ap-[]₀ refl = refl
-
-    ap-[]₁ : ∀ {t : Tm Γ i A} {u : Tm Γ i B} (p : A ≡ B) → t ≡[ ap-Tm p ] u → t [ σ ] ≡[ ap-Tm (ap-[]T₁ p) ] u [ σ ]
-    ap-[]₁ refl refl = refl
 
     ap-▷[] : (p : Γ ≡ Δ) → A ≡[ ap-Tyᶜ p ] B → (Γ ▷[ i ] A) ≡ (Δ ▷[ i ] B)
     ap-▷[] refl refl = refl
@@ -162,7 +157,6 @@ module need-nothing where
       → (σ ,, t) ≡[ ap-Subᶜ p (ap-▷[] q prA ) ] (σ' ,, t')
     ap-,, refl refl refl refl refl = refl
 
-
   nn-ctors : CwFwEᴰ-core nn-sorts core
   nn-ctors .idᴰ {Γ = Γ} {Γᴰ = (↑↑Γ , iΓ , pΓ)} = by (ap-id (iΓ .witness)) , by (trans id∘ (sym ∘id))
   nn-ctors ._∘ᴰ_ {Δᴰ = (_ , iΔ , _)} {Θᴰ = (_ , iΘ , _)} {σ = σ} {Γᴰ = (_ , iΓ , _)} {τ = τ} (iσ , pσ) (iτ , pτ)
@@ -181,14 +175,14 @@ module need-nothing where
       (trans [∘]T (ap-[]T₁ (pA .witness)))))
   nn-ctors ._[_]ᴰ {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = z} {Aᴰ = (iA , pA)} {Γᴰ = (↑↑Γ , iΓ , pΓ)} (ia , pa) (iσ , pσ)
     =  by (ap-[] (iΓ .witness) (iΔ .witness) (iA .witness) (iσ .witness) (ia .witness))
-      , by (transᴰ {p = ap-Tm (sym [∘]T)} (symᴰ [∘])
-      (transᴰ {p = ap-Tm (ap-[]T₀ (pσ .witness))} (ap-[]₀ (pσ .witness))
-      (transᴰ {p = ap-Tm [∘]T} [∘] (ap-[]₁ (pA .witness) (pa .witness)))))
+      , by (transᴰ (symᴰ [∘])
+      (transᴰ (ap-[]₀ (pσ .witness))
+      (transᴰ [∘] (ap-[]₁ (pA .witness) (pa .witness)))))
   nn-ctors ._[_]ᴰ {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = ω} {Aᴰ = (iA , pA)} {Γᴰ = (↑↑Γ , iΓ , pΓ)} (ia , pa) (iσ , pσ)
     = by (ap-[] (iΓ .witness) (iΔ .witness) (iA .witness) (iσ .witness) (ia .witness))
-      , by (transᴰ {p = ap-Tm (sym [∘]T)} (symᴰ [∘])
-      (transᴰ {p = ap-Tm (ap-[]T₀ (pσ .witness))} (ap-[]₀ (pσ .witness))
-      (transᴰ {p = ap-Tm [∘]T} [∘] (trans (ap-[]₁ (pA .witness) (pa .witness)) ↓*[]))))
+      , by (transᴰ (symᴰ [∘])
+      (transᴰ (ap-[]₀ (pσ .witness))
+      (transᴰ [∘] (trans (ap-[]₁ (pA .witness) (pa .witness)) ↓*[]))))
   nn-ctors ._[_]#ᴰ = λ _ _ → tt
   nn-ctors .[id]Tᴰ = refl
   nn-ctors .[id]ᴰ {i = z} = refl
@@ -201,25 +195,33 @@ module need-nothing where
   nn-ctors ._▷ᴰ[_]_ {Γ = Γ} {A = A} (↑↑ , iΓ , pΓ) z (iA , pA)
     = ((↑↑ ∘ p) ,, coe (ap-Tm (sym (trans [∘]T (ap-[]T₁ (pA .witness))))) q) 
       , by (ap-▷[] (iΓ .witness) (iA .witness))
-      , by (trans (ap-,, refl (iΓ .witness) {t = coe _ q}
-      (trans (ap-∘ refl (iΓ .witness) refl (pΓ .witness) refl) (trans id∘ (ap-p refl  reflᴰ)))
-      (iA .witness) (splitl {x = ⟦ q ⟧ᵗ} {q = ap-Tmᶜ refl {! !}} (ap-q (iΓ .witness) (iA .witness)))) p,q)
-  (nn-ctors ▷ᴰ[ ↑↑ , iΓ , pΓ ] ω) (iA , pA)
+      , by (transᴰ (ap-,, refl (iΓ .witness)
+      (transᴰ (ap-∘ refl (iΓ .witness) refl (pΓ .witness) refl) (dep (trans id∘ reflᴰ)))
+      (iA .witness) (splitl reflᴰ)) (dep p,q))
+  nn-ctors ._▷ᴰ[_]_ {Γ = Γ} {A = A} (↑↑ , iΓ , pΓ) ω (iA , pA)
     = ((↑↑ ∘ p) ,, coe (ap-Tm (sym (trans [∘]T (ap-[]T₁ (pA .witness))))) (↓* q))
       , by (ap-▷[] (iΓ .witness) (iA .witness))
-      , {!!}
+      , by (transᴰ (ap-,, refl (iΓ .witness)
+      (transᴰ (ap-∘ refl (iΓ .witness) refl (pΓ .witness) refl) (dep (trans id∘ reflᴰ)))
+      (iA .witness) (splitl reflᴰ)) (dep helper))
+        where
+          opaque
+            unfolding ↓*ᴰ
+            helper : (⟦ p {Γ} {ω} {A} ⟧ˢ ,, ⟦ ↓* q ⟧ᵗ) ≡ id
+            helper = undep (transᴰ (ap-,, refl refl reflᴰ reflᴰ (splitl (transᴰ [id] reflᴰ))) (dep p,q))
   nn-ctors .pᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {i = z} {Aᴰ = (iA , pA)}
     = by (ap-p (iΓ .witness) (iA .witness))
       , by p∘, 
   nn-ctors .pᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {i = ω} {Aᴰ = (iA , pA)}
     = by (ap-p (iΓ .witness) (iA .witness))
       , by p∘,
-  nn-ctors .qᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {i = z} {Aᴰ = (iA , pA)}
+  nn-ctors .qᴰ {Γ = Γ} {Γᴰ = (↑↑ , iΓ , pΓ)} {i = z} {A = A} {Aᴰ = (iA , pA)}
     = by (ap-q (iΓ .witness) (iA .witness))
-      ,  by (trans ({! !}) q[,])
+      , by (transᴰ (transᴰ {q = ap-Tm (trans [∘]T (trans (ap-[]T₁ (pA .witness)) (sym (trans (ap-[]T₀ p,q) [id]T))))}
+        q[,] (splitl (symᴰ q[,]))) q[,])
   nn-ctors .qᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {i = ω} {Aᴰ = (iA , pA)}
     = by (ap-q (iΓ .witness) (iA .witness))
-      ,  by (trans ({! !}) q[,])
+      , by (transᴰ {q = ap-Tm (trans [∘]T (ap-[]T₁ (pA .witness)))} q[,] (splitl reflᴰ))
   _,,ᴰ_ nn-ctors {Γᴰ = (↑↑Γ , iΓ , pΓ)} {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = z} {Aᴰ = (iA , pA)}  (iσ , pσ) (it , pt)
     = by (ap-,, (iΓ .witness) (iΔ .witness) (iσ .witness) (iA .witness) (it .witness)) , {!!}
   _,,ᴰ_ nn-ctors {Γᴰ = (↑↑Γ , iΓ , pΓ)} {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = ω} {Aᴰ = (iA , pA)}  (iσ , pσ) (it , pt)
@@ -256,15 +258,19 @@ module need-nothing where
 
 
   ⟦↑↑⟧≡↑↑ : {Γ : Con}
-    → (let (↑↑Γ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn (Γ))
-    → (let (↑↑⟦Γ⟧ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn (⟦ Γ ⟧ᶜ))
+    → (let (↑↑Γ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn Γ)
+    → (let (↑↑⟦Γ⟧ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn ⟦ Γ ⟧ᶜ)
     → ⟦ ↑↑Γ ⟧ˢ ≡ ↑↑⟦Γ⟧
   ⟦↑↑⟧≡↑↑ {Γ} = (CwFwE-elim-Con.⟦_⟧
-    (λ Γ → (let (↑↑Γ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn (Γ))
-    → (let (↑↑⟦Γ⟧ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn (⟦ Γ ⟧ᶜ))
-    → (⟦ ↑↑Γ ⟧ˢ ≡ ↑↑⟦Γ⟧) true)
+    (λ Γ
+      → (let (↑↑Γ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn Γ)
+      → (let (↑↑⟦Γ⟧ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn ⟦ Γ ⟧ᶜ)
+      → (⟦ ↑↑Γ ⟧ˢ ≡ ↑↑⟦Γ⟧) true)
       (by refl)
-      (λ Γ A pr → by (cong (λ σ → ((σ ∘ p) ,, coe (ap-Tmᶜ refl {! !}) q)) (pr .witness)))
+      (λ Γ A pr →
+        let (↑↑Γ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn Γ in
+        let (↑↑⟦Γ⟧ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn ⟦ Γ ⟧ᶜ in
+        by (cong (λ σ → ((σ ∘ p) ,, coe (ap-Tmᶜ refl {! !}) q)) (pr .witness)))
       (λ Γ A pr → by ({! !}))
       ( λ Γ pr → by (trans ∘id (pr .witness)) ) Γ) .witness
 
@@ -280,7 +286,7 @@ module need-nothing where
     let (↑↑ , iΓ , pΓ) = CwFwE-elim.⟦_⟧ᶜ nn Γ in
     let (iA , pA) = CwFwE-elim.⟦_⟧ᵀ nn A in
     let (i↑↑ , p↑↑) =  CwFwE-elim.⟦_⟧ˢ nn ↑↑ in
-    trans (ap-[]T₀ (⟦↑↑⟧≡↑↑ {Γ = Γ})) (pA .witness)  
+    trans (ap-[]T₀ ⟦↑↑⟧≡↑↑) (pA .witness)  
   types-need-nothing {Γ = Γ} .from-to A =
     let (iA , pA) = CwFwE-elim.⟦_⟧ᵀ nn A in pA .witness
 
@@ -296,6 +302,6 @@ module need-nothing where
     let (↑↑ , iΓ , pΓ) = CwFwE-elim.⟦_⟧ᶜ nn Γ in
     let (ia , pa) = CwFwE-elim.⟦_⟧ᵗ nn a in
     let (i↑↑ , p↑↑) =  CwFwE-elim.⟦_⟧ˢ nn ↑↑ in
-    transᴰ {p = ap-Tm (ap-[]T₀ (⟦↑↑⟧≡↑↑ {Γ = Γ}))} (ap-[]₀ (⟦↑↑⟧≡↑↑ {Γ = Γ})) (pa .witness)  
+    transᴰ {p = ap-Tm (ap-[]T₀ ⟦↑↑⟧≡↑↑)} (ap-[]₀ ⟦↑↑⟧≡↑↑) (pa .witness)  
   erased-terms-need-nothing {Γ = Γ} .from-to a =
     let (ia , pa) = CwFwE-elim.⟦_⟧ᵗ nn a in pa .witness

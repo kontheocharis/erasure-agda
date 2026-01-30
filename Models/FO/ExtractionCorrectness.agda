@@ -13,7 +13,18 @@ open import Theories.CwFwE
 open import Mode
 
 -- The code extraction model
--- Interprets all terms as erased terms, and # as unit.
+--
+-- This is a CwFwE containing untyped lambda calculus, the standard
+-- interpretation, as well as a logical relation between the two.
+--
+-- We can thus derive correctness properties about the extracted code (see
+-- bottom of file)
+--
+-- Morally, this whole file lives in Psh(Λ), which is why we have a second-order
+-- model of Λ available---the representables. We can take the global sections of
+-- theorems to get the corresponding statement in Set about closed Λ terms.
+-- This is easier than to formalise in Set because then we would need to deal with
+-- closed first-order Λ terms.
 
 postulate
   Λ : Set
@@ -227,48 +238,57 @@ module _ where
     fam-U .El-code = refl
     fam-U .code-El = refl
 
-open CwFwE-sorts fam-s
-open in-CwFwE-sorts fam-s
-open CwFwE-core fam-c
-open in-CwFwE-core fam-c
-open Π-structure fam-Π
-open U-structure fam-U
+    fam : CwFwE
+    fam .CwFwE.sorts = fam-s
+    fam .CwFwE.core = fam-c
+    fam .CwFwE.Π-str = fam-Π
+    fam .CwFwE.U-str = fam-U
 
-Nat : Ty Γ
-Nat =
-  (λ γ → ℕ) 
-  , (λ γₛ z₁ z₂ → ⊤)
-  , λ γₛ γ aₛ aₑ a₀ → (aₑ ≡ embed-nat aₛ) true
+opaque
+  unfolding fam
 
-zero : Tm Γ ω (Nat {Γ})
-zero =
-  (λ γ → 0)
-  , (λ _ → zeroΛ)
-  , (λ γₛ γ → tt)
-  , (λ γₛ γₑ γ γ' → by refl)
+  open CwFwE-sorts fam-s
+  open in-CwFwE-sorts fam-s
+  open CwFwE-core fam-c
+  open in-CwFwE-core fam-c
+  open Π-structure fam-Π
+  open U-structure fam-U
 
-succ : Tm Γ ω (Nat {Γ}) → Tm Γ ω (Nat {Γ})
-succ (nₛ , nₑ , n₀ , n₁) =
-  (λ γ → suc (nₛ γ))
-  , (λ γₑ → succΛ (nₑ γₑ) )
-  , (λ γₛ γ → tt)
-  , λ γₛ γₑ γ γ' → by (cong succΛ (n₁ γₛ γₑ γ γ' .witness))
+  Nat : Ty Γ
+  Nat =
+    (λ γ → ℕ) 
+    , (λ γₛ z₁ z₂ → ⊤)
+    , λ γₛ γ aₛ aₑ a₀ → (aₑ ≡ embed-nat aₛ) true
 
-tracking : Tm ∙ ω (Π {∙} ω (Nat {∙}) (Nat {∙ ▷[ z ] (Nat {∙})}))
-  → Σ[ fₛ ∈ (ℕ → ℕ) ]
-    Σ[ fₑ ∈ Λ ]
-    (∀ aₛ aₑ → (aₑ ≡ embed-nat aₛ) true → ((fₑ ＠ aₑ) ≡ embed-nat (fₛ aₛ)) true)
-tracking (fₛ , fₑ , f₀ , f₁) = fₛ tt , fₑ tt , λ aₛ aₑ → f₁ tt tt tt tt aₛ aₑ tt
+  zero : Tm Γ ω (Nat {Γ})
+  zero =
+    (λ γ → 0)
+    , (λ _ → zeroΛ)
+    , (λ γₛ γ → tt)
+    , (λ γₛ γₑ γ γ' → by refl)
 
-noninterference : Tm ∙ ω (Π {∙} z (Nat {∙}) (Nat {∙ ▷[ z ] (Nat {∙})}))
-  → Σ[ fₛ ∈ (ℕ → ℕ) ]
-    Σ[ fₑ ∈ Λ ]
-    Σ[ xₛ ∈ ℕ ]
-    ((∀ aₛ → (fₛ aₛ ≡ xₛ) true) × (fₑ ≡ embed-nat xₛ) true)
-noninterference (fₛ , fₑ , f₀ , f₁) =
-  fₛ tt , fₑ tt , fₛ tt 0
-  , (λ n →
-    let by pn = f₁ tt tt tt tt n tt in
-    let by p0 = f₁ tt tt tt tt 0 tt in by (embed-nat-inj _ _ (trans (sym pn) p0)))
-  , f₁ tt tt tt tt 0 tt
+  succ : Tm Γ ω (Nat {Γ}) → Tm Γ ω (Nat {Γ})
+  succ (nₛ , nₑ , n₀ , n₁) =
+    (λ γ → suc (nₛ γ))
+    , (λ γₑ → succΛ (nₑ γₑ) )
+    , (λ γₛ γ → tt)
+    , λ γₛ γₑ γ γ' → by (cong succΛ (n₁ γₛ γₑ γ γ' .witness))
+
+  tracking : Tm ∙ ω (Π {∙} ω (Nat {∙}) (Nat {∙ ▷[ z ] (Nat {∙})}))
+    → Σ[ fₛ ∈ (ℕ → ℕ) ]
+      Σ[ fₑ ∈ Λ ]
+      (∀ aₛ aₑ → (aₑ ≡ embed-nat aₛ) true → ((fₑ ＠ aₑ) ≡ embed-nat (fₛ aₛ)) true)
+  tracking (fₛ , fₑ , f₀ , f₁) = fₛ tt , fₑ tt , λ aₛ aₑ → f₁ tt tt tt tt aₛ aₑ tt
+
+  noninterference : Tm ∙ ω (Π {∙} z (Nat {∙}) (Nat {∙ ▷[ z ] (Nat {∙})}))
+    → Σ[ fₛ ∈ (ℕ → ℕ) ]
+      Σ[ fₑ ∈ Λ ]
+      Σ[ xₛ ∈ ℕ ]
+      ((∀ aₛ → (fₛ aₛ ≡ xₛ) true) × (fₑ ≡ embed-nat xₛ) true)
+  noninterference (fₛ , fₑ , f₀ , f₁) =
+    fₛ tt , fₑ tt , fₛ tt 0
+    , (λ n →
+      let by pn = f₁ tt tt tt tt n tt in
+      let by p0 = f₁ tt tt tt tt 0 tt in by (embed-nat-inj _ _ (trans (sym pn) p0)))
+    , f₁ tt tt tt tt 0 tt
 

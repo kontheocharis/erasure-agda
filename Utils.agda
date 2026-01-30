@@ -102,7 +102,7 @@ postulate
   coe-pair :
     {a : A} {b : B a}
     {p : Σ A B ≡ Σ A' B'}
-    → coe p (a , b) ≡ (coe (coe-Σ p .fst) a , coe (coe-Σ p .snd a) b)
+    → coe₀ p (a , b) ≡ (coe (coe-Σ p .fst) a , coe (coe-Σ p .snd a) b)
   {-# REWRITE coe-pair #-}
 
   coe-Π : (((a : A) → B a) ≡ ((a : A') → B' a))
@@ -110,7 +110,7 @@ postulate
   coe-lam : 
     {f : Π {ℓ} {ℓ'} A B}
     {p : ((a : A) → B a) ≡ ((a : A') → B' a)}
-    → coe p f ≡ λ a → coe (coe-Π p .snd _) (f (coe (coe-Π p .fst) a))
+    → coe₀ p f ≡ λ a → coe (coe-Π p .snd _) (f (coe (coe-Π p .fst) a))
   {-# REWRITE coe-lam #-}
 
 -- Adding this as the last rule because it's the most general. Otherwise

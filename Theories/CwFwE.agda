@@ -10,7 +10,6 @@ open import Mode
 
 record CwFwE-sorts : Set where
   field
-    -- Sorts
     Con : Set
     Sub : Con → Con → Set
     Ty : Con → Set
@@ -125,16 +124,15 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       ↓ : Tm (Γ ▷#) ω (A [ p# ]T) → Tm Γ z A
       ↑ : Tm Γ z A → Tm (Γ ▷#) ω (A [ p# ]T)
 
-      -- This type is ugly
       ↓[] : (↓ t) [ σ ] ≡ ↓
         (coe (ap-Tm (trans (sym [∘]T) (trans (ap-[]T₀ p∘,#) [∘]T)))
         (t [ σ ⁺# ]))  
-      -- Luckily the other direction is derivable (and I will not derive it)
+      -- The other direction is derivable (and I will not derive it)
 
       ↑↓ : ↑ (↓ t) ≡ t
       ↓↑ : ↓ (↑ t) ≡ t
 
-    -- various congruence rules
+    -- Various congruence rules
     opaque
       unfolding coe
 
@@ -217,6 +215,7 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       p,↓*q : (p {Γ} {_} {A} ,, ↓* {i = z} q) ≡ id
       p,↓*q = p,q
 
+      -- These lemmas are needed for lam[]
       pz∘⁺≡⁺∘pz : (_⁺ {Γ} {A = A} σ) ∘ pz {Γ} {ω} ≡ pz ∘ (σ ⁺)
       pz∘⁺≡⁺∘pz {σ = σ} = trans ,∘ (trans
         (undep (ap-,, refl refl (dep (trans (trans (sym assoc) (cong (σ ∘_) p∘,)) (sym p∘,)))
@@ -293,9 +292,9 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
   open in-CwFwE-core c
   variable
     Γᴰ Γᴰ' Δᴰ Δᴰ' Θᴰ : Conᴰ Γ
-    σᴰ τᴰ ρᴰ : Subᴰ Γᴰ Δᴰ σ
+    σᴰ σᴰ' τᴰ τᴰ' ρᴰ : Subᴰ Γᴰ Δᴰ σ
     Aᴰ Aᴰ' Bᴰ Cᴰ : Tyᴰ Γᴰ A
-    tᴰ uᴰ vᴰ : Tmᴰ Γᴰ i Aᴰ t
+    tᴰ tᴰ' uᴰ uᴰ' vᴰ : Tmᴰ Γᴰ i Aᴰ t
     πᴰ : #∈ᴰ Γᴰ π
 
   opaque
@@ -454,23 +453,6 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
       p,↓*qᴰ : (pᴰ {Γᴰ = Γᴰ} {i = _} {Aᴰ = Aᴰ} ,,ᴰ ↓*ᴰ {i = z} qᴰ) ≡[ ap-Subᴰ p,↓*q ] idᴰ
       p,↓*qᴰ = p,qᴰ
 
-      pz∘⁺≡⁺∘pzᴰ : (_⁺ᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} σᴰ) ∘ᴰ pzᴰ {Γᴰ = Γᴰ} {i = ω}
-        ≡[ ap-Subᴰ pz∘⁺≡⁺∘pz ]
-        pzᴰ ∘ᴰ (σᴰ ⁺ᴰ)
-      pz∘⁺≡⁺∘pzᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} {σᴰ = σᴰ} = transᴰ ,∘ᴰ (transᴰ
-        {! !}
-        (symᴰ ,∘ᴰ)) 
-
-      [pz][⁺]≡[⁺][pz]ᴰ : (Aᴰ [ σᴰ ⁺ᴰ ]Tᴰ) [ pzᴰ {Γᴰ = Γᴰ} {i = i} ]Tᴰ
-        ≡[ ap-Tyᴰ [pz][⁺]≡[⁺][pz] ]
-        (Aᴰ [ pzᴰ ]Tᴰ) [ σᴰ ⁺ᴰ ]Tᴰ
-      [pz][⁺]≡[⁺][pz]ᴰ {Aᴰ = Aᴰ} {Γᴰ = Γᴰ} {σᴰ = σᴰ} {i = z} =
-        transᴰ (ap-[]T₀ᴰ p,q p,qᴰ) (transᴰ [id]Tᴰ
-        (ap-[]T₁ᴰ (sym (trans (ap-[]T₀ p,q) [id]T))
-                  (symᴰ (transᴰ {p = ap-Tyᴰ (ap-[]T₀ p,q)} (ap-[]T₀ᴰ p,q p,qᴰ) [id]Tᴰ))))
-      [pz][⁺]≡[⁺][pz]ᴰ {Aᴰ = Aᴰ} {Γᴰ = Γᴰ} {σᴰ = σᴰ} {i = ω} =
-        transᴰ (symᴰ [∘]Tᴰ) (transᴰ (ap-[]T₀ᴰ pz∘⁺≡⁺∘pz pz∘⁺≡⁺∘pzᴰ) [∘]Tᴰ)
-
   module in-CwFwEᴰ-core (cᴰ : CwFwEᴰ-core) where
     open CwFwEᴰ-core cᴰ
 
@@ -481,9 +463,9 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
         Π[]ᴰ : (Πᴰ i Aᴰ Bᴰ) [ σᴰ ]Tᴰ ≡[ ap-Tyᴰ Π[] ] Πᴰ i (Aᴰ [ σᴰ ]Tᴰ) (Bᴰ [ σᴰ ⁺ᴰ ]Tᴰ)
 
         lamᴰ : (tᴰ : Tmᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) ω (Bᴰ [ pzᴰ ]Tᴰ) t) → Tmᴰ Γᴰ ω (Πᴰ i Aᴰ Bᴰ) (lam t)
-        lam[]ᴰ : (lamᴰ {i = i} tᴰ) [ σᴰ ]ᴰ
-          ≡[ ap-Tmᴰ Π[] Π[]ᴰ lam[] ]
-          lamᴰ (coe (ap-Tmᴰ (sym [pz][⁺]≡[⁺][pz]) (symᴰ [pz][⁺]≡[⁺][pz]ᴰ) refl) (tᴰ [ σᴰ ⁺ᴰ ]ᴰ))
+        -- Not including lam[]ᴰ because that would require proving the lemma pz∘⁺≡⁺∘pz
+        -- in the displayed case. This doesn't even matter when we eliminate into Prop
+        -- which is always the case in this repo. Either way it is possible to prove it.
 
         apᴰ : (tᴰ : Tmᴰ Γᴰ ω (Πᴰ i Aᴰ Bᴰ) t) → Tmᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) ω (Bᴰ [ pzᴰ ]Tᴰ) (ap t)
 
@@ -755,7 +737,6 @@ module CwFwE-elim-Con
   nᴰ-Π-str .Πᴰ = λ i Aᴰ Bᴰ → tt
   nᴰ-Π-str .Π[]ᴰ = refl
   nᴰ-Π-str .lamᴰ = λ tᴰ → tt
-  nᴰ-Π-str .lam[]ᴰ = refl
   nᴰ-Π-str .apᴰ = λ tᴰ → tt
   nᴰ-Π-str .Πβᴰ = refl
   nᴰ-Π-str .Πηᴰ = refl
@@ -853,11 +834,9 @@ module CwFwE-uniform (m : CwFwE) (n : CwFwE) where
     nᴰ-Π-str .Π[]ᴰ = dep Π[]
     nᴰ-Π-str .lamᴰ {i = z} =  lam {i = z} 
     nᴰ-Π-str .lamᴰ {i = ω} =  lam {i = ω} 
-    nᴰ-Π-str .lam[]ᴰ {i = z} = lam[]
     nᴰ-Π-str .apᴰ {i = z} = ap
     nᴰ-Π-str .Πβᴰ {i = z} = dep Πβ
     nᴰ-Π-str .Πηᴰ {i = z} = dep Πη
-    nᴰ-Π-str .lam[]ᴰ {i = ω} = lam[]
     nᴰ-Π-str .apᴰ {i = ω} = ap
     nᴰ-Π-str .Πβᴰ {i = ω} = dep Πβ
     nᴰ-Π-str .Πηᴰ {i = ω} = dep Πη

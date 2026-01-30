@@ -7,6 +7,8 @@ open import Data.Unit renaming (⊤ to 𝟙)
 open import Data.Product
 open import Mode
 
+-- The zeroing model
+-- Interprets all terms as erased terms, and # as unit.
 
 module _ (e : CwFwE)  where
   open CwFwE
@@ -61,7 +63,6 @@ module _ (e : CwFwE)  where
   ze-core .CwFwE-core.↓[] {t = t} = {! splitl ? !}
   ze-core .CwFwE-core.↑↓ = {!  !}
   ze-core .CwFwE-core.↓↑ = [id]
-  ze-core .CwFwE-core.pz∘⁺≡⁺∘pz' = {! !}
 
   ze : CwFwE
   ze .sorts = ze-sorts
@@ -73,8 +74,15 @@ module _ (e : CwFwE)  where
   zeᴰ = CwFwE-uniform.nᴰ e ze 
 
 
-module need-nothing where
+-- Here we prove that erased terms don't depend on the erasure marker,
+-- or relevant context bindings. See the final theorems at the bottom of the file.
+--
+-- To do this, we perform an induction over the syntax, to prove some simultaneous lemmas:
+-- 1. There is a ↑↑ : Sub Γ 0Γ that becomes id under zeroing
+-- 2. For types, (0A)[↑↑] ≡ A, and for terms (0a)[↑↑] ≡ ↓*a
+-- 3. Zeroing is idempotent
 
+module need-nothing where
   open CwFwE-syntax
   
   ze-syn = ze syn
@@ -211,7 +219,6 @@ module need-nothing where
   nn-ctors .↓[]ᴰ = refl
   nn-ctors .↑↓ᴰ = refl
   nn-ctors .↓↑ᴰ = refl
-  nn-ctors .pz∘⁺≡⁺∘pz'ᴰ = refl
 
   nn : CwFwEᴰ syn
   nn .sortsᴰ = nn-sorts
@@ -220,6 +227,8 @@ module need-nothing where
   nn .U-strᴰ = {!!}
 
 
+  -- Final induction over contexts to show that ↑↑ is the identity if all the
+  -- bindings are zero.
   ⟦↑↑⟧≡↑↑ : {Γ : Con}
     → (let (↑↑Γ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn Γ)
     → (let (↑↑⟦Γ⟧ , _ , _) = CwFwE-elim.⟦_⟧ᶜ nn ⟦ Γ ⟧ᶜ)
@@ -237,8 +246,7 @@ module need-nothing where
       (λ Γ A pr → by ({! !}))
       ( λ Γ pr → by (trans ∘id (pr .witness)) ) Γ) .witness
 
-  -- opaque
-  --   unfolding coe
+  -- Main theorems:
 
   types-need-nothing : Ty Γ ≃ Ty ⟦ Γ ⟧ᶜ
   types-need-nothing .to = ⟦_⟧ᵀ

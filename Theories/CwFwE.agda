@@ -133,13 +133,54 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
 
       ↑↓ : ↑ (↓ t) ≡ t
       ↓↑ : ↓ (↑ t) ≡ t
-  
-    pz' : Sub (Γ ▷[ ω ] A) (Γ ▷[ z ] A)
-    pz' = p ,, ↓ (q [ p# ])
 
-    field
-      -- TODO: prove this
-      pz∘⁺≡⁺∘pz' : (_⁺ {Γ} {A = A} σ) ∘ pz' {Γ} ≡ pz' ∘ (σ ⁺)
+    -- various congruence rules
+    opaque
+      unfolding coe
+
+      ap-▷[] : (p : Γ ≡ Δ) → A ≡[ ap-Tyᶜ p ] B → (Γ ▷[ i ] A) ≡ (Δ ▷[ i ] B)
+      ap-▷[] refl refl = refl
+
+      ap-id : (p : Γ ≡ Γ') → id {Γ} ≡[ ap-Subᶜ p p ] id {Γ'}
+      ap-id refl = refl
+
+      ap-ε : (p : Γ ≡ Γ') → ε {Γ} ≡[ ap-Subᶜ p refl ] ε {Γ'}
+      ap-ε refl = refl
+
+      ap-∘ : ∀ (p : Γ ≡ Γ') (q : Δ ≡ Δ') (r : Θ ≡ Θ') {σ τ}
+        → σ ≡[ ap-Subᶜ p q ] σ'
+        → τ ≡[ ap-Subᶜ r p ] τ'
+        → σ ∘ τ ≡[ ap-Subᶜ r q ] σ' ∘ τ'
+      ap-∘ refl refl refl refl refl = refl
+
+      ap-[]T : ∀ (q : Δ ≡ Δ') (p : Γ ≡ Γ') → A ≡[ ap-Tyᶜ p ] A' → σ ≡[ ap-Subᶜ q p ] σ' → (A [ σ ]T) ≡[ ap-Tyᶜ q ] (A' [ σ' ]T)
+      ap-[]T refl refl refl refl = refl
+
+      ap-p : (prΓ : Γ ≡ Γ')
+        → (prA : A ≡[ ap-Tyᶜ prΓ ] A')
+        → p {Γ} {i} {A} ≡[ ap-Subᶜ (ap-▷[] prΓ prA) prΓ ] p {Γ'} {i} {A'}
+      ap-p refl refl = refl
+
+      ap-q : ∀ (prΓ : Γ ≡ Γ')
+        → (prA : A ≡[ ap-Tyᶜ prΓ ] A')
+        → q {Γ} {i} {A} ≡[ ap-Tmᶜ (ap-▷[] prΓ prA) (ap-[]T (ap-▷[] prΓ prA) prΓ prA (ap-p prΓ prA) ) ] q {Γ'} {i} {A'}
+      ap-q refl refl = refl
+
+      ap-[] : ∀ (q : Δ ≡ Δ') (p : Γ ≡ Γ')
+        → (prA : A ≡[ ap-Tyᶜ p ] A')
+        → (prσ : σ ≡[ ap-Subᶜ q p ] σ')
+        → t ≡[ ap-Tmᶜ p prA ] t'
+        → (t [ σ ]) ≡[ ap-Tmᶜ q (ap-[]T q p prA prσ) ] (t' [ σ' ])
+      ap-[] refl refl refl refl refl = refl
+
+      ap-,, : ∀ (p : Γ ≡ Γ') (q : Δ ≡ Δ')
+        {t : Tm Γ i (A [ σ ]T)}
+        {t' : Tm Γ' i (A' [ σ' ]T) }
+        → (prσ : σ ≡[ ap-Subᶜ p q ] σ')
+        → (prA : A ≡[ ap-Tyᶜ q ] A')
+        → t ≡[ ap-Tmᶜ p (ap-[]T p q prA prσ) ] t'
+        → (σ ,, t) ≡[ ap-Subᶜ p (ap-▷[] q prA ) ] (σ' ,, t')
+      ap-,, refl refl refl refl refl = refl
 
     opaque
       unfolding coe
@@ -177,7 +218,11 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       p,↓*q = p,q
 
       pz∘⁺≡⁺∘pz : (_⁺ {Γ} {A = A} σ) ∘ pz {Γ} {ω} ≡ pz ∘ (σ ⁺)
-      pz∘⁺≡⁺∘pz {Γ = Γ} {A = A} {σ = σ} = pz∘⁺≡⁺∘pz'
+      pz∘⁺≡⁺∘pz {σ = σ} = trans ,∘ (trans
+        (undep (ap-,, refl refl (dep (trans (trans (sym assoc) (cong (σ ∘_) p∘,)) (sym p∘,)))
+        reflᴰ (splitl (transᴰ {q = ap-Tm (ap-[]T₀ (sym p∘,))} (transᴰ (ap-[] refl refl (dep [∘]T) reflᴰ (splitl reflᴰ))
+        (transᴰ q[,] (ap-↓* ( sym [∘]T) (splitr reflᴰ)))) (splitr (symᴰ ↓*q[,]))))))
+        (sym ,∘))
 
       [pz][⁺]≡[⁺][pz] : (A [ σ ⁺ ]T) [ pz {Γ} {i} ]T ≡ (A [ pz ]T) [ σ ⁺ ]T
       [pz][⁺]≡[⁺][pz] {A = A} {Γ = Γ} {σ = σ} {i = z} =
@@ -396,14 +441,6 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
       ↑↓ᴰ : ↑ᴰ (↓ᴰ tᴰ) ≡[ ap-Tmᴰ refl reflᴰ (dep ↑↓) ] tᴰ
       ↓↑ᴰ : ↓ᴰ (↑ᴰ tᴰ) ≡[ ap-Tmᴰ refl reflᴰ (dep ↓↑) ] tᴰ
 
-    pz'ᴰ : Subᴰ (Γᴰ ▷ᴰ[ ω ] Aᴰ) (Γᴰ ▷ᴰ[ z ] Aᴰ) pz'
-    pz'ᴰ = pᴰ ,,ᴰ ↓ᴰ (qᴰ [ p#ᴰ ]ᴰ)
-
-    field
-      pz∘⁺≡⁺∘pz'ᴰ : (_⁺ᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} σᴰ) ∘ᴰ pz'ᴰ {Γᴰ = Γᴰ}
-        ≡[ ap-Subᴰ pz∘⁺≡⁺∘pz' ]
-        pz'ᴰ ∘ᴰ (σᴰ ⁺ᴰ)
-
     opaque
       unfolding ↓*  pz
 
@@ -420,19 +457,17 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
       pz∘⁺≡⁺∘pzᴰ : (_⁺ᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} σᴰ) ∘ᴰ pzᴰ {Γᴰ = Γᴰ} {i = ω}
         ≡[ ap-Subᴰ pz∘⁺≡⁺∘pz ]
         pzᴰ ∘ᴰ (σᴰ ⁺ᴰ)
-      pz∘⁺≡⁺∘pzᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} {σᴰ = σᴰ} = pz∘⁺≡⁺∘pz'ᴰ
+      pz∘⁺≡⁺∘pzᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} {σᴰ = σᴰ} = {!!} -- pz∘⁺≡⁺∘pz'ᴰ
 
       [pz][⁺]≡[⁺][pz]ᴰ : (Aᴰ [ σᴰ ⁺ᴰ ]Tᴰ) [ pzᴰ {Γᴰ = Γᴰ} {i = i} ]Tᴰ
         ≡[ ap-Tyᴰ [pz][⁺]≡[⁺][pz] ]
         (Aᴰ [ pzᴰ ]Tᴰ) [ σᴰ ⁺ᴰ ]Tᴰ
       [pz][⁺]≡[⁺][pz]ᴰ {Aᴰ = Aᴰ} {Γᴰ = Γᴰ} {σᴰ = σᴰ} {i = z} =
-        transᴰ {p = ap-Tyᴰ (ap-[]T₀ p,q)} (ap-[]T₀ᴰ p,q p,qᴰ)
-        (transᴰ {p = ap-Tyᴰ [id]T} [id]Tᴰ
+        transᴰ (ap-[]T₀ᴰ p,q p,qᴰ) (transᴰ [id]Tᴰ
         (ap-[]T₁ᴰ (sym (trans (ap-[]T₀ p,q) [id]T))
                   (symᴰ (transᴰ {p = ap-Tyᴰ (ap-[]T₀ p,q)} (ap-[]T₀ᴰ p,q p,qᴰ) [id]Tᴰ))))
       [pz][⁺]≡[⁺][pz]ᴰ {Aᴰ = Aᴰ} {Γᴰ = Γᴰ} {σᴰ = σᴰ} {i = ω} =
-        transᴰ {p = ap-Tyᴰ (sym [∘]T)} (symᴰ [∘]Tᴰ)
-        (transᴰ {p = ap-Tyᴰ (ap-[]T₀ pz∘⁺≡⁺∘pz)} (ap-[]T₀ᴰ pz∘⁺≡⁺∘pz pz∘⁺≡⁺∘pzᴰ) [∘]Tᴰ)
+        transᴰ (symᴰ [∘]Tᴰ) (transᴰ (ap-[]T₀ᴰ pz∘⁺≡⁺∘pz pz∘⁺≡⁺∘pzᴰ) [∘]Tᴰ)
 
   module in-CwFwEᴰ-core (cᴰ : CwFwEᴰ-core) where
     open CwFwEᴰ-core cᴰ
@@ -713,7 +748,7 @@ module CwFwE-elim-Con
   nᴰ-core .↓[]ᴰ = refl
   nᴰ-core .↑↓ᴰ = refl
   nᴰ-core .↓↑ᴰ = refl
-  nᴰ-core .pz∘⁺≡⁺∘pz'ᴰ = refl
+  -- nᴰ-core .pz∘⁺≡⁺∘pz'ᴰ = refl
 
   nᴰ-Π-str : Π-structureᴰ nᴰ-sorts core nᴰ-core Π-str
   nᴰ-Π-str .Πᴰ = λ i Aᴰ Bᴰ → tt
@@ -808,7 +843,7 @@ module CwFwE-uniform (m : CwFwE) (n : CwFwE) where
   nᴰ-core .↓[]ᴰ = dep ↓[]
   nᴰ-core .↑↓ᴰ = dep ↑↓
   nᴰ-core .↓↑ᴰ = dep ↓↑
-  nᴰ-core .pz∘⁺≡⁺∘pz'ᴰ = dep pz∘⁺≡⁺∘pz'
+  -- nᴰ-core .pz∘⁺≡⁺∘pz'ᴰ = dep pz∘⁺≡⁺∘pz
 
   opaque
     unfolding pzᴰ ↓*ᴰ

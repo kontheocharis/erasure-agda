@@ -109,54 +109,6 @@ module need-nothing where
     Σ[ ia ∈ (⟦ ⟦ a ⟧ᵗ ⟧ᵗ ≡[ ap-Tmᶜ (iΓ .witness) (iA .witness) ] ⟦ a ⟧ᵗ) true ]
     (⟦ a ⟧ᵗ [ ↑↑Γ ] ≡[ ap-Tm (pA .witness) ] (↓* a)) true
 
-  -- various congruence rules
-  opaque
-    unfolding coe
-
-    ap-▷[] : (p : Γ ≡ Δ) → A ≡[ ap-Tyᶜ p ] B → (Γ ▷[ i ] A) ≡ (Δ ▷[ i ] B)
-    ap-▷[] refl refl = refl
-
-    ap-id : (p : Γ ≡ Γ') → id {Γ} ≡[ ap-Subᶜ p p ] id {Γ'}
-    ap-id refl = refl
-
-    ap-ε : (p : Γ ≡ Γ') → ε {Γ} ≡[ ap-Subᶜ p refl ] ε {Γ'}
-    ap-ε refl = refl
-
-    ap-∘ : ∀ (p : Γ ≡ Γ') (q : Δ ≡ Δ') (r : Θ ≡ Θ') {σ τ}
-      → σ ≡[ ap-Subᶜ p q ] σ'
-      → τ ≡[ ap-Subᶜ r p ] τ'
-      → σ ∘ τ ≡[ ap-Subᶜ r q ] σ' ∘ τ'
-    ap-∘ refl refl refl refl refl = refl
-
-    ap-[]T : ∀ (q : Δ ≡ Δ') (p : Γ ≡ Γ') → A ≡[ ap-Tyᶜ p ] A' → σ ≡[ ap-Subᶜ q p ] σ' → (A [ σ ]T) ≡[ ap-Tyᶜ q ] (A' [ σ' ]T)
-    ap-[]T refl refl refl refl = refl
-
-    ap-p : (prΓ : Γ ≡ Γ')
-      → (prA : A ≡[ ap-Tyᶜ prΓ ] A')
-      → p {Γ} {i} {A} ≡[ ap-Subᶜ (ap-▷[] prΓ prA) prΓ ] p {Γ'} {i} {A'}
-    ap-p refl refl = refl
-
-    ap-q : ∀ (prΓ : Γ ≡ Γ')
-      → (prA : A ≡[ ap-Tyᶜ prΓ ] A')
-      → q {Γ} {i} {A} ≡[ ap-Tmᶜ (ap-▷[] prΓ prA) (ap-[]T (ap-▷[] prΓ prA) prΓ prA (ap-p prΓ prA) ) ] q {Γ'} {i} {A'}
-    ap-q refl refl = refl
-
-    ap-[] : ∀ (q : Δ ≡ Δ') (p : Γ ≡ Γ')
-      → (prA : A ≡[ ap-Tyᶜ p ] A')
-      → (prσ : σ ≡[ ap-Subᶜ q p ] σ')
-      → t ≡[ ap-Tmᶜ p prA ] t'
-      → (t [ σ ]) ≡[ ap-Tmᶜ q (ap-[]T q p prA prσ) ] (t' [ σ' ])
-    ap-[] refl refl refl refl refl = refl
-  
-    ap-,, : ∀ (p : Γ ≡ Γ') (q : Δ ≡ Δ')
-      {t : Tm Γ i (A [ σ ]T)}
-      {t' : Tm Γ' i (A' [ σ' ]T) }
-      → (prσ : σ ≡[ ap-Subᶜ p q ] σ')
-      → (prA : A ≡[ ap-Tyᶜ q ] A')
-      → t ≡[ ap-Tmᶜ p (ap-[]T p q prA prσ) ] t'
-      → (σ ,, t) ≡[ ap-Subᶜ p (ap-▷[] q prA ) ] (σ' ,, t')
-    ap-,, refl refl refl refl refl = refl
-
   nn-ctors : CwFwEᴰ-core nn-sorts core
   nn-ctors .idᴰ {Γ = Γ} {Γᴰ = (↑↑Γ , iΓ , pΓ)} = by (ap-id (iΓ .witness)) , by (trans id∘ (sym ∘id))
   nn-ctors ._∘ᴰ_ {Δᴰ = (_ , iΔ , _)} {Θᴰ = (_ , iΘ , _)} {σ = σ} {Γᴰ = (_ , iΓ , _)} {τ = τ} (iσ , pσ) (iτ , pτ)
@@ -252,9 +204,10 @@ module need-nothing where
   nn-ctors .p∘,#ᴰ = refl
   nn-ctors .q[,#]ᴰ = refl
   nn-ctors .↓ᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {Aᴰ = (iA , pA)} (it , pt)
-    = by ({! splitl ?!}) , by {!!}
+    = by (splitr (splitl (it .witness))) , by {! !}
   nn-ctors .↑ᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {Aᴰ = (iA , pA)} (it , pt)
-    = by (ap-[] (iΓ .witness) (iΓ .witness) (iA .witness) ( ap-id (iΓ .witness)) (it .witness)) , {! !}
+    = by (ap-[] (iΓ .witness) (iΓ .witness) (iA .witness) (ap-id (iΓ .witness)) (it .witness))
+    , {! !}
   nn-ctors .↓[]ᴰ = refl
   nn-ctors .↑↓ᴰ = refl
   nn-ctors .↓↑ᴰ = refl

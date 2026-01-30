@@ -457,7 +457,9 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
       pz∘⁺≡⁺∘pzᴰ : (_⁺ᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} σᴰ) ∘ᴰ pzᴰ {Γᴰ = Γᴰ} {i = ω}
         ≡[ ap-Subᴰ pz∘⁺≡⁺∘pz ]
         pzᴰ ∘ᴰ (σᴰ ⁺ᴰ)
-      pz∘⁺≡⁺∘pzᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} {σᴰ = σᴰ} = {!!} -- pz∘⁺≡⁺∘pz'ᴰ
+      pz∘⁺≡⁺∘pzᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} {σᴰ = σᴰ} = transᴰ ,∘ᴰ (transᴰ
+        {! !}
+        (symᴰ ,∘ᴰ)) 
 
       [pz][⁺]≡[⁺][pz]ᴰ : (Aᴰ [ σᴰ ⁺ᴰ ]Tᴰ) [ pzᴰ {Γᴰ = Γᴰ} {i = i} ]Tᴰ
         ≡[ ap-Tyᴰ [pz][⁺]≡[⁺][pz] ]
@@ -748,7 +750,6 @@ module CwFwE-elim-Con
   nᴰ-core .↓[]ᴰ = refl
   nᴰ-core .↑↓ᴰ = refl
   nᴰ-core .↓↑ᴰ = refl
-  -- nᴰ-core .pz∘⁺≡⁺∘pz'ᴰ = refl
 
   nᴰ-Π-str : Π-structureᴰ nᴰ-sorts core nᴰ-core Π-str
   nᴰ-Π-str .Πᴰ = λ i Aᴰ Bᴰ → tt
@@ -843,7 +844,6 @@ module CwFwE-uniform (m : CwFwE) (n : CwFwE) where
   nᴰ-core .↓[]ᴰ = dep ↓[]
   nᴰ-core .↑↓ᴰ = dep ↑↓
   nᴰ-core .↓↑ᴰ = dep ↓↑
-  -- nᴰ-core .pz∘⁺≡⁺∘pz'ᴰ = dep pz∘⁺≡⁺∘pz
 
   opaque
     unfolding pzᴰ ↓*ᴰ

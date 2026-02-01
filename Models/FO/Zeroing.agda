@@ -16,6 +16,8 @@ module _ (e : CwFwE)  where
   open in-CwFwE-sorts (e .sorts)
   open CwFwE-core (e .core)
   open in-CwFwE-core (e .core)
+  open Π-structure (e .Π-str)
+  open U-structure (e .U-str)
 
   ze-sorts : CwFwE-sorts
   ze-sorts .CwFwE-sorts.Con = Con
@@ -58,11 +60,22 @@ module _ (e : CwFwE)  where
   ze-core .CwFwE-core.p,#q = refl
   ze-core .CwFwE-core.p∘,# = id∘
   ze-core .CwFwE-core.q[,#] = refl
-  ze-core .CwFwE-core.↓ x = coe (cong (Tm _ _) [id]T) x
+  ze-core .CwFwE-core.↓ x = coe (ap-Tm [id]T) x
   ze-core .CwFwE-core.↑ x = x [ id ]
-  ze-core .CwFwE-core.↓[] {t = t} = {! splitl ? !}
-  ze-core .CwFwE-core.↑↓ = {!  !}
+  ze-core .CwFwE-core.↓[] {t = t} = undep (splitr (splitr (ap-[] refl refl (dep (sym [id]T)) (dep (sym ∘id)) (splitl reflᴰ)))) 
+  ze-core .CwFwE-core.↑↓ = undep (transᴰ {q = ap-Tm (sym [id]T)} [id] (splitl reflᴰ)) 
   ze-core .CwFwE-core.↓↑ = [id]
+
+  ze-Π : in-CwFwE-sorts.in-CwFwE-core.Π-structure ze-sorts ze-core
+  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π i A B = Π i A B
+  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π[] = Π[]
+  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam {i = z} f
+    = ↓ (coe (ap-Tm (sym Π[])) (lam (coe (ap-Tm {! !}) ((↑ (f [ (p# ∘ p) ,, coe (ap-Tm (sym [∘]T)) q ])) [  id ,# (q# [ p ]#) ]))) )
+  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam {i = ω} f = {! !}
+  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam[] = {! !}
+  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.ap = {! !}
+  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πβ = {! !}
+  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πη = {!!}
 
   ze : CwFwE
   ze .sorts = ze-sorts

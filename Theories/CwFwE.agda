@@ -15,6 +15,7 @@ record CwFwE-sorts : Set where
     Ty : Con → Set
     #∈ : Con → Set
     Tm : ∀ Γ → Mode → Ty Γ → Set
+    #-prop : ∀ {Γ} (p q : #∈ Γ) → p ≡ q
 
 module in-CwFwE-sorts (s : CwFwE-sorts) where
   open CwFwE-sorts s
@@ -23,7 +24,7 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
     σ σ' τ τ' ρ : Sub Γ Δ
     A A' B B' C : Ty Γ
     t t' u u' v : Tm Γ i A
-    π ξ : #∈ Γ
+    π π' ξ : #∈ Γ
 
   opaque
     unfolding coe
@@ -71,13 +72,16 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       ∙ : Con
       ε : Sub Γ ∙
       ∃!ε : ε {Γ} ≡ σ
-    
+
+      -- All the equations on the #∈_ sort are technically unnecessary
+      -- because it is a proposition, but we include them here anyway.
+
       _[_]T : (A : Ty Δ) → (σ : Sub Γ Δ) → Ty Γ
       _[_] : (t : Tm Δ i A) → (σ : Sub Γ Δ) → Tm Γ i (A [ σ ]T)
       _[_]# : (t : #∈ Δ) → (σ : Sub Γ Δ) → #∈ Γ
       [id]T : A [ id ]T ≡ A
       [id] : (t [ id ]) ≡[ ap-Tm {i = i} [id]T ] t
-      [id]# : π [ id ]# ≡ π
+      [id]# : π [ id ]# ≡ π 
       [∘]T : A [ σ ∘ τ ]T ≡ (A [ σ ]T) [ τ ]T
       [∘] : t [ σ ∘ τ ] ≡[ ap-Tm {i = i} [∘]T ] ((t [ σ ]) [ τ ])
       [∘]# : π [ σ ∘ τ ]# ≡ (π [ σ ]#) [ τ ]#
@@ -180,6 +184,12 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
         → (σ ,, t) ≡[ ap-Subᶜ p (ap-▷[] q prA ) ] (σ' ,, t')
       ap-,, refl refl refl refl refl = refl
 
+      ap-,# : ∀ (p : Γ ≡ Γ') (q : Δ ≡ Δ')
+        → (prσ : σ ≡[ ap-Subᶜ p q ] σ')
+        → π ≡[ ap-#∈ᶜ p ] π'
+        → (σ ,# π) ≡[ ap-Subᶜ p (cong _▷# q) ] (σ' ,# π')
+      ap-,# refl refl refl refl = refl
+
     opaque
       unfolding coe
       ap-[]₀ : (p : σ ≡ τ) → t [ σ ] ≡[ ap-Tm (ap-[]T₀ p) ] t [ τ ]
@@ -187,6 +197,9 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
 
       ap-[]₁ : ∀ {t : Tm Γ i A} {u : Tm Γ i B} (p : A ≡ B) → t ≡[ ap-Tm p ] u → t [ σ ] ≡[ ap-Tm (ap-[]T₁ p) ] u [ σ ]
       ap-[]₁ refl refl = refl
+
+    ↑[p#] : (↑ t) [ p# ] ≡ ↑ (t [ p# ])
+    ↑[p#] = ?
 
     opaque
       ↓* : Tm Γ i A → Tm Γ z A
@@ -196,6 +209,9 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       ↓*[] : {t : Tm Γ i A} → (↓* t) [ σ ] ≡ ↓* (t [ σ ])
       ↓*[] {i = z} = refl
       ↓*[] {i = ω} = trans ↓[] (cong ↓ (transᴰ (symᴰ [∘]) (transᴰ (ap-[]₀ p∘,#) [∘])))
+
+      ↓*↑ : {t : Tm Γ z A} → ↓* (↑ t) ≡ t [ p# ]
+      ↓*↑ = trans (cong ↓ ↑[p#]) ↓↑
 
 
     opaque
@@ -283,6 +299,7 @@ record CwFwEᴰ-sorts (s : CwFwE-sorts) : Set where
     Tyᴰ : ∀ {Γ} → Conᴰ Γ → Ty Γ → Set
     #∈ᴰ : ∀ {Γ} → Conᴰ Γ → #∈ Γ → Set
     Tmᴰ : ∀ {Γ A} → (Γᴰ : Conᴰ Γ) → (i : Mode) → Tyᴰ Γᴰ A → Tm Γ i A → Set
+    #-propᴰ : ∀ {Γ Γᴰ π π'} → (p : #∈ᴰ {Γ} Γᴰ π) (q : #∈ᴰ Γᴰ π') → (prf : π ≡ π') → p ≡[  cong (#∈ᴰ _) prf  ] q
 
 module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwFwE-sorts.CwFwE-core s) where
   open CwFwE-sorts s
@@ -691,6 +708,7 @@ module CwFwE-elim-Con
   nᴰ-sorts .Tyᴰ _ _ = 𝟙
   nᴰ-sorts .#∈ᴰ _ _ = 𝟙
   nᴰ-sorts .Tmᴰ _ _ _ _ = 𝟙
+  nᴰ-sorts .#-propᴰ p₁ q₁ prf = refl
 
   nᴰ-core : CwFwEᴰ-core nᴰ-sorts core 
   nᴰ-core .idᴰ = tt
@@ -785,6 +803,7 @@ module CwFwE-uniform (m : CwFwE) (n : CwFwE) where
   nᴰ-sorts .Tyᴰ Γ _ = Ty Γ
   nᴰ-sorts .#∈ᴰ Γ _ = #∈ Γ
   nᴰ-sorts .Tmᴰ Γ i A _ = Tm Γ i A
+  nᴰ-sorts .#-propᴰ p₁ q₁ prf = #-prop (coe _ p₁) q₁
 
   nᴰ-core : CwFwEᴰ-core nᴰ-sorts (m .CwFwE.core)
   nᴰ-core .idᴰ = id

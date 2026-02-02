@@ -286,6 +286,18 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
         El-code : El (code A) ≡ A
         code-El : code (El t) ≡ t
 
+      opaque
+        unfolding coe
+        ap-U : (p : Γ ≡ Γ') → U ≡[ ap-Tyᶜ p ] U
+        ap-U refl = refl
+
+        ap-El : (p : Γ ≡ Γ') → t ≡[ ap-Tmᶜ p (ap-U p) ] u → El t ≡[ ap-Tyᶜ p ] El u
+        ap-El refl refl = refl
+
+        ap-code : (p : Γ ≡ Γ') → A ≡[ ap-Tyᶜ p ] B → code A ≡[ ap-Tmᶜ p (ap-U p) ] code B
+        ap-code refl refl = refl
+
+
 record CwFwE : Set where
   field
     sorts : CwFwE-sorts

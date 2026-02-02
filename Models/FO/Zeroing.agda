@@ -67,16 +67,25 @@ module _ (e : CwFwE)  where
   ze-core .CwFwE-core.↑↓ = undep (transᴰ {q = ap-Tm (sym [id]T)} [id] (splitl reflᴰ)) 
   ze-core .CwFwE-core.↓↑ = [id]
 
-  ze-Π : in-CwFwE-sorts.in-CwFwE-core.Π-structure ze-sorts ze-core
-  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π i A B = Π i A B
-  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π[] = Π[]
-  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam {i = z} f
-    = ↓ (coe (ap-Tm (sym Π[])) (lam (coe (ap-Tm {! !}) ((↑ (f [ (p# ∘ p) ,, coe (ap-Tm (sym [∘]T)) q ])) [  id ,# (q# [ p ]#) ]))) )
-  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam {i = ω} f = {! !}
-  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam[] = {! !}
-  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.ap = {! !}
-  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πβ = {! !}
-  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πη = {!!}
+  -- -- This is annoying because of all the coercions so I will leave it out for now
+  -- -- However, it definitely works because it works in the second-order model
+  --
+  -- opaque
+  --   unfolding pz
+  --   ze-Π : in-CwFwE-sorts.in-CwFwE-core.Π-structure ze-sorts ze-core
+  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π i A B = Π i A B
+  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π[] = Π[]
+  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam {i = z} f
+  --     = ↓ (coe (ap-Tm (sym Π[])) (lam (coe (ap-Tm ( trans (sym [∘]T) ( trans (sym [∘]T) (trans (sym [∘]T)
+  --     (trans (ap-[]T₀ (trans ( cong (_∘ _) p,q)
+  --     (trans id∘ (cong (_ ∘_) (trans p∘,# (sym p,q)))))) [∘]T)))))
+  --     ((↑ (f [ (p# ∘ p) ,, coe (ap-Tm (sym [∘]T)) q ])) [  id ,# (q# [ p ]#) ]))) )
+  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam {i = ω} f = {! !}
+  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam[] {z} = {! !}
+  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam[] {ω} = {!!}
+  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.ap = {! !}
+  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πβ = {! !}
+  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πη = {!!}
 
   ze-U : in-CwFwE-sorts.in-CwFwE-core.U-structure ze-sorts ze-core
   ze-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.U = U
@@ -91,7 +100,7 @@ module _ (e : CwFwE)  where
   ze : CwFwE
   ze .sorts = ze-sorts
   ze .core = ze-core
-  ze .Π-str = ze-Π
+  ze .Π-str = {!!}
   ze .U-str = ze-U
 
   zeᴰ : CwFwEᴰ e
@@ -261,11 +270,11 @@ module need-nothing where
     nn-core .↓↑ᴰ = refl
 
     nn-U : U-structureᴰ nn-sorts core nn-core U-str
-    nn-U .Uᴰ = by {! !} , by U[]
+    nn-U .Uᴰ {Γᴰ = (_ , iΓ , _)} = by (ap-U (iΓ .witness)) , by U[]
     nn-U .U[]ᴰ = refl
-    nn-U .Elᴰ (it , pt) = {!!} , by (trans El[] (cong El (pt .witness))) 
+    nn-U .Elᴰ {Γᴰ = (_ , iΓ , _)} (it , pt) = by (ap-El (iΓ .witness) (it .witness)) , by (trans El[] (cong El (pt .witness))) 
     nn-U .El[]ᴰ = refl
-    nn-U .codeᴰ (iA , pA) =  {!!} ,  by (trans code[] (cong code (pA .witness)))
+    nn-U .codeᴰ {Γᴰ = (_ , iΓ , _)} (iA , pA) = by (ap-code (iΓ .witness) (iA .witness)) ,  by (trans code[] (cong code (pA .witness)))
     nn-U .code[]ᴰ = refl
     nn-U .El-codeᴰ = refl
     nn-U .code-Elᴰ = refl
@@ -273,7 +282,7 @@ module need-nothing where
   nn : CwFwEᴰ syn
   nn .sortsᴰ = nn-sorts
   nn .coreᴰ = nn-core
-  nn .Π-strᴰ = {!!}
+  nn .Π-strᴰ = {!!} -- left out of the zeroing model
   nn .U-strᴰ = nn-U
   
   opaque

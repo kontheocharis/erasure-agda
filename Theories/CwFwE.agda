@@ -537,6 +537,8 @@ module CwFwE-syntax where
   open in-CwFwE-sorts sorts public
   open in-CwFwE-sorts.CwFwE-core core public
   open in-CwFwE-sorts.in-CwFwE-core sorts core public
+  open in-CwFwE-sorts.in-CwFwE-core.U-structure U-str public
+  open in-CwFwE-sorts.in-CwFwE-core.Π-structure Π-str public
 
   -- Injectivity for syntax sorts
 
@@ -669,9 +671,7 @@ module CwFwE-syntax where
 
     {-# REWRITE ⟦pz⟧ #-}
 
-    open Π-structure Π-str
     open Π-structureᴰ Π-strᴰ
-    open U-structure U-str
     open U-structureᴰ U-strᴰ
 
     postulate

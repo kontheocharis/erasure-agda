@@ -158,116 +158,126 @@ module need-nothing where
     inj-↑[p#] : {t u : Tm (Γ ▷#) ω (A [ p# ]T)} → ↓ (t [ p# ]) ≡ ↓ (u [ p# ]) → ↓ t ≡ ↓ u
     inj-↑[p#] prf = cong ↓ (p#-inj q# (trans (sym ↑↓) (trans (cong ↑ prf) ↑↓)))
 
-    nn-ctors : CwFwEᴰ-core nn-sorts core
-    nn-ctors .idᴰ {Γ = Γ} {Γᴰ = (↑↑Γ , iΓ , pΓ)} = by (ap-id (iΓ .witness)) , by (trans id∘ (sym ∘id))
-    nn-ctors ._∘ᴰ_ {Δᴰ = (_ , iΔ , _)} {Θᴰ = (_ , iΘ , _)} {σ = σ} {Γᴰ = (_ , iΓ , _)} {τ = τ} (iσ , pσ) (iτ , pτ)
+    nn-core : CwFwEᴰ-core nn-sorts core
+    nn-core .idᴰ {Γ = Γ} {Γᴰ = (↑↑Γ , iΓ , pΓ)} = by (ap-id (iΓ .witness)) , by (trans id∘ (sym ∘id))
+    nn-core ._∘ᴰ_ {Δᴰ = (_ , iΔ , _)} {Θᴰ = (_ , iΘ , _)} {σ = σ} {Γᴰ = (_ , iΓ , _)} {τ = τ} (iσ , pσ) (iτ , pτ)
       =  by (ap-∘ (iΔ .witness) (iΘ .witness) (iΓ .witness) ( iσ .witness) ( iτ .witness))
         , by (trans (sym assoc) (trans (cong (⟦ σ ⟧ˢ ∘_) (pτ .witness))
         (trans assoc (trans (cong (_∘ τ) (pσ .witness)) (sym assoc)))))
-    nn-ctors .assocᴰ = refl
-    nn-ctors .∘idᴰ = refl
-    nn-ctors .id∘ᴰ = refl
-    nn-ctors .∙ᴰ = id , by refl , by (dep refl)
-    nn-ctors .εᴰ {Γᴰ = (_ , iΓ , _)} = by (ap-ε (iΓ .witness)) , by (trans (sym ∃!ε) (sym id∘))
-    nn-ctors .∃!εᴰ = refl
-    nn-ctors ._[_]Tᴰ {Δᴰ = (↑↑Δ , iΔ , pΔ)} {Γᴰ = (↑↑Γ , iΓ , pΓ)} {σ = σ} (iA , pA) (iσ , pσ)
+    nn-core .assocᴰ = refl
+    nn-core .∘idᴰ = refl
+    nn-core .id∘ᴰ = refl
+    nn-core .∙ᴰ = id , by refl , by (dep refl)
+    nn-core .εᴰ {Γᴰ = (_ , iΓ , _)} = by (ap-ε (iΓ .witness)) , by (trans (sym ∃!ε) (sym id∘))
+    nn-core .∃!εᴰ = refl
+    nn-core ._[_]Tᴰ {Δᴰ = (↑↑Δ , iΔ , pΔ)} {Γᴰ = (↑↑Γ , iΓ , pΓ)} {σ = σ} (iA , pA) (iσ , pσ)
       =  by (ap-[]T (iΓ .witness) (iΔ .witness) (iA .witness) (iσ .witness))
         , by (trans (sym [∘]T) (trans (ap-[]T₀ (pσ .witness))
         (trans [∘]T (ap-[]T₁ (pA .witness)))))
-    nn-ctors ._[_]ᴰ {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = z} {Aᴰ = (iA , pA)} {Γᴰ = (↑↑Γ , iΓ , pΓ)} (ia , pa) (iσ , pσ)
+    nn-core ._[_]ᴰ {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = z} {Aᴰ = (iA , pA)} {Γᴰ = (↑↑Γ , iΓ , pΓ)} (ia , pa) (iσ , pσ)
       =  by (ap-[] (iΓ .witness) (iΔ .witness) (iA .witness) (iσ .witness) (ia .witness))
         , by (transᴰ (symᴰ [∘])
         (transᴰ (ap-[]₀ (pσ .witness))
         (transᴰ [∘] (ap-[]₁ (pA .witness) (pa .witness)))))
-    nn-ctors ._[_]ᴰ {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = ω} {Aᴰ = (iA , pA)} {Γᴰ = (↑↑Γ , iΓ , pΓ)} (ia , pa) (iσ , pσ)
+    nn-core ._[_]ᴰ {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = ω} {Aᴰ = (iA , pA)} {Γᴰ = (↑↑Γ , iΓ , pΓ)} (ia , pa) (iσ , pσ)
       = by (ap-[] (iΓ .witness) (iΔ .witness) (iA .witness) (iσ .witness) (ia .witness))
         , by (transᴰ (symᴰ [∘])
         (transᴰ (ap-[]₀ (pσ .witness))
         (transᴰ [∘] (trans (ap-[]₁ (pA .witness) (pa .witness)) ↓*[]))))
-    nn-ctors ._[_]#ᴰ = λ _ _ → tt
-    nn-ctors .[id]Tᴰ = refl
-    nn-ctors .[id]ᴰ {i = z} = refl
-    nn-ctors .[id]ᴰ {i = ω} = refl
-    nn-ctors .[id]#ᴰ = refl
-    nn-ctors .[∘]Tᴰ = refl
-    nn-ctors .[∘]ᴰ {i = z} = refl
-    nn-ctors .[∘]ᴰ {i = ω} = refl
-    nn-ctors .[∘]#ᴰ = refl
-    nn-ctors ._▷ᴰ[_]_ {Γ = Γ} {A = A} (↑↑ , iΓ , pΓ) z (iA , pA)
+    nn-core ._[_]#ᴰ = λ _ _ → tt
+    nn-core .[id]Tᴰ = refl
+    nn-core .[id]ᴰ {i = z} = refl
+    nn-core .[id]ᴰ {i = ω} = refl
+    nn-core .[id]#ᴰ = refl
+    nn-core .[∘]Tᴰ = refl
+    nn-core .[∘]ᴰ {i = z} = refl
+    nn-core .[∘]ᴰ {i = ω} = refl
+    nn-core .[∘]#ᴰ = refl
+    nn-core ._▷ᴰ[_]_ {Γ = Γ} {A = A} (↑↑ , iΓ , pΓ) z (iA , pA)
       = ((↑↑ ∘ p) ,, coe (ap-Tm (sym (trans [∘]T (ap-[]T₁ (pA .witness))))) q) 
         , by (ap-▷[] (iΓ .witness) (iA .witness))
         , by (transᴰ (ap-,, refl (iΓ .witness)
         (transᴰ (ap-∘ refl (iΓ .witness) refl (pΓ .witness) refl) (dep (trans id∘ reflᴰ)))
         (iA .witness) (splitl reflᴰ)) (dep p,q))
-    nn-ctors ._▷ᴰ[_]_ {Γ = Γ} {A = A} (↑↑ , iΓ , pΓ) ω (iA , pA)
+    nn-core ._▷ᴰ[_]_ {Γ = Γ} {A = A} (↑↑ , iΓ , pΓ) ω (iA , pA)
       = ((↑↑ ∘ p) ,, coe (ap-Tm (sym (trans [∘]T (ap-[]T₁ (pA .witness))))) (↓* q))
         , by (ap-▷[] (iΓ .witness) (iA .witness))
         , by (transᴰ (ap-,, refl (iΓ .witness)
         (transᴰ (ap-∘ refl (iΓ .witness) refl (pΓ .witness) refl) (dep (trans id∘ reflᴰ)))
         (iA .witness) (splitl reflᴰ)) (transᴰ (ap-,, refl refl reflᴰ reflᴰ (splitl (transᴰ [id] reflᴰ))) (dep p,q)))
-    nn-ctors .pᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {i = z} {Aᴰ = (iA , pA)}
+    nn-core .pᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {i = z} {Aᴰ = (iA , pA)}
       = by (ap-p (iΓ .witness) (iA .witness))
         , by p∘, 
-    nn-ctors .pᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {i = ω} {Aᴰ = (iA , pA)}
+    nn-core .pᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {i = ω} {Aᴰ = (iA , pA)}
       = by (ap-p (iΓ .witness) (iA .witness))
         , by p∘,
-    nn-ctors .qᴰ {Γ = Γ} {Γᴰ = (↑↑ , iΓ , pΓ)} {i = z} {A = A} {Aᴰ = (iA , pA)}
+    nn-core .qᴰ {Γ = Γ} {Γᴰ = (↑↑ , iΓ , pΓ)} {i = z} {A = A} {Aᴰ = (iA , pA)}
       = by (ap-q (iΓ .witness) (iA .witness))
         , by (transᴰ (transᴰ {q = ap-Tm (trans [∘]T (trans (ap-[]T₁ (pA .witness)) (sym (trans (ap-[]T₀ p,q) [id]T))))}
           q[,] (splitl (symᴰ q[,]))) q[,])
-    nn-ctors .qᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {i = ω} {Aᴰ = (iA , pA)}
+    nn-core .qᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {i = ω} {Aᴰ = (iA , pA)}
       = by (ap-q (iΓ .witness) (iA .witness))
         , by (transᴰ {q = ap-Tm (trans [∘]T (ap-[]T₁ (pA .witness)))} q[,] (splitl reflᴰ))
-    _,,ᴰ_ nn-ctors {Γᴰ = (↑↑Γ , iΓ , pΓ)} {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = z} {Aᴰ = (iA , pA)} (iσ , pσ) (it , pt)
+    _,,ᴰ_ nn-core {Γᴰ = (↑↑Γ , iΓ , pΓ)} {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = z} {Aᴰ = (iA , pA)} (iσ , pσ) (it , pt)
       = by (ap-,, (iΓ .witness) (iΔ .witness) (iσ .witness) (iA .witness) (it .witness))
         ,  by (trans ,∘ (trans (undep (ap-,, refl refl
           (dep (trans (pσ .witness) (sym (trans (sym assoc) (cong (↑↑Δ ∘_) p∘,))))) reflᴰ
           (splitr (splitl (transᴰ (pt .witness) (symᴰ (transᴰ
           (ap-[] refl refl (dep (trans [∘]T (ap-[]T₁ (pA .witness)))) reflᴰ (splitl reflᴰ)) q[,])))))))
           (sym (,∘)))) 
-    _,,ᴰ_ nn-ctors {Γᴰ = (↑↑Γ , iΓ , pΓ)} {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = ω} {Aᴰ = (iA , pA)}  (iσ , pσ) (it , pt)
+    _,,ᴰ_ nn-core {Γᴰ = (↑↑Γ , iΓ , pΓ)} {Δᴰ = (↑↑Δ , iΔ , pΔ)} {i = ω} {Aᴰ = (iA , pA)}  (iσ , pσ) (it , pt)
       = by (ap-,, (iΓ .witness) (iΔ .witness) (iσ .witness) (iA .witness) (it .witness))
         ,  by (trans ,∘ (trans (undep (ap-,, refl refl
           (dep (trans (pσ .witness) (sym (trans (sym assoc) (cong (↑↑Δ ∘_) p∘,))))) reflᴰ
           (splitr (splitl (transᴰ (pt .witness) (symᴰ (transᴰ
           (ap-[] refl refl (dep (trans [∘]T (ap-[]T₁ (pA .witness)))) reflᴰ (splitl reflᴰ)) ↓*q[,])))))))
           (sym (,∘)))) 
-    nn-ctors .,∘ᴰ = refl
-    nn-ctors .p,qᴰ = refl
-    nn-ctors .p∘,ᴰ = refl
-    nn-ctors .q[,]ᴰ {i = z} = refl
-    nn-ctors .q[,]ᴰ {i = ω} = refl
-    nn-ctors ._▷#ᴰ (↑↑ , iΓ , pΓ)
+    nn-core .,∘ᴰ = refl
+    nn-core .p,qᴰ = refl
+    nn-core .p∘,ᴰ = refl
+    nn-core .q[,]ᴰ {i = z} = refl
+    nn-core .q[,]ᴰ {i = ω} = refl
+    nn-core ._▷#ᴰ (↑↑ , iΓ , pΓ)
       = (↑↑ ∘ p#) , iΓ , by (trans (cong (coe _) ∘id) (pΓ .witness))
-    nn-ctors .p#ᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} = by (ap-id (iΓ .witness)) , by id∘
-    nn-ctors .q#ᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} = tt
-    _,#ᴰ_ nn-ctors {Γᴰ = ↑↑Γ , iΓ , pΓ} {Δᴰ = ↑↑Δ , iΔ , pΔ} {σ = σ} (iσ , pσ) tt
+    nn-core .p#ᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} = by (ap-id (iΓ .witness)) , by id∘
+    nn-core .q#ᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} = tt
+    _,#ᴰ_ nn-core {Γᴰ = ↑↑Γ , iΓ , pΓ} {Δᴰ = ↑↑Δ , iΔ , pΔ} {σ = σ} (iσ , pσ) tt
       = iσ , by (trans (pσ .witness) (trans (cong (↑↑Δ ∘_) (sym (p∘,#))) assoc))
-    nn-ctors .,#∘ᴰ = refl
-    nn-ctors .p,#qᴰ = refl
-    nn-ctors .p∘,#ᴰ = refl
-    nn-ctors .q[,#]ᴰ = refl
-    nn-ctors .↓ᴰ {Γ = Γ} {Γᴰ = (↑↑ , iΓ , pΓ)} {Aᴰ = (iA , pA)} (it , pt)
+    nn-core .,#∘ᴰ = refl
+    nn-core .p,#qᴰ = refl
+    nn-core .p∘,#ᴰ = refl
+    nn-core .q[,#]ᴰ = refl
+    nn-core .↓ᴰ {Γ = Γ} {Γᴰ = (↑↑ , iΓ , pΓ)} {Aᴰ = (iA , pA)} (it , pt)
       =  by (splitr (splitl (it .witness))) ,  by (transᴰ (symᴰ (transᴰ {q = ap-Tm (sym (pA .witness))}
       (dep ↓↑) (splitl (ap-[]₁ [id]T refl))))
       (dep (inj-↑[p#] (undep (transᴰ (transᴰ (transᴰ (dep (sym ↓[p#]))
       (ap-[]₁ (sym (trans (ap-[]T₁ [id]T) (pA .witness))) (movel ↓↑))) (symᴰ [∘])) (pt .witness))))))
-    nn-ctors .↑ᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {Aᴰ = (iA , pA)} (it , pt)
+    nn-core .↑ᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {Aᴰ = (iA , pA)} (it , pt)
       = by (ap-[] (iΓ .witness) (iΓ .witness) (iA .witness) (ap-id (iΓ .witness)) (it .witness))
       , by (transᴰ [∘] (transᴰ (ap-[] refl refl (dep (trans (ap-[]T₁ [id]T) (pA .witness))) reflᴰ
       (transᴰ (ap-[]₁ [id]T [id]) (pt .witness))) (symᴰ (dep ↓*↑))))
-    nn-ctors .↓[]ᴰ = refl
-    nn-ctors .↑↓ᴰ = refl
-    nn-ctors .↓↑ᴰ = refl
+    nn-core .↓[]ᴰ = refl
+    nn-core .↑↓ᴰ = refl
+    nn-core .↓↑ᴰ = refl
+
+    nn-U : U-structureᴰ nn-sorts core nn-core U-str
+    nn-U .Uᴰ = by {! !} , by U[]
+    nn-U .U[]ᴰ = refl
+    nn-U .Elᴰ (it , pt) = {!!} , by (trans El[] (cong El (pt .witness))) 
+    nn-U .El[]ᴰ = refl
+    nn-U .codeᴰ (iA , pA) =  {!!} ,  by (trans code[] (cong code (pA .witness)))
+    nn-U .code[]ᴰ = refl
+    nn-U .El-codeᴰ = refl
+    nn-U .code-Elᴰ = refl
 
   nn : CwFwEᴰ syn
   nn .sortsᴰ = nn-sorts
-  nn .coreᴰ = nn-ctors
+  nn .coreᴰ = nn-core
   nn .Π-strᴰ = {!!}
-  nn .U-strᴰ = {!!}
-
+  nn .U-strᴰ = nn-U
+  
   opaque
-    unfolding ↓*ᴰ nn-ctors
+    unfolding ↓*ᴰ nn-core
 
     -- Final induction over contexts to show that ↑↑ is the identity if all the
     -- bindings are zero.

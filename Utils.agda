@@ -154,6 +154,9 @@ opaque
   undep : x ≡[ refl ] y → x ≡ y
   undep p = p
 
+  movel : x ≡ coe (sym q) y → x ≡[ q ] y
+  movel {q = refl} refl = refl
+
   splitl : x ≡[ trans p q ] y → coe p x ≡[ q ] y
   splitl {p = refl} q = q
 

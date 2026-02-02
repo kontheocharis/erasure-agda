@@ -128,37 +128,18 @@ module need-nothing where
   σ≡,# : ∀ {Γ Δ} {σ : Sub Γ (Δ ▷#)} → σ ≡ ((p# ∘ σ) ,# (q# [ σ ]#))
   σ≡,# {σ = σ} = trans (sym id∘) (trans (cong (_∘ σ) (sym (p,#q))) ,#∘)
 
-  -- q[p#]-epi : ∀ {Γ Δ i A} {σ τ : Sub Γ (Δ ▷[ i ] A)} → q [ σ ∘ p# ] ≡[ _ ] q [ τ ∘ p# ] → q [ σ ] ≡[ _ ] q [ τ ]
-  -- q[p#]-epi {Γ} {Δ} {i} {A} {σ} {τ} prf = (CwFwE-elim-Con.⟦_⟧
-  --   (λ Δ → ∀ A → (σ τ : Sub Γ (Δ ▷[ i ] A)) → q [ σ ∘ p# ] ≡[ _ ] q [ τ ∘ p# ] → (q [ σ ] ≡[ _ ] q [ τ ]) true)
-  --   (λ A σ τ prf → {! !})
-  --   {!!}
-  --   {!!}
-  --   {!!}
-  --    Δ) A σ τ prf .witness
-
-  -- p#-epi : ∀ {Γ Δ} {σ τ : Sub Γ Δ} → σ ∘ p# ≡ τ ∘ p# → σ ≡ τ
-  -- p#-epi {Γ} {Δ} {σ} {τ} prf = (CwFwE-elim-Con.⟦_⟧
-  --   (λ Δ → (σ τ : Sub Γ Δ) → σ ∘ p# ≡ τ ∘ p# → (σ ≡ τ) true)
-  --   (λ σ τ prf → by (trans (sym ∃!ε) ∃!ε))
-  --   (λ Γ A rec σ τ prf → by (trans (σ≡,,) (trans
-  --     (undep (ap-,, refl refl (dep ((rec (p ∘ σ) (p ∘ τ) (trans (sym assoc)
-  --     (trans (cong (p ∘_) prf) (assoc)))) .witness))
-  --     reflᴰ (splitr (splitl (q[p#]-epi (ap-[]₀ {t = q} prf))))))
-  --     (sym σ≡,,))))
-  --   (λ Γ A rec σ τ prf → by (trans (σ≡,,) (trans
-  --     (undep (ap-,, refl refl (dep ((rec (p ∘ σ) (p ∘ τ) (trans (sym assoc)
-  --     (trans (cong (p ∘_) prf) (assoc)))) .witness))
-  --     reflᴰ (splitr (splitl (q[p#]-epi (ap-[]₀ {t = q} prf))))))
-  --     (sym σ≡,,))))
-  --   (λ Γ rec σ τ prf → by (trans (σ≡,#) (trans
-  --     (undep (ap-,# refl refl (dep ((rec (p# ∘ σ) (p# ∘ τ) (trans (sym assoc)
-  --     (trans (cong (p# ∘_) prf) assoc))) .witness)) (#-prop _ _)))
-  --     (sym σ≡,#))))
-  --   Δ) σ τ prf .witness
 
   opaque
     unfolding ↓*ᴰ
+
+    p#-inj : #∈ Γ → {t : Tm Γ i A} → t [ p# ] ≡ u [ p# ] → t ≡ u
+    p#-inj mrk prf =
+      undep (transᴰ (symᴰ (transᴰ (ap-[]₀ p∘,#) [id]))
+      (transᴰ (transᴰ [∘] (transᴰ (ap-[]₁ {σ = (id ,# mrk)} refl (dep prf)) (symᴰ [∘])))
+      (transᴰ (ap-[]₀ p∘,#) [id])))
+
+    inj-↑[p#] : {t u : Tm (Γ ▷#) ω (A [ p# ]T)} → ↓ (t [ p# ]) ≡ ↓ (u [ p# ]) → ↓ t ≡ ↓ u
+    inj-↑[p#] prf = cong ↓ (p#-inj q# (trans (sym ↑↓) (trans (cong ↑ prf) ↑↓)))
 
     nn-sorts : CwFwEᴰ-sorts sorts
     nn-sorts .Conᴰ Γ =
@@ -266,11 +247,15 @@ module need-nothing where
     nn-ctors .p,#qᴰ = refl
     nn-ctors .p∘,#ᴰ = refl
     nn-ctors .q[,#]ᴰ = refl
-    nn-ctors .↓ᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {Aᴰ = (iA , pA)} (it , pt)
-      = by (splitr (splitl (it .witness))) , by {! !}
+    nn-ctors .↓ᴰ {Γ = Γ} {Γᴰ = (↑↑ , iΓ , pΓ)} {Aᴰ = (iA , pA)} (it , pt)
+      =  by (splitr (splitl (it .witness))) ,  by (transᴰ (symᴰ (transᴰ {q = ap-Tm (sym (pA .witness))}
+      (dep ↓↑) (splitl (ap-[]₁ [id]T refl))))
+      (dep (inj-↑[p#] (undep (transᴰ (transᴰ (transᴰ (dep (sym ↓[p#]))
+      (ap-[]₁ (sym (trans (ap-[]T₁ [id]T) (pA .witness))) (movel ↓↑))) (symᴰ [∘])) (pt .witness))))))
     nn-ctors .↑ᴰ {Γᴰ = (↑↑ , iΓ , pΓ)} {Aᴰ = (iA , pA)} (it , pt)
       = by (ap-[] (iΓ .witness) (iΓ .witness) (iA .witness) (ap-id (iΓ .witness)) (it .witness))
-      ,  by (transᴰ [∘] (?))
+      , by (transᴰ [∘] (transᴰ (ap-[] refl refl (dep (trans (ap-[]T₁ [id]T) (pA .witness))) reflᴰ
+      (transᴰ (ap-[]₁ [id]T [id]) (pt .witness))) (symᴰ (dep ↓*↑))))
     nn-ctors .↓[]ᴰ = refl
     nn-ctors .↑↓ᴰ = refl
     nn-ctors .↓↑ᴰ = refl

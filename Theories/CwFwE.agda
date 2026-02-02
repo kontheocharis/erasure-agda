@@ -198,10 +198,17 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       ap-[]₁ : ∀ {t : Tm Γ i A} {u : Tm Γ i B} (p : A ≡ B) → t ≡[ ap-Tm p ] u → t [ σ ] ≡[ ap-Tm (ap-[]T₁ p) ] u [ σ ]
       ap-[]₁ refl refl = refl
 
+    p#∘p#,#q# : ((p# {Γ} ∘ p#) ,# q#) ≡ p#
+    p#∘p#,#q# = trans (trans (trans (undep (ap-,# refl refl reflᴰ (#-prop _ _))) (sym ,#∘))
+     (cong (_∘ p#) p,#q)) (id∘)
+
+
     ↑[p#] : (↑ t) [ p# ] ≡ ↑ (t [ p# ])
     ↑[p#] = sym (trans (cong ↑ (undep (ap-[]₁ refl (dep (sym ↓↑)))))
-      (trans (cong ↑ ↓[]) (trans ↑↓ (ap-[]₀ ( trans (trans (trans (undep (ap-,# refl refl reflᴰ (#-prop _ _))) (sym ,#∘))
-      (cong (_∘ p#) p,#q)) (id∘))))))
+      (trans (cong ↑ ↓[]) (trans ↑↓ (ap-[]₀ p#∘p#,#q#))))
+
+    ↓[p#] : (↓ t) [ p# ] ≡ ↓ (t [ p# ])
+    ↓[p#] = trans ↓[] ( cong ↓ (ap-[]₀ p#∘p#,#q#))
 
     opaque
       ↓* : Tm Γ i A → Tm Γ z A
@@ -449,7 +456,7 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
     σᴰ ⁺#ᴰ = (σᴰ ∘ᴰ p#ᴰ) ,#ᴰ q#ᴰ
 
     field
-      ↓ᴰ : Tmᴰ (Γᴰ ▷#ᴰ) ω (Aᴰ [ p#ᴰ ]Tᴰ) t → Tmᴰ Γᴰ z Aᴰ (↓ t)
+      ↓ᴰ : Tmᴰ {Γ ▷#} (Γᴰ ▷#ᴰ) ω (Aᴰ [ p#ᴰ ]Tᴰ) t → Tmᴰ Γᴰ z Aᴰ (↓ t)
       ↑ᴰ : Tmᴰ Γᴰ z Aᴰ t → Tmᴰ (Γᴰ ▷#ᴰ) ω (Aᴰ [ p#ᴰ ]Tᴰ) (↑ t)
       ↓[]ᴰ : (↓ᴰ tᴰ) [ σᴰ ]ᴰ ≡[ ap-Tmᴰ refl reflᴰ (dep ↓[]) ]
         ↓ᴰ (coe (ap-Tmᴰ (trans (sym [∘]T) (trans (ap-[]T₀ p∘,#) [∘]T))

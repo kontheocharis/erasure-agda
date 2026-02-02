@@ -199,7 +199,9 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       ap-[]₁ refl refl = refl
 
     ↑[p#] : (↑ t) [ p# ] ≡ ↑ (t [ p# ])
-    ↑[p#] = ?
+    ↑[p#] = sym (trans (cong ↑ (undep (ap-[]₁ refl (dep (sym ↓↑)))))
+      (trans (cong ↑ ↓[]) (trans ↑↓ (ap-[]₀ ( trans (trans (trans (undep (ap-,# refl refl reflᴰ (#-prop _ _))) (sym ,#∘))
+      (cong (_∘ p#) p,#q)) (id∘))))))
 
     opaque
       ↓* : Tm Γ i A → Tm Γ z A

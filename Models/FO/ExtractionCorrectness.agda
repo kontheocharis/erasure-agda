@@ -90,6 +90,7 @@ module _ where
       Σ[ aₛ ∈ ((γₛ : Γₛ) → Aₛ γₛ) ]
       (∀ γₛ → (γ : Γ₀ γₛ) → A₀ γₛ γ (aₛ γₛ))
     fam-s .#∈ (Γₛ , Γₑ , Γ₀ , Γ₁) = Γₑ → ⊥
+    fam-s .#-prop p₁ q₁ = refl
 
     fam-c : CwFwE-core fam-s
     fam-c .id = (λ z₁ → z₁) , (λ z₁ → z₁) , (λ γₛ z₁ → z₁) , (λ γₛ γₑ γ z₁ → z₁)

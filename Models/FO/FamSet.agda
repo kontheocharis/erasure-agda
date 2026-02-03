@@ -30,6 +30,7 @@ module _ where
     fam-s .Tm (Γ₀ , Γ₁) ω (A₀ , A₁) = Σ[ a₀ ∈ ((γ : Γ₀) → A₀ γ) ] (∀ γ → (γ' : Γ₁ γ) → A₁ γ (a₀ γ))  
     fam-s .Tm (Γ₀ , Γ₁) z (A₀ , A₁) = (γ : Γ₀) → A₀ γ
     fam-s .#∈ (Γ₀ , Γ₁) = (γ : Γ₀) → Γ₁ γ → ⊥
+    fam-s .#-prop p₁ q₁ = refl
 
     fam-c : CwFwE-core fam-s
     fam-c .id = (λ γ → γ) , (λ γ γ' → γ') 

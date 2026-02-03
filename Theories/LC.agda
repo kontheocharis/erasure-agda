@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas #-}
 module Theories.LC where
 
 open import Agda.Primitive
@@ -37,30 +36,16 @@ record LC : Set (lsuc ℓ) where
   recΛ zr su n = n $ zr $ (ƛ k ⇒ ƛ sk ⇒ su k sk)
 
   recΛβ-zero : ∀ {zr su} → recΛ zr su zeroΛ ≡ zr
-  recΛβ-zero {zr} {su} =  {!   !}
-    --   recΛ zr su zeroΛ
-    -- ≡⟨⟩
-    --   ((ƛ z ⇒ ƛ s ⇒ z) $ zr $ (ƛ k ⇒ ƛ sk ⇒ su k sk))
-    -- ≡⟨ (λ i → (beta (λ z → ƛ s ⇒ z) zr i) $ (ƛ k ⇒ ƛ sk ⇒ su k sk)) ⟩
-    --   ((ƛ s ⇒ zr) $ (ƛ k ⇒ ƛ sk ⇒ su k sk))
-    -- ≡⟨ (λ i → (beta (λ s → zr) (ƛ k ⇒ ƛ sk ⇒ su k sk) i)) ⟩
-    --   zr
-    -- ∎
+  recΛβ-zero {zr} {su} =
+    trans (cong (_$ (ƛ k ⇒ ƛ sk ⇒ su k sk)) (beta (λ z → ƛ s ⇒ z) zr))
+          (beta (λ _ → zr) (ƛ k ⇒ ƛ sk ⇒ su k sk))
 
   recΛβ-succ : ∀ {zr su n} → recΛ zr su (succΛ n) ≡ su n (recΛ zr su n)
-  recΛβ-succ {zr} {su} {n} = {!   !}
-    --   recΛ zr su (succΛ n)
-    -- ≡⟨⟩
-    --   ((ƛ z ⇒ ƛ s ⇒ (s $ n $ (n $ z $ s))) $ zr $ (ƛ k ⇒ ƛ sk ⇒ su k sk))
-    -- ≡⟨ (λ i → (beta (λ z → ƛ s ⇒ (s $ n $ (n $ z $ s))) zr i) $ (ƛ k ⇒ ƛ sk ⇒ su k sk)) ⟩
-    --   ((ƛ s ⇒ (s $ n $ (n $ zr $ s))) $ (ƛ k ⇒ ƛ sk ⇒ su k sk))
-    -- ≡⟨ beta _ _ ⟩
-    --   ((ƛ k ⇒ ƛ sk ⇒ su k sk) $ n $ (n $ zr $ (ƛ k ⇒ ƛ sk ⇒ su k sk)))
-    -- ≡⟨ (λ i → beta (λ k → ƛ sk ⇒ su k sk) n i $ (n $ zr $ (ƛ k ⇒ ƛ sk ⇒ su k sk))) ⟩
-    --   ((ƛ sk ⇒ su n sk) $ (n $ zr $ (ƛ k ⇒ ƛ sk ⇒ su k sk)))
-    -- ≡⟨ beta _ _ ⟩ 
-    --   su n (recΛ zr su n)
-    -- ∎
+  recΛβ-succ {zr} {su} {n} =
+    trans (cong (_$ (ƛ k ⇒ ƛ sk ⇒ su k sk)) (beta (λ z → ƛ s ⇒ (s $ n $ (n $ z $ s))) zr))
+    (trans (beta (λ s → s $ n $ (n $ zr $ s)) (ƛ k ⇒ ƛ sk ⇒ su k sk))
+    (trans (cong (_$ (n $ zr $ (ƛ k ⇒ ƛ sk ⇒ su k sk))) (beta (λ k → ƛ sk ⇒ su k sk) n))
+           (beta (λ sk → su n sk) (n $ zr $ (ƛ k ⇒ ƛ sk ⇒ su k sk)))))
 
   embed-nat : ℕ → Λ
   embed-nat ℕ.zero = zeroΛ

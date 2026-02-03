@@ -25,8 +25,8 @@ module in-CwF-sorts (s : CwF-sorts) where
       id : Sub Γ Γ
       _∘_ : (σ : Sub Δ Θ) → (τ : Sub Γ Δ) → Sub Γ Θ
       assoc : ρ ∘ (σ ∘ τ) ≡ (ρ ∘ σ) ∘ τ
-      ∘id : id ∘ σ ≡ σ
-      id∘ : σ ∘ id ≡ σ
+      id∘ : id ∘ σ ≡ σ
+      ∘id : σ ∘ id ≡ σ
 
       ∙ : Con
       ε : Sub Γ ∙

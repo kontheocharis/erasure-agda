@@ -33,8 +33,6 @@ module _ (sorts : TT-sorts {ℓty} {ℓtm}) where
       Π : (A : Ty) → (Tm A → Ty) → Ty
       lam : ((a : Tm A) → Tm (X a)) → Tm (Π A X)
       app : Tm (Π A X) → (a : Tm A) → Tm (X a)
-
-      -- Beta rules for irrelevant fragment
       lam-app : lam (app t) ≡ t
       app-lam : app (lam f) t ≡ f t
 

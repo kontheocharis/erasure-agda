@@ -165,4 +165,3 @@ opaque
 
   merger : x ≡[ p ] coe q y → x ≡[ trans p (sym q) ] y
   merger {p = refl} {q = refl} refl = refl
-

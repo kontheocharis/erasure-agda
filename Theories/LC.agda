@@ -3,7 +3,6 @@ module Theories.LC where
 
 open import Agda.Primitive
 open import Utils
-open import Mode
 open import Data.Nat using (ℕ; suc)
 
 private

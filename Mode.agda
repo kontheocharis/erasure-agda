@@ -16,7 +16,7 @@ opaque
 
 variable
   i j : Mode
-    
+
 opaque
   unfolding _*_
 
@@ -38,4 +38,3 @@ opaque
 
 -- Better definitional computation for _*_
 {-# REWRITE j*ω ω*j z*j j*z #-}
-

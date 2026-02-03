@@ -47,8 +47,6 @@ module _ (sorts : TTwE-sorts {ℓp} {ℓty} {ℓtm}) where
       Π : (j : Mode) → (A : Ty) → (Tm z A → Ty) → Ty
       lam : ((a : Tm j A) → Tm ω (X (↓* a))) → Tm ω (Π j A X)
       app : Tm ω (Π j A X) → (a : Tm j A) → Tm ω (X (↓* a))
-
-      -- Beta rules for irrelevant fragment
       lam-app : lam {j} (app t) ≡ t
       app-lam : app {j} (lam f) t ≡ f t
 

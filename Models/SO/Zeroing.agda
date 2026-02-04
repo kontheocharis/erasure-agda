@@ -6,12 +6,12 @@ open import Utils
 open import Mode
 
 -- Zeroing model of TTwE
-module TTwE-zeroing {ℓ} {ℓ'} (m : TTwE {lzero} {ℓ} {ℓ'}) where
+module TTwE-zeroing {ℓ} {ℓ'} (m : TTwE {ℓ} {ℓ'}) where
   open TTwE 
   open TTwE-sorts 
   open TTwE-ctors
 
-  ze-sorts : TTwE-sorts {lzero} {ℓ} {ℓ'}
+  ze-sorts : TTwE-sorts {ℓ} {ℓ'}
   ze-sorts .# = ⊤
   ze-sorts .Ty = m .Ty
   ze-sorts .Tm j A = m .Tm z A
@@ -28,17 +28,17 @@ module TTwE-zeroing {ℓ} {ℓ'} (m : TTwE {lzero} {ℓ} {ℓ'}) where
   ze-ctors .app {ω} = TTwE.appz m
   ze-ctors .lam-app {z} = TTwE.lamz-appz m
   ze-ctors .lam-app {ω} = TTwE.lamz-appz m
-  ze-ctors .app-lam {z} = TTwE.appz-lamz m {j = z} 
-  ze-ctors .app-lam {ω} {f = f} = TTwE.appz-lamz m {j = ω} {f = f}
+  ze-ctors .app-lam {j = z} = TTwE.appz-lamz m {j = z} 
+  ze-ctors .app-lam {j = ω} {f = f} = TTwE.appz-lamz m {j = ω} {f = f}
   ze-ctors .U = m .U
   ze-ctors .El = m .El
   ze-ctors .Nat = m .Nat
   ze-ctors .zero = TTwE.zeroz m
   ze-ctors .succ = TTwE.succz m
   ze-ctors .elim-Nat = TTwE.elim-Natz m
-  ze-ctors .elim-Nat-zero = TTwE.elim-Nat-zeroz m
-  ze-ctors .elim-Nat-succ = TTwE.elim-Nat-succz m
+  ze-ctors .elim-Nat-zero = {!   !}
+  ze-ctors .elim-Nat-succ = {!   !}
 
-  ze : TTwE {lzero} {ℓ} {ℓ'}
+  ze : TTwE {ℓ} {ℓ'}
   ze .sorts = ze-sorts
   ze .ctors = ze-ctors

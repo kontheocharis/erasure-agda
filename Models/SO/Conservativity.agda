@@ -13,7 +13,7 @@ module TT-TTwE {ℓ} {ℓ'} (m : TT {ℓ} {ℓ'}) where
   open TTwE-sorts 
   open TTwE-ctors
 
-  f-sorts : TTwE-sorts {lzero} {ℓ} {ℓ'}
+  f-sorts : TTwE-sorts {ℓ} {ℓ'}
   f-sorts .# = ⊤
   f-sorts .Ty = m .Ty
   f-sorts .Tm j A = m .Tm A
@@ -30,8 +30,8 @@ module TT-TTwE {ℓ} {ℓ'} (m : TT {ℓ} {ℓ'}) where
   f-ctors .app {ω} = m .app
   f-ctors .lam-app {z} = m .lam-app
   f-ctors .lam-app {ω} = m .lam-app
-  f-ctors .app-lam {z} = m .app-lam
-  f-ctors .app-lam {ω} = m .app-lam
+  f-ctors .app-lam {j = z} = m .app-lam
+  f-ctors .app-lam {j = ω} = m .app-lam
   f-ctors .U = m .U
   f-ctors .El = m .El
   f-ctors .Nat = m .Nat
@@ -41,12 +41,12 @@ module TT-TTwE {ℓ} {ℓ'} (m : TT {ℓ} {ℓ'}) where
   f-ctors .elim-Nat-zero = m .elim-Nat-zero
   f-ctors .elim-Nat-succ = m .elim-Nat-succ
 
-  f : TTwE {lzero} {ℓ} {ℓ'}
+  f : TTwE {ℓ} {ℓ'}
   f .sorts = f-sorts
   f .ctors = f-ctors
 
 -- TTwE model of TT using erased terms
-module TTwE-TT {ℓ} {ℓ'} (i : TTwE {lzero} {ℓ} {ℓ'}) where
+module TTwE-TT {ℓ} {ℓ'} (i : TTwE {ℓ} {ℓ'}) where
   open TTwE
   open TT 
   open TT-sorts 
@@ -68,8 +68,8 @@ module TTwE-TT {ℓ} {ℓ'} (i : TTwE {lzero} {ℓ} {ℓ'}) where
   m-ctors .zero = TTwE.zeroz i
   m-ctors .succ = TTwE.succz i
   m-ctors .elim-Nat = TTwE.elim-Natz i
-  m-ctors .elim-Nat-zero {ms = ms} = TTwE.elim-Nat-zeroz i {ms = ms}
-  m-ctors .elim-Nat-succ {ms = ms} = TTwE.elim-Nat-succz i {ms = ms}
+  m-ctors .elim-Nat-zero {ms = ms} = {!!} -- @@TODO
+  m-ctors .elim-Nat-succ {ms = ms} = {!!}
 
   m : TT {ℓ} {ℓ'}
   m .sorts = m-sorts

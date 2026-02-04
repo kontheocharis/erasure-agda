@@ -1,4 +1,3 @@
-{-# OPTIONS --allow-unsolved-metas --type-in-type #-}
 module Theories.TTwE where
 
 open import Agda.Primitive
@@ -9,9 +8,9 @@ private
   variable
     ℓ ℓ' ℓp ℓty ℓtm : Level
 
-record TTwE-sorts {ℓp} {ℓty} {ℓtm} : Set (lsuc (ℓp ⊔ ℓty ⊔ ℓtm)) where
+record TTwE-sorts {ℓty} {ℓtm} : Set (lsuc (ℓty ⊔ ℓtm)) where
   field
-    # : Prop ℓp
+    # : Prop
     Ty : Set ℓty
     Tm : Mode → Ty → Set ℓtm
 
@@ -23,7 +22,7 @@ record TTwE-sorts {ℓp} {ℓty} {ℓtm} : Set (lsuc (ℓp ⊔ ℓty ⊔ ℓtm))
   coeTm : ∀ {A B} → A ≡ B → Tm i A → Tm i B
   coeTm {i = i} p a = coe (cong (Tm i) p) a
     
-module _ (sorts : TTwE-sorts ) where
+module _ {ℓty} {ℓtm} (sorts : TTwE-sorts {ℓty} {ℓtm}) where
   open TTwE-sorts sorts
   
   private
@@ -40,7 +39,7 @@ module _ (sorts : TTwE-sorts ) where
   ↓* {i = z} t = t
   ↓* {i = ω} t = ↓ (λ _ → t)
       
-  record TTwE-ctors : Set where
+  record TTwE-ctors : Set (lsuc (ℓty ⊔ ℓtm)) where
     field
       -- Pi types
       Π : (j : Mode) → (A : Ty) → (Tm z A → Ty) → Ty
@@ -130,12 +129,11 @@ module _ (sorts : TTwE-sorts ) where
       elim-Nat X (↑ p ze) (λ n pn → coe (ap-Tm (cong X (cong ↓ (propfunext  λ p → cong succ ↑↓))))
       (↑ p (su (↓* n) (↓* pn)))) (↑ p n))
 
-    -- Can also derive the eliminator rules..
+    -- @TODO: Can also derive the eliminator rules..
 
-
-record TTwE {ℓp} {ℓty} {ℓtm} : Set (lsuc (ℓp ⊔ ℓty ⊔ ℓtm)) where
+record TTwE {ℓty} {ℓtm} : Set (lsuc (ℓty ⊔ ℓtm)) where
   field
-    sorts : TTwE-sorts {ℓp} {ℓty} {ℓtm}
+    sorts : TTwE-sorts {ℓty} {ℓtm}
   open TTwE-sorts sorts public
   field
     ctors : TTwE-ctors sorts

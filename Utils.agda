@@ -12,7 +12,7 @@ open import Data.Empty renaming (⊥ to Empty)
 private variable
   ℓ ℓ' : Level
   A A' : Set ℓ
-  P P' : Prop ℓ
+  P P' : Prop
   B B' : A → Set ℓ
   C : P → Set ℓ
   x y z : A
@@ -27,7 +27,7 @@ data ⊥ : Prop where
 exfalso : ⊥ → A
 exfalso ()
 
-exfalso-prop : ⊥ → P
+exfalso-prop : ∀ {P : Prop ℓ} → ⊥ → P
 exfalso-prop ()
 
 exfalso-empty-prop : Empty → P

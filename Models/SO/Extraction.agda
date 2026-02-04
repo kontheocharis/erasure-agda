@@ -13,7 +13,7 @@ module LC-TTwE {ℓ} {ℓ'} (l : LC {ℓ'}) where
   open TTwE-sorts 
   open TTwE-ctors
 
-  ex-sorts : TTwE-sorts {lzero} {ℓ} {ℓ'}
+  ex-sorts : TTwE-sorts {ℓ} {ℓ'}
   ex-sorts .# = ⊥
   ex-sorts .Ty = Unit*
   ex-sorts .Tm z tt* = Unit*
@@ -31,8 +31,8 @@ module LC-TTwE {ℓ} {ℓ'} (l : LC {ℓ'}) where
   ex-ctors .app {ω} f x = l .apply f x
   ex-ctors .lam-app {z} = refl
   ex-ctors .lam-app {ω} = l .eta _
-  ex-ctors .app-lam {z} = refl
-  ex-ctors .app-lam {ω} = l .beta _ _
+  ex-ctors .app-lam {j = z} = refl
+  ex-ctors .app-lam {j = ω} = funext (λ x → l .beta _ _)
   ex-ctors .U = tt*
   ex-ctors .El _ = tt*
   ex-ctors .Nat = tt*
@@ -42,6 +42,6 @@ module LC-TTwE {ℓ} {ℓ'} (l : LC {ℓ'}) where
   ex-ctors .elim-Nat-zero = recΛβ-zero l
   ex-ctors .elim-Nat-succ = recΛβ-succ l
 
-  ex : TTwE {lzero} {ℓ} {ℓ'}
+  ex : TTwE {ℓ} {ℓ'}
   ex .sorts = ex-sorts
   ex .ctors = ex-ctors

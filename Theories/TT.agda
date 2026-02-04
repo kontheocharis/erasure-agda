@@ -34,7 +34,7 @@ module _ (sorts : TT-sorts {ℓty} {ℓtm}) where
       lam : ((a : Tm A) → Tm (X a)) → Tm (Π A X)
       app : Tm (Π A X) → (a : Tm A) → Tm (X a)
       lam-app : lam (app t) ≡ t
-      app-lam : app (lam f) t ≡ f t
+      app-lam : app (lam f) ≡ f
 
       -- Universe
       U : Ty

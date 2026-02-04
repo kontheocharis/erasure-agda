@@ -85,6 +85,9 @@ opaque
 cong : (f : A → A') → x ≡ y → f x ≡ f y
 cong f refl = refl
 
+cong₂ : ∀ {B C : Set ℓ} {z w : B} → (f : A → B → C) → x ≡ y → z ≡ w → f x z ≡ f y w
+cong₂ f refl refl = refl
+
 sym : x ≡ y → y ≡ x
 sym refl = refl
 
@@ -148,6 +151,9 @@ opaque
   transᴰ : x ≡[ p ] y → y ≡[ q ] z → x ≡[ trans p q ] z
   transᴰ {p = refl} {q = refl} refl m = m
 
+  congᴰ : (B : A → Set ℓ) → (f : (a : A) → B a) → (p : x ≡ y) → f x ≡[ cong B p ] f y
+  congᴰ _ _ refl = refl
+
   dep : x ≡ y → x ≡[ refl ] y
   dep p = p
 
@@ -165,3 +171,14 @@ opaque
 
   merger : x ≡[ p ] coe q y → x ≡[ trans p (sym q) ] y
   merger {p = refl} {q = refl} refl = refl
+
+
+opaque
+  unfolding coe
+
+  ap-→ : ∀ {C C' : Set ℓ} → A ≡ A' → C ≡ C' → (A → C) ≡ (A' → C')
+  ap-→ refl refl = refl
+
+  ap-$ : ∀ {f g : (x : A) → B x} → f ≡ g → ∀ x → f x ≡ g x
+  ap-$ refl x = refl
+    

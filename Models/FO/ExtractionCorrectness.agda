@@ -25,6 +25,9 @@ open import Mode
 -- theorems to get the corresponding statement in Set about closed Λ terms.
 -- This is easier than to formalise in Set because then we would need to deal with
 -- closed first-order Λ terms.
+--
+-- It is also possible to separate the base interpretations from the logical relation
+-- through a displayed model, but this seems easier.
 
 postulate
   Λ : Set

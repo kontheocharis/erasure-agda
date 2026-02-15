@@ -8,24 +8,41 @@ open import Mode
 
 postulate
   # : Prop
+  $ : Prop
   Ty : Set
+  Ex : Set
   Tm : Mode → Ty → Set
-
-  ↓ : ∀ {A} → (# → Tm ω A) → Tm z A
-  ↑ : ∀ {A} → # → Tm z A → Tm ω A
-  ↓↑ : ∀ {A} {t : Tm z A} → ↓ (λ p → ↑ p t) ≡ t
-  ↑↓ : ∀ {A} {t# : # → Tm ω A} {p : #} → ↑ p (↓ t#) ≡ t# p
-
-  {-# REWRITE ↑↓ ↓↑ #-}
 
 private variable
   A B C : Ty
   A# B# C# : # → Ty
+  A$ B$ C$ : $ → Ty
   X Y Z : Tm i A → Ty
   X# Y# Z# : (p : #) → Tm i A → Ty
+  X$ Y$ Z$ : (q : $) → Tm i (A$ q) → Ty
   t u v v' : Tm i A
   t# u# v# : (p : #) → Tm i A
+  t$ u$ v$ : (q : $) → Tm ω (A$ q)
   f g h : (a : Tm j B) → Tm i A
+  f$ g$ h$ : (q : $) → (a : Tm j (A$ q)) → Tm i (X$ q a)
+  c k l : Ex
+  p : #
+  q : $
+
+postulate
+  ↓ : (# → Tm ω A) → Tm z A
+  ↑ : # → Tm z A → Tm ω A
+  ↓↑ : ↓ (λ p → ↑ p t) ≡ t
+  ↑↓ : ↑ p (↓ t#) ≡ t# p
+
+  ^ : $ → Ex → Tm ω A
+  ↯ : ((q : $) → Tm ω (A$ q)) → Ex
+
+  {-# REWRITE ↑↓ ↓↑ #-}
+
+postulate
+  ∅ : $ → Tm z A
+  ∅η : ∅ q ≡ t
 
 opaque
   ↓* : Tm i A → Tm z A
@@ -49,15 +66,24 @@ opaque
 
 {-# REWRITE ↑↓* ↓↑* ↓*z #-}
   
+postulate
+  elam : (Ex → Ex) → Ex
+  eapp : Ex → Ex → Ex
   
 postulate
   Π : (j : Mode) → (A : Ty) → (Tm j A → Ty) → Ty
   lam : ((a : Tm j A) → Tm ω (X a)) → Tm ω (Π j A X)
   app : Tm ω (Π j A X) → (a : Tm j A) → Tm ω (X a)
-  lam-app : lam {j} (app t) ≡ t
-  app-lam : app {j} (lam f) ≡ f
+  lam-app : # → lam {j} (app t) ≡ t
+  app-lam : # → app {j} (lam f) ≡ f
+
+  ↯lamω : ↯ (λ q → lam {ω} (f$ q)) ≡ elam (λ x → ↯ (λ q → (f$ q (^ q x))))
+  ↯lamz : ↯ (λ q → lam {z} (f$ q)) ≡ ↯ (λ q → (f$ q (∅ q)))
   
-  {-# REWRITE lam-app app-lam #-}
+  ↯appω : ↯ (λ q → app {ω} {A$ q} {X$ q} (t$ q) (u$ q)) ≡ eapp (↯ t$) (↯ u$)
+  ↯appz : ↯ (λ q → app {z} {A$ q} {X$ q} (t$ q) (∅ q)) ≡ ↯ t$
+
+  -- {-# REWRITE lam-app app-lam #-}
   
 postulate
   U : Ty
@@ -79,8 +105,8 @@ postulate
     → (n : Tm ω Nat) → Tm ω (X n)
 
   -- Computation for elim-Nat
-  elim-Nat-zero : ∀ {mz ms} → elim-Nat X mz ms zero ≡ mz
-  elim-Nat-succ : ∀ {mz ms n} → elim-Nat X mz ms (succ n) ≡ ms n (elim-Nat X mz ms n)
+  elim-Nat-zero : ∀ {mz ms} {p : #} → elim-Nat X mz ms zero ≡ mz
+  elim-Nat-succ : ∀ {mz ms n} {p : #} → elim-Nat X mz ms (succ n) ≡ ms n (elim-Nat X mz ms n)
 
 -- Types are #-modal
 opaque
@@ -111,7 +137,6 @@ appz : Tm z (Π j A (X ∘↓)) → (a : Tm z A) → Tm z (X a)
 appz u v = ↓ λ p → app (↑ p u) (↑* p v)
 
 -- ..
-
 
 
 

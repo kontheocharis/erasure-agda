@@ -241,6 +241,7 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
       p,↓*q = p,q
 
       -- These lemmas are needed for lam[]
+      -- @@TODO: Remove these, use normal Π instead..
       pz∘⁺≡⁺∘pz : (_⁺ {Γ} {A = A} σ) ∘ pz {Γ} {ω} ≡ pz ∘ (σ ⁺)
       pz∘⁺≡⁺∘pz {σ = σ} = trans ,∘ (trans
         (undep (ap-,, refl refl (dep (trans (trans (sym assoc) (cong (σ ∘_) p∘,)) (sym p∘,)))
@@ -260,6 +261,7 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
 
     record Π-structure  : Set where
       field
+      -- @@TODO: use normal Π instead (i.e. replace z with i). It is equivalent.. Will probably make some proofs easier too.
         Π : (i : Mode) → (A : Ty Γ) → (B : Ty (Γ ▷[ z ] A)) → Ty Γ
         Π[] : (Π i A B) [ σ ]T ≡ Π i (A [ σ ]T) (B [ σ ⁺ ]T)
 

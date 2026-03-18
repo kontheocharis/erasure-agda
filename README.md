@@ -1,5 +1,7 @@
 # Formalisation of the paper "Type Theory with Erasure"
 
+[Paper link (Draft)](cthe.me/erasure-sogat.pdf)
+
 ## Contents
 
 | File | Description |

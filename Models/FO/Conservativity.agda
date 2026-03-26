@@ -124,8 +124,8 @@ module ⌞⌟-mod (m : CwF) where
   ⌞⌟-core .CwFwE-core.q[,#] = refl
   ⌞⌟-core .CwFwE-core.↓ x = coe (ap-Tm [id]T) x
   ⌞⌟-core .CwFwE-core.↑ x = x [ id ]
-  ⌞⌟-core .CwFwE-core.↓[] = {!!}
-  ⌞⌟-core .CwFwE-core.↑↓ = {!!}
+  ⌞⌟-core .CwFwE-core.↓[] {t = t} = undep (splitr (splitr (ap-[] refl refl (dep (sym [id]T)) (dep (sym ∘id)) (splitl reflᴰ))))
+  ⌞⌟-core .CwFwE-core.↑↓ = undep (transᴰ {q = ap-Tm (sym [id]T)} [id] (splitl reflᴰ))
   ⌞⌟-core .CwFwE-core.↓↑ = [id]
 
   ⌞⌟-U : in-CwFwE-sorts.in-CwFwE-core.U-structure ⌞⌟-sorts ⌞⌟-core
@@ -138,10 +138,29 @@ module ⌞⌟-mod (m : CwF) where
   ⌞⌟-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.El-code = El-code
   ⌞⌟-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.code-El = code-El
 
+  open in-CwFwE-sorts ⌞⌟-sorts using (in-CwFwE-core)
+  open in-CwFwE-core ⌞⌟-core using (Π-structure)
+
+  opaque
+    unfolding pz ↓*
+
+    ⌞⌟-Π : Π-structure
+    ⌞⌟-Π .Π-structure.Π i A B = Π A B
+    ⌞⌟-Π .Π-structure.Π[] = Π[]
+    ⌞⌟-Π .Π-structure.lam {i = z} f = lam (coe (ap-Tm (sym (trans (ap-[]T₀ p,q) [id]T))) f)
+    ⌞⌟-Π .Π-structure.lam {i = ω} f = lam (coe (ap-Tm (sym (trans (ap-[]T₀ p,q) [id]T))) f)
+    ⌞⌟-Π .Π-structure.lam[] = {!!}
+    ⌞⌟-Π .Π-structure.ap {i = z} f = coe (ap-Tm (trans (ap-[]T₀ p,q) [id]T)) (ap f)
+    ⌞⌟-Π .Π-structure.ap {i = ω} f = coe (ap-Tm (trans (ap-[]T₀ p,q) [id]T)) (ap f)
+    ⌞⌟-Π .Π-structure.Πβ {i = z} = {!!}
+    ⌞⌟-Π .Π-structure.Πβ {i = ω} = {!!}
+    ⌞⌟-Π .Π-structure.Πη {i = z} = {!!}
+    ⌞⌟-Π .Π-structure.Πη {i = ω} = {!!}
+
   ⌞⌟ : CwFwE
   ⌞⌟ .sorts = ⌞⌟-sorts
   ⌞⌟ .core = ⌞⌟-core
-  ⌞⌟ .Π-str = {!!}
+  ⌞⌟ .Π-str = ⌞⌟-Π
   ⌞⌟ .U-str = ⌞⌟-U
 
 -- Conservativity

@@ -150,6 +150,31 @@ module in-CwF-sorts (s : CwF-sorts) where
       _⇒_ : Ty Γ → Ty Γ → Ty Γ
       A ⇒ B = Π A (B [ p ]T)
 
+      opaque
+        unfolding coe
+
+        ap-Π : (prΓ : Γ ≡ Γ') → (prA : A ≡[ ap-Tyᶜ prΓ ] B)
+          → {B₁ : Ty (Γ ▷ A)} {B₂ : Ty (Γ' ▷ B)}
+          → B₁ ≡[ ap-Tyᶜ (ap-▷ prΓ prA) ] B₂
+          → Π A B₁ ≡[ ap-Tyᶜ prΓ ] Π B B₂
+        ap-Π refl refl refl = refl
+
+        ap-lam : (prΓ : Γ ≡ Γ') → (prA : A ≡[ ap-Tyᶜ prΓ ] B)
+          → {B₁ : Ty (Γ ▷ A)} {B₂ : Ty (Γ' ▷ B)}
+          → (prB : B₁ ≡[ ap-Tyᶜ (ap-▷ prΓ prA) ] B₂)
+          → {t₁ : Tm (Γ ▷ A) B₁} {t₂ : Tm (Γ' ▷ B) B₂}
+          → t₁ ≡[ ap-Tmᶜ (ap-▷ prΓ prA) prB ] t₂
+          → lam t₁ ≡[ ap-Tmᶜ prΓ (ap-Π prΓ prA prB) ] lam t₂
+        ap-lam refl refl refl refl = refl
+
+        ap-ap : (prΓ : Γ ≡ Γ') → (prA : A ≡[ ap-Tyᶜ prΓ ] B)
+          → {B₁ : Ty (Γ ▷ A)} {B₂ : Ty (Γ' ▷ B)}
+          → (prB : B₁ ≡[ ap-Tyᶜ (ap-▷ prΓ prA) ] B₂)
+          → {t₁ : Tm Γ (Π A B₁)} {t₂ : Tm Γ' (Π B B₂)}
+          → t₁ ≡[ ap-Tmᶜ prΓ (ap-Π prΓ prA prB) ] t₂
+          → ap t₁ ≡[ ap-Tmᶜ (ap-▷ prΓ prA) prB ] ap t₂
+        ap-ap refl refl refl refl = refl
+
     record U-structure : Set where
       field
         U : Ty Γ

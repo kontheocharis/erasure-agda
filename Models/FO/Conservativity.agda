@@ -107,6 +107,9 @@ module _ (e : CwFwE)  where
   ⌞⌟ᴰ : CwFwEᴰ e
   ⌞⌟ᴰ = CwFwE-uniform.nᴰ e ⌞⌟
 
+  ⌜⌝ᴰ : CwFwEᴰ ⌞⌟
+  ⌜⌝ᴰ = CwFwE-uniform.nᴰ ⌞⌟ e
+
 
 
 -- The ⌜⌝ model. Interprets CwF using the zeroed fragment of CwFwE
@@ -171,9 +174,3 @@ module _ (e : CwFwE)  where
   ⌜⌝ .CwF.U-str = ⌜⌝-U
 
 -- Conservativity:
--- The eliminator on ⌞⌟ᴰ gives a map ⟦_⟧ from CwFwE to the zeroed model.
--- For CwF contexts (no ω-extensions), the round-trip ⌞⌜⌝⌟ is the identity,
--- so Tm_CwFwE Γ z A ≅ Tm_CwF ⌜Γ⌝ ⌜A⌝ (which are the same type by definition of ⌜⌝).
---
--- The surjective map: given t : Tm_CwFwE Γ z A, ⟦t⟧ : Tm ⟦Γ⟧ z ⟦A⟧ = Tm_CwF ⌜Γ⌝ ⌜A⌝.
--- The section: Tm_CwF Γ A = Tm Γ z A embeds directly into CwFwE.

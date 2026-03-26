@@ -83,7 +83,53 @@ module in-CwF-sorts (s : CwF-sorts) where
 
     _⁺ : (σ : Sub Γ Δ) → Sub (Γ ▷ (A [ σ ]T)) (Δ ▷ A)
     σ ⁺ = (σ ∘ p) ,, coe (ap-Tm (sym [∘]T)) q
-  
+
+    -- Congruence rules
+    opaque
+      unfolding coe
+
+      ap-▷ : (p : Γ ≡ Γ') → A ≡[ ap-Tyᶜ p ] B → (Γ ▷ A) ≡ (Γ' ▷ B)
+      ap-▷ refl refl = refl
+
+      ap-id : (p : Γ ≡ Γ') → id {Γ} ≡[ ap-Subᶜ p p ] id {Γ'}
+      ap-id refl = refl
+
+      ap-ε : (p : Γ ≡ Γ') → ε {Γ} ≡[ ap-Subᶜ p refl ] ε {Γ'}
+      ap-ε refl = refl
+
+      ap-∘ : ∀ {Γ₁ Γ₂ Δ₁ Δ₂ Θ₁ Θ₂} (p : Γ₁ ≡ Γ₂) (q : Δ₁ ≡ Δ₂) (r : Θ₁ ≡ Θ₂)
+        {σ₁ : Sub Γ₁ Δ₁} {σ₂ : Sub Γ₂ Δ₂} {τ₁ : Sub Θ₁ Γ₁} {τ₂ : Sub Θ₂ Γ₂}
+        → σ₁ ≡[ ap-Subᶜ p q ] σ₂
+        → τ₁ ≡[ ap-Subᶜ r p ] τ₂
+        → σ₁ ∘ τ₁ ≡[ ap-Subᶜ r q ] σ₂ ∘ τ₂
+      ap-∘ refl refl refl refl refl = refl
+
+      ap-[]T : (q : Δ ≡ Δ') (p : Γ ≡ Γ') → A ≡[ ap-Tyᶜ p ] B → σ ≡[ ap-Subᶜ q p ] τ
+        → (A [ σ ]T) ≡[ ap-Tyᶜ q ] (B [ τ ]T)
+      ap-[]T refl refl refl refl = refl
+
+      ap-[] : (q : Δ ≡ Δ') (p : Γ ≡ Γ')
+        → (prA : A ≡[ ap-Tyᶜ p ] B)
+        → (prσ : σ ≡[ ap-Subᶜ q p ] τ)
+        → t ≡[ ap-Tmᶜ p prA ] u
+        → (t [ σ ]) ≡[ ap-Tmᶜ q (ap-[]T q p prA prσ) ] (u [ τ ])
+      ap-[] refl refl refl refl refl = refl
+
+      ap-p : (prΓ : Γ ≡ Γ') → (prA : A ≡[ ap-Tyᶜ prΓ ] B)
+        → p {Γ} {A} ≡[ ap-Subᶜ (ap-▷ prΓ prA) prΓ ] p {Γ'} {B}
+      ap-p refl refl = refl
+
+      ap-q : (prΓ : Γ ≡ Γ') → (prA : A ≡[ ap-Tyᶜ prΓ ] B)
+        → q {Γ} {A} ≡[ ap-Tmᶜ (ap-▷ prΓ prA) (ap-[]T (ap-▷ prΓ prA) prΓ prA (ap-p prΓ prA)) ] q {Γ'} {B}
+      ap-q refl refl = refl
+
+      ap-,, : (p : Γ ≡ Γ') (q : Δ ≡ Δ')
+        {t : Tm Γ (A [ σ ]T)} {t' : Tm Γ' (B [ τ ]T)}
+        → (prσ : σ ≡[ ap-Subᶜ p q ] τ)
+        → (prA : A ≡[ ap-Tyᶜ q ] B)
+        → t ≡[ ap-Tmᶜ p (ap-[]T p q prA prσ) ] t'
+        → (σ ,, t) ≡[ ap-Subᶜ p (ap-▷ q prA) ] (τ ,, t')
+      ap-,, refl refl refl refl refl = refl
 
   module in-CwF-core (c : CwF-core) where
     open CwF-core c

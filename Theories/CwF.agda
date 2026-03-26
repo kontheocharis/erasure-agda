@@ -80,7 +80,7 @@ module in-CwF-sorts (s : CwF-sorts) where
       _⇒_ : Ty Γ → Ty Γ → Ty Γ
       A ⇒ B = Π A (B [ p ]T)
 
-    record U-small-structure : Set where
+    record U-structure : Set where
       field
         U : Ty Γ
         U[] : U [ σ ]T ≡ U
@@ -88,43 +88,21 @@ module in-CwF-sorts (s : CwF-sorts) where
         El : (t : Tm Γ U) → Ty Γ
         El[] : (El t) [ σ ]T ≡ El (subst (Tm _) U[] (t [ σ ]))
 
-      _[_]U : (t : Tm Δ U) → (σ : Sub Γ Δ) → Tm Γ U
-      _[_]U t σ = coeTm U[] (t [ σ ])
-
-      _⁺U : (σ : Sub Γ Δ) → Sub (Γ ▷ El (t [ σ ]U)) (Δ ▷ El t)
-      σ ⁺U = ((σ ∘ p) ,, subst (Tm _) (trans (cong (_[ p ]T) (sym El[])) (sym [∘]T)) q)
-
-      TmU : ∀ Γ → Tm Γ U → Set
-      TmU Γ t = Tm Γ (El t)
-
-      _[_]u : (a : TmU Δ t) → (σ : Sub Γ Δ) → TmU Γ (t [ σ ]U)
-      _[_]u a σ = coeTm El[] (a [ σ ])
-
-      _▷U_ : (Γ : Con) → Tm Γ U → Con
-      Γ ▷U t = Γ ▷ El t
-
-    record U-big-structure (u-small : U-small-structure) : Set where
-      open U-small-structure u-small
-      field
         code : (A : Ty Γ) → Tm Γ U
         code[] : (code A) [ σ ] ≡[ cong (Tm _) U[] ] code (A [ σ ]T)
 
         El-code : El (code A) ≡ A
         code-El : code (El t) ≡ t
 
-    record ΠU-structure (univ : U-small-structure) : Set where
-      open U-small-structure univ
-      field
-        ΠU : (t : Tm Γ U) → (u : Tm (Γ ▷U t) U) → Tm Γ U
-        ΠU[] : (ΠU t u) [ σ ]U ≡ ΠU (t [ σ ]U) (u [ σ ⁺U ]U)
-
-        lamU : (f : TmU (Γ ▷U t) u) → TmU Γ (ΠU t u)
-        lamU[] : (lamU t) [ σ ]u ≡[ cong (TmU _) ΠU[] ] lamU (t [ σ ⁺U ]u)
-
-        apU : (f : TmU Γ (ΠU t u)) → TmU (Γ ▷U t) u
-
-        ΠβU : apU (lamU t) ≡ t
-        ΠηU : lamU (apU t) ≡ t
 
 
-
+record CwF : Set where
+  field
+    sorts : CwF-sorts
+  open in-CwF-sorts sorts
+  field
+    core : CwF-core
+  open in-CwF-core core
+  field
+    Π-str : Π-structure
+    U-str : U-structure

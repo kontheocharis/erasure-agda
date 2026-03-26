@@ -8,7 +8,7 @@ open import Data.Unit renaming (⊤ to 𝟙)
 open import Data.Product
 open import Mode
 
--- The ⌞_⌟ model
+-- The ⌞⌟ model
 -- Interprets CwFwE using CwF
 
 module _ (e : CwFwE)  where
@@ -20,193 +20,160 @@ module _ (e : CwFwE)  where
   open Π-structure (e .Π-str)
   open U-structure (e .U-str)
 
-  fg-sorts : CwFwE-sorts
-  fg-sorts .CwFwE-sorts.Con = Con
-  fg-sorts .CwFwE-sorts.Sub = Sub
-  fg-sorts .CwFwE-sorts.Ty = Ty
-  fg-sorts .CwFwE-sorts.#∈ Γ = 𝟙
-  fg-sorts .CwFwE-sorts.Tm Γ i A = Tm Γ z A 
-  fg-sorts .CwFwE-sorts.#-prop p₁ q₁ = refl
+  ⌞⌟-sorts : CwFwE-sorts
+  ⌞⌟-sorts .CwFwE-sorts.Con = Con
+  ⌞⌟-sorts .CwFwE-sorts.Sub = Sub
+  ⌞⌟-sorts .CwFwE-sorts.Ty = Ty
+  ⌞⌟-sorts .CwFwE-sorts.#∈ Γ = 𝟙
+  ⌞⌟-sorts .CwFwE-sorts.Tm Γ i A = Tm Γ z A 
+  ⌞⌟-sorts .CwFwE-sorts.#-prop p₁ q₁ = refl
 
-  fg-core : in-CwFwE-sorts.CwFwE-core fg-sorts
-  fg-core .CwFwE-core.id = id
-  fg-core .CwFwE-core._∘_ = _∘_
-  fg-core .CwFwE-core.assoc = assoc
-  fg-core .CwFwE-core.∘id = ∘id
-  fg-core .CwFwE-core.id∘ = id∘
-  fg-core .CwFwE-core.∙ = ∙
-  fg-core .CwFwE-core.ε = ε
-  fg-core .CwFwE-core.∃!ε = ∃!ε
-  fg-core .CwFwE-core._[_]T = _[_]T
-  fg-core .CwFwE-core._[_] = _[_]
-  fg-core .CwFwE-core._[_]# = λ t σ → tt
-  fg-core .CwFwE-core.[id]T = [id]T
-  fg-core .CwFwE-core.[id] = [id]
-  fg-core .CwFwE-core.[id]# = refl
-  fg-core .CwFwE-core.[∘]T = [∘]T
-  fg-core .CwFwE-core.[∘] = [∘]
-  fg-core .CwFwE-core.[∘]# = refl
-  (fg-core CwFwE-core.▷[ Γ ] i) A = Γ ▷[ z ] A
-  fg-core .CwFwE-core.p = p
-  fg-core .CwFwE-core.q = q
-  fg-core .CwFwE-core._,,_ = _,,_
-  fg-core .CwFwE-core.,∘ = ,∘
-  fg-core .CwFwE-core.p,q = p,q
-  fg-core .CwFwE-core.p∘, = p∘,
-  fg-core .CwFwE-core.q[,] = q[,]
-  (fg-core CwFwE-core.▷#) Γ = Γ
-  fg-core .CwFwE-core.p# = id
-  fg-core .CwFwE-core.q# = tt
-  fg-core .CwFwE-core._,#_ = λ σ π → σ
-  fg-core .CwFwE-core.,#∘ = refl
-  fg-core .CwFwE-core.p,#q = refl
-  fg-core .CwFwE-core.p∘,# = id∘
-  fg-core .CwFwE-core.q[,#] = refl
-  fg-core .CwFwE-core.↓ x = coe (ap-Tm [id]T) x
-  fg-core .CwFwE-core.↑ x = x [ id ]
-  fg-core .CwFwE-core.↓[] {t = t} = undep (splitr (splitr (ap-[] refl refl (dep (sym [id]T)) (dep (sym ∘id)) (splitl reflᴰ)))) 
-  fg-core .CwFwE-core.↑↓ = undep (transᴰ {q = ap-Tm (sym [id]T)} [id] (splitl reflᴰ)) 
-  fg-core .CwFwE-core.↓↑ = [id]
+  ⌞⌟-core : in-CwFwE-sorts.CwFwE-core ⌞⌟-sorts
+  ⌞⌟-core .CwFwE-core.id = id
+  ⌞⌟-core .CwFwE-core._∘_ = _∘_
+  ⌞⌟-core .CwFwE-core.assoc = assoc
+  ⌞⌟-core .CwFwE-core.∘id = ∘id
+  ⌞⌟-core .CwFwE-core.id∘ = id∘
+  ⌞⌟-core .CwFwE-core.∙ = ∙
+  ⌞⌟-core .CwFwE-core.ε = ε
+  ⌞⌟-core .CwFwE-core.∃!ε = ∃!ε
+  ⌞⌟-core .CwFwE-core._[_]T = _[_]T
+  ⌞⌟-core .CwFwE-core._[_] = _[_]
+  ⌞⌟-core .CwFwE-core._[_]# = λ t σ → tt
+  ⌞⌟-core .CwFwE-core.[id]T = [id]T
+  ⌞⌟-core .CwFwE-core.[id] = [id]
+  ⌞⌟-core .CwFwE-core.[id]# = refl
+  ⌞⌟-core .CwFwE-core.[∘]T = [∘]T
+  ⌞⌟-core .CwFwE-core.[∘] = [∘]
+  ⌞⌟-core .CwFwE-core.[∘]# = refl
+  (⌞⌟-core CwFwE-core.▷[ Γ ] i) A = Γ ▷[ z ] A
+  ⌞⌟-core .CwFwE-core.p = p
+  ⌞⌟-core .CwFwE-core.q = q
+  ⌞⌟-core .CwFwE-core._,,_ = _,,_
+  ⌞⌟-core .CwFwE-core.,∘ = ,∘
+  ⌞⌟-core .CwFwE-core.p,q = p,q
+  ⌞⌟-core .CwFwE-core.p∘, = p∘,
+  ⌞⌟-core .CwFwE-core.q[,] = q[,]
+  (⌞⌟-core CwFwE-core.▷#) Γ = Γ
+  ⌞⌟-core .CwFwE-core.p# = id
+  ⌞⌟-core .CwFwE-core.q# = tt
+  ⌞⌟-core .CwFwE-core._,#_ = λ σ π → σ
+  ⌞⌟-core .CwFwE-core.,#∘ = refl
+  ⌞⌟-core .CwFwE-core.p,#q = refl
+  ⌞⌟-core .CwFwE-core.p∘,# = id∘
+  ⌞⌟-core .CwFwE-core.q[,#] = refl
+  ⌞⌟-core .CwFwE-core.↓ x = coe (ap-Tm [id]T) x
+  ⌞⌟-core .CwFwE-core.↑ x = x [ id ]
+  ⌞⌟-core .CwFwE-core.↓[] {t = t} = undep (splitr (splitr (ap-[] refl refl (dep (sym [id]T)) (dep (sym ∘id)) (splitl reflᴰ)))) 
+  ⌞⌟-core .CwFwE-core.↑↓ = undep (transᴰ {q = ap-Tm (sym [id]T)} [id] (splitl reflᴰ)) 
+  ⌞⌟-core .CwFwE-core.↓↑ = [id]
 
   -- -- This is annoying because of all the coercions so I will leave it out for now
   -- -- However, it definitely works because it works in the second-order model
   --
   -- opaque
   --   unfolding pz
-  --   fg-Π : in-CwFwE-sorts.in-CwFwE-core.Π-structure fg-sorts fg-core
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π i A B = Π i A B
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π[] = Π[]
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam {i = z} f
+  --   ⌞⌟-Π : in-CwFwE-sorts.in-CwFwE-core.Π-structure ⌞⌟-sorts ⌞⌟-core
+  --   ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π i A B = Π i A B
+  --   ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π[] = Π[]
+  --   ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam {i = z} f
   --     = ↓ (coe (ap-Tm (sym Π[])) (lam (coe (ap-Tm ( trans (sym [∘]T) ( trans (sym [∘]T) (trans (sym [∘]T)
   --     (trans (ap-[]T₀ (trans ( cong (_∘ _) p,q)
   --     (trans id∘ (cong (_ ∘_) (trans p∘,# (sym p,q)))))) [∘]T)))))
   --     ((↑ (f [ (p# ∘ p) ,, coe (ap-Tm (sym [∘]T)) q ])) [  id ,# (q# [ p ]#) ]))) )
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam {i = ω} f = {! !}
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam[] {z} = {! !}
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam[] {ω} = {!!}
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.ap = {! !}
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πβ = {! !}
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πη = {!!}
+  --   ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam {i = ω} f = {! !}
+  --   ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam[] {z} = {! !}
+  --   ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam[] {ω} = {!!}
+  --   ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.ap = {! !}
+  --   ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πβ = {! !}
+  --   ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πη = {!!}
 
-  fg-U : in-CwFwE-sorts.in-CwFwE-core.U-structure fg-sorts fg-core
-  fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.U = U
-  fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.U[] = U[]
-  fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.El = El
-  fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.El[] = El[]
-  fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.code = code
-  fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.code[] = code[]
-  fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.El-code = El-code
-  fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.code-El = code-El
+  ⌞⌟-U : in-CwFwE-sorts.in-CwFwE-core.U-structure ⌞⌟-sorts ⌞⌟-core
+  ⌞⌟-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.U = U
+  ⌞⌟-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.U[] = U[]
+  ⌞⌟-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.El = El
+  ⌞⌟-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.El[] = El[]
+  ⌞⌟-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.code = code
+  ⌞⌟-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.code[] = code[]
+  ⌞⌟-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.El-code = El-code
+  ⌞⌟-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.code-El = code-El
 
-  fg : CwFwE
-  fg .sorts = fg-sorts
-  fg .core = fg-core
-  fg .Π-str = {!!}
-  fg .U-str = fg-U
+  ⌞⌟ : CwFwE
+  ⌞⌟ .sorts = ⌞⌟-sorts
+  ⌞⌟ .core = ⌞⌟-core
+  ⌞⌟ .Π-str = {!!}
+  ⌞⌟ .U-str = ⌞⌟-U
 
-  fgᴰ : CwFwEᴰ e
-  fgᴰ = CwFwE-uniform.nᴰ e fg 
+  ⌞⌟ᴰ : CwFwEᴰ e
+  ⌞⌟ᴰ = CwFwE-uniform.nᴰ e ⌞⌟
 
 
 
--- The ⌜_⌝ model. Interprets CwF using the zeroed fragment of CwFwE
+-- The ⌜⌝ model. Interprets CwF using the zeroed fragment of CwFwE
 module _ (e : CwFwE)  where
-  -- open CwFwE
-  -- open CwFwE-sorts (e .sorts)
-  -- open in-CwFwE-sorts (e .sorts)
-  -- open CwFwE-core (e .core)
-  -- open in-CwFwE-core (e .core)
-  -- open Π-structure (e .Π-str)
-  -- open U-structure (e .U-str)
+  open CwFwE
+  open CwFwE-sorts (e .sorts)
+  open in-CwFwE-sorts (e .sorts)
+  open CwFwE-core (e .core)
+  open in-CwFwE-core (e .core)
+  open Π-structure (e .Π-str)
+  open U-structure (e .U-str)
+  open CwF
 
-  -- fg-sorts : CwFwE-sorts
-  -- fg-sorts .CwFwE-sorts.Con = Con
-  -- fg-sorts .CwFwE-sorts.Sub = Sub
-  -- fg-sorts .CwFwE-sorts.Ty = Ty
-  -- fg-sorts .CwFwE-sorts.#∈ Γ = 𝟙
-  -- fg-sorts .CwFwE-sorts.Tm Γ i A = Tm Γ z A 
-  -- fg-sorts .CwFwE-sorts.#-prop p₁ q₁ = refl
+  ⌜⌝-sorts : CwF-sorts
+  ⌜⌝-sorts .CwF-sorts.Con = Con
+  ⌜⌝-sorts .CwF-sorts.Sub = Sub
+  ⌜⌝-sorts .CwF-sorts.Ty = Ty
+  ⌜⌝-sorts .CwF-sorts.Tm Γ A = Tm Γ z A
 
-  -- fg-core : in-CwFwE-sorts.CwFwE-core fg-sorts
-  -- fg-core .CwFwE-core.id = id
-  -- fg-core .CwFwE-core._∘_ = _∘_
-  -- fg-core .CwFwE-core.assoc = assoc
-  -- fg-core .CwFwE-core.∘id = ∘id
-  -- fg-core .CwFwE-core.id∘ = id∘
-  -- fg-core .CwFwE-core.∙ = ∙
-  -- fg-core .CwFwE-core.ε = ε
-  -- fg-core .CwFwE-core.∃!ε = ∃!ε
-  -- fg-core .CwFwE-core._[_]T = _[_]T
-  -- fg-core .CwFwE-core._[_] = _[_]
-  -- fg-core .CwFwE-core._[_]# = λ t σ → tt
-  -- fg-core .CwFwE-core.[id]T = [id]T
-  -- fg-core .CwFwE-core.[id] = [id]
-  -- fg-core .CwFwE-core.[id]# = refl
-  -- fg-core .CwFwE-core.[∘]T = [∘]T
-  -- fg-core .CwFwE-core.[∘] = [∘]
-  -- fg-core .CwFwE-core.[∘]# = refl
-  -- (fg-core CwFwE-core.▷[ Γ ] i) A = Γ ▷[ z ] A
-  -- fg-core .CwFwE-core.p = p
-  -- fg-core .CwFwE-core.q = q
-  -- fg-core .CwFwE-core._,,_ = _,,_
-  -- fg-core .CwFwE-core.,∘ = ,∘
-  -- fg-core .CwFwE-core.p,q = p,q
-  -- fg-core .CwFwE-core.p∘, = p∘,
-  -- fg-core .CwFwE-core.q[,] = q[,]
-  -- (fg-core CwFwE-core.▷#) Γ = Γ
-  -- fg-core .CwFwE-core.p# = id
-  -- fg-core .CwFwE-core.q# = tt
-  -- fg-core .CwFwE-core._,#_ = λ σ π → σ
-  -- fg-core .CwFwE-core.,#∘ = refl
-  -- fg-core .CwFwE-core.p,#q = refl
-  -- fg-core .CwFwE-core.p∘,# = id∘
-  -- fg-core .CwFwE-core.q[,#] = refl
-  -- fg-core .CwFwE-core.↓ x = coe (ap-Tm [id]T) x
-  -- fg-core .CwFwE-core.↑ x = x [ id ]
-  -- fg-core .CwFwE-core.↓[] {t = t} = undep (splitr (splitr (ap-[] refl refl (dep (sym [id]T)) (dep (sym ∘id)) (splitl reflᴰ)))) 
-  -- fg-core .CwFwE-core.↑↓ = undep (transᴰ {q = ap-Tm (sym [id]T)} [id] (splitl reflᴰ)) 
-  -- fg-core .CwFwE-core.↓↑ = [id]
+  open in-CwF-sorts ⌜⌝-sorts
 
-  -- -- This is annoying because of all the coercions so I will leave it out for now
-  -- -- However, it definitely works because it works in the second-order model
-  --
-  -- opaque
-  --   unfolding pz
-  --   fg-Π : in-CwFwE-sorts.in-CwFwE-core.Π-structure fg-sorts fg-core
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π i A B = Π i A B
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π[] = Π[]
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam {i = z} f
-  --     = ↓ (coe (ap-Tm (sym Π[])) (lam (coe (ap-Tm ( trans (sym [∘]T) ( trans (sym [∘]T) (trans (sym [∘]T)
-  --     (trans (ap-[]T₀ (trans ( cong (_∘ _) p,q)
-  --     (trans id∘ (cong (_ ∘_) (trans p∘,# (sym p,q)))))) [∘]T)))))
-  --     ((↑ (f [ (p# ∘ p) ,, coe (ap-Tm (sym [∘]T)) q ])) [  id ,# (q# [ p ]#) ]))) )
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam {i = ω} f = {! !}
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam[] {z} = {! !}
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam[] {ω} = {!!}
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.ap = {! !}
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πβ = {! !}
-  --   fg-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πη = {!!}
+  ⌜⌝-core : CwF-core
+  ⌜⌝-core .CwF-core.id = id
+  ⌜⌝-core .CwF-core._∘_ = _∘_
+  ⌜⌝-core .CwF-core.assoc = assoc
+  ⌜⌝-core .CwF-core.id∘ = id∘
+  ⌜⌝-core .CwF-core.∘id = ∘id
+  ⌜⌝-core .CwF-core.∙ = ∙
+  ⌜⌝-core .CwF-core.ε = ε
+  ⌜⌝-core .CwF-core.∃!ε = ∃!ε
+  ⌜⌝-core .CwF-core._[_]T = _[_]T
+  ⌜⌝-core .CwF-core._[_] = _[_]
+  ⌜⌝-core .CwF-core.[id]T = [id]T
+  ⌜⌝-core .CwF-core.[id] = [id]
+  ⌜⌝-core .CwF-core.[∘]T = [∘]T
+  ⌜⌝-core .CwF-core.[∘] = [∘]
+  ⌜⌝-core .CwF-core._▷_ = _▷[ z ]_
+  ⌜⌝-core .CwF-core.p = p
+  ⌜⌝-core .CwF-core.q = q
+  ⌜⌝-core .CwF-core._,,_ = _,,_
+  ⌜⌝-core .CwF-core.,∘ = ,∘
+  ⌜⌝-core .CwF-core.p,q = p,q
+  ⌜⌝-core .CwF-core.p∘, = p∘,
+  ⌜⌝-core .CwF-core.q[,] = q[,]
 
-  -- fg-U : in-CwFwE-sorts.in-CwFwE-core.U-structure fg-sorts fg-core
-  -- fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.U = U
-  -- fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.U[] = U[]
-  -- fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.El = El
-  -- fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.El[] = El[]
-  -- fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.code = code
-  -- fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.code[] = code[]
-  -- fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.El-code = El-code
-  -- fg-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.code-El = code-El
+  open in-CwF-core ⌜⌝-core
 
-  -- fg : CwFwE
-  -- fg .sorts = fg-sorts
-  -- fg .core = fg-core
-  -- fg .Π-str = {!!}
-  -- fg .U-str = fg-U
+  ⌜⌝-U : in-CwF-sorts.in-CwF-core.U-structure ⌜⌝-sorts ⌜⌝-core
+  ⌜⌝-U .in-CwF-sorts.in-CwF-core.U-structure.U = U
+  ⌜⌝-U .in-CwF-sorts.in-CwF-core.U-structure.U[] = U[]
+  ⌜⌝-U .in-CwF-sorts.in-CwF-core.U-structure.El = El
+  ⌜⌝-U .in-CwF-sorts.in-CwF-core.U-structure.El[] = El[]
+  ⌜⌝-U .in-CwF-sorts.in-CwF-core.U-structure.code = code
+  ⌜⌝-U .in-CwF-sorts.in-CwF-core.U-structure.code[] = code[]
+  ⌜⌝-U .in-CwF-sorts.in-CwF-core.U-structure.El-code = El-code
+  ⌜⌝-U .in-CwF-sorts.in-CwF-core.U-structure.code-El = code-El
 
-  -- fgᴰ : CwFwEᴰ e
-  -- fgᴰ = CwFwE-uniform.nᴰ e fg 
-
+  ⌜⌝ : CwF
+  ⌜⌝ .CwF.sorts = ⌜⌝-sorts
+  ⌜⌝ .CwF.core = ⌜⌝-core
+  ⌜⌝ .CwF.Π-str = {!!}
+  ⌜⌝ .CwF.U-str = ⌜⌝-U
 
 -- Conservativity:
+-- The eliminator on ⌞⌟ᴰ gives a map ⟦_⟧ from CwFwE to the zeroed model.
+-- For CwF contexts (no ω-extensions), the round-trip ⌞⌜⌝⌟ is the identity,
+-- so Tm_CwFwE Γ z A ≅ Tm_CwF ⌜Γ⌝ ⌜A⌝ (which are the same type by definition of ⌜⌝).
 --
--- There is a surjective (ie with an inverse) map Tm z ⌜Γ⌝ ⌜A⌝ → Tm Γ A
+-- The surjective map: given t : Tm_CwFwE Γ z A, ⟦t⟧ : Tm ⟦Γ⟧ z ⟦A⟧ = Tm_CwF ⌜Γ⌝ ⌜A⌝.
+-- The section: Tm_CwF Γ A = Tm Γ z A embeds directly into CwFwE.

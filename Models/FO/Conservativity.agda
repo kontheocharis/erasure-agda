@@ -171,80 +171,80 @@ module Conservativity where
   open in-CwFᴰ-core
 
   private
-    rt-sorts : CwFᴰ-sorts (CwF.sorts cwf)
-    rt-sorts .Conᴰ Γ =
+    co-sorts : CwFᴰ-sorts (CwF.sorts cwf)
+    co-sorts .Conᴰ Γ =
       (⌞ ⌜ Γ ⌝ᶜ ⌟ᶜ ≡ Γ) true
-    rt-sorts .Subᴰ {Γ} {Δ} Γᴰ Δᴰ σ =
+    co-sorts .Subᴰ {Γ} {Δ} Γᴰ Δᴰ σ =
       (⌞ ⌜ σ ⌝ˢ ⌟ˢ ≡[ C.ap-Subᶜ (Γᴰ .witness) (Δᴰ .witness) ] σ) true
-    rt-sorts .Tyᴰ {Γ} Γᴰ A =
+    co-sorts .Tyᴰ {Γ} Γᴰ A =
       (⌞ ⌜ A ⌝ᵀ ⌟ᵀ ≡[ C.ap-Tyᶜ (Γᴰ .witness) ] A) true
-    rt-sorts .Tmᴰ {Γ} {A} Γᴰ Aᴰ t =
+    co-sorts .Tmᴰ {Γ} {A} Γᴰ Aᴰ t =
       (⌞ ⌜ t ⌝ᵗ ⌟ᵗ ≡[ C.ap-Tmᶜ (Γᴰ .witness) (Aᴰ .witness) ] t) true
 
-    rt-core : in-CwFᴰ-sorts.CwFᴰ-core rt-sorts (CwF.core cwf)
-    rt-core .CwFᴰ-core.idᴰ {Γᴰ = Γᴰ} .witness = (C.ap-id (Γᴰ .witness))
-    rt-core .CwFᴰ-core._∘ᴰ_ {Δᴰ = Δᴰ} {Θᴰ = Θᴰ} {Γᴰ = Γᴰ} σᴰ τᴰ =
+    co-core : in-CwFᴰ-sorts.CwFᴰ-core co-sorts (CwF.core cwf)
+    co-core .CwFᴰ-core.idᴰ {Γᴰ = Γᴰ} .witness = (C.ap-id (Γᴰ .witness))
+    co-core .CwFᴰ-core._∘ᴰ_ {Δᴰ = Δᴰ} {Θᴰ = Θᴰ} {Γᴰ = Γᴰ} σᴰ τᴰ =
       by (C.ap-∘ (Δᴰ .witness) (Θᴰ .witness) (Γᴰ .witness) (σᴰ .witness) (τᴰ .witness))
-    rt-core .CwFᴰ-core.assocᴰ = refl
-    rt-core .CwFᴰ-core.id∘ᴰ = refl
-    rt-core .CwFᴰ-core.∘idᴰ = refl
-    rt-core .CwFᴰ-core.∙ᴰ = by refl
-    rt-core .CwFᴰ-core.εᴰ {Γᴰ = Γᴰ} = by (C.ap-ε (Γᴰ .witness))
-    rt-core .CwFᴰ-core.∃!εᴰ = refl
-    rt-core .CwFᴰ-core._[_]Tᴰ {Δᴰ = Δᴰ} {Γᴰ = Γᴰ} Aᴰ σᴰ =
+    co-core .CwFᴰ-core.assocᴰ = refl
+    co-core .CwFᴰ-core.id∘ᴰ = refl
+    co-core .CwFᴰ-core.∘idᴰ = refl
+    co-core .CwFᴰ-core.∙ᴰ = by refl
+    co-core .CwFᴰ-core.εᴰ {Γᴰ = Γᴰ} = by (C.ap-ε (Γᴰ .witness))
+    co-core .CwFᴰ-core.∃!εᴰ = refl
+    co-core .CwFᴰ-core._[_]Tᴰ {Δᴰ = Δᴰ} {Γᴰ = Γᴰ} Aᴰ σᴰ =
       by (C.ap-[]T (Γᴰ .witness) (Δᴰ .witness) (Aᴰ .witness) (σᴰ .witness))
-    rt-core .CwFᴰ-core._[_]ᴰ {Δᴰ = Δᴰ} {Aᴰ = Aᴰ} {Γᴰ = Γᴰ} tᴰ σᴰ =
+    co-core .CwFᴰ-core._[_]ᴰ {Δᴰ = Δᴰ} {Aᴰ = Aᴰ} {Γᴰ = Γᴰ} tᴰ σᴰ =
       by (C.ap-[] (Γᴰ .witness) (Δᴰ .witness) (Aᴰ .witness) (σᴰ .witness) (tᴰ .witness))
-    rt-core .CwFᴰ-core.[id]Tᴰ = refl
-    rt-core .CwFᴰ-core.[id]ᴰ = refl
-    rt-core .CwFᴰ-core.[∘]Tᴰ = refl
-    rt-core .CwFᴰ-core.[∘]ᴰ = refl
-    rt-core .CwFᴰ-core._▷ᴰ_ Γᴰ Aᴰ = by (C.ap-▷ (Γᴰ .witness) (Aᴰ .witness))
-    rt-core .CwFᴰ-core.pᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} = by (C.ap-p (Γᴰ .witness) (Aᴰ .witness))
-    rt-core .CwFᴰ-core.qᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} = by (C.ap-q (Γᴰ .witness) (Aᴰ .witness))
-    rt-core .CwFᴰ-core._,,ᴰ_ {Γᴰ = Γᴰ} {Δᴰ = Δᴰ} {Aᴰ = Aᴰ} σᴰ tᴰ =
+    co-core .CwFᴰ-core.[id]Tᴰ = refl
+    co-core .CwFᴰ-core.[id]ᴰ = refl
+    co-core .CwFᴰ-core.[∘]Tᴰ = refl
+    co-core .CwFᴰ-core.[∘]ᴰ = refl
+    co-core .CwFᴰ-core._▷ᴰ_ Γᴰ Aᴰ = by (C.ap-▷ (Γᴰ .witness) (Aᴰ .witness))
+    co-core .CwFᴰ-core.pᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} = by (C.ap-p (Γᴰ .witness) (Aᴰ .witness))
+    co-core .CwFᴰ-core.qᴰ {Γᴰ = Γᴰ} {Aᴰ = Aᴰ} = by (C.ap-q (Γᴰ .witness) (Aᴰ .witness))
+    co-core .CwFᴰ-core._,,ᴰ_ {Γᴰ = Γᴰ} {Δᴰ = Δᴰ} {Aᴰ = Aᴰ} σᴰ tᴰ =
       by (C.ap-,, (Γᴰ .witness) (Δᴰ .witness) (σᴰ .witness) (Aᴰ .witness) (tᴰ .witness))
-    rt-core .CwFᴰ-core.,∘ᴰ = refl
-    rt-core .CwFᴰ-core.p,qᴰ = refl
-    rt-core .CwFᴰ-core.p∘,ᴰ = refl
-    rt-core .CwFᴰ-core.q[,]ᴰ = refl
+    co-core .CwFᴰ-core.,∘ᴰ = refl
+    co-core .CwFᴰ-core.p,qᴰ = refl
+    co-core .CwFᴰ-core.p∘,ᴰ = refl
+    co-core .CwFᴰ-core.q[,]ᴰ = refl
 
-    rt-Π : Π-structureᴰ rt-sorts (CwF.core cwf) rt-core (CwF.Π-str cwf)
-    rt-Π .Π-structureᴰ.Πᴰ Aᴰ Bᴰ = {!!}
-    rt-Π .Π-structureᴰ.Π[]ᴰ = {!!}
-    rt-Π .Π-structureᴰ.lamᴰ tᴰ = {!!}
-    rt-Π .Π-structureᴰ.lamᴰ[] = {!!}
-    rt-Π .Π-structureᴰ.apᴰ tᴰ = {!!}
-    rt-Π .Π-structureᴰ.Πβᴰ = {!!}
-    rt-Π .Π-structureᴰ.Πηᴰ = {!!}
+    co-Π : Π-structureᴰ co-sorts (CwF.core cwf) co-core (CwF.Π-str cwf)
+    co-Π .Π-structureᴰ.Πᴰ Aᴰ Bᴰ = {!!}
+    co-Π .Π-structureᴰ.Π[]ᴰ = {!!}
+    co-Π .Π-structureᴰ.lamᴰ tᴰ = {!!}
+    co-Π .Π-structureᴰ.lamᴰ[] = {!!}
+    co-Π .Π-structureᴰ.apᴰ tᴰ = {!!}
+    co-Π .Π-structureᴰ.Πβᴰ = {!!}
+    co-Π .Π-structureᴰ.Πηᴰ = {!!}
 
-    rt-U : U-structureᴰ rt-sorts (CwF.core cwf) rt-core (CwF.U-str cwf)
-    rt-U .U-structureᴰ.Uᴰ {Γᴰ = Γᴰ} = {!!}
-    rt-U .U-structureᴰ.U[]ᴰ = {!!}
-    rt-U .U-structureᴰ.Elᴰ tᴰ = {!!}
-    rt-U .U-structureᴰ.El[]ᴰ = {!!}
-    rt-U .U-structureᴰ.codeᴰ Aᴰ = {!!}
-    rt-U .U-structureᴰ.code[]ᴰ = {!!}
-    rt-U .U-structureᴰ.El-codeᴰ = {!!}
-    rt-U .U-structureᴰ.code-Elᴰ = {!!}
+    co-U : U-structureᴰ co-sorts (CwF.core cwf) co-core (CwF.U-str cwf)
+    co-U .U-structureᴰ.Uᴰ {Γᴰ = Γᴰ} = by (C.ap-U (Γᴰ .witness))
+    co-U .U-structureᴰ.U[]ᴰ = refl
+    co-U .U-structureᴰ.Elᴰ {Γᴰ = Γᴰ} tᴰ = by (C.ap-El (Γᴰ .witness) (tᴰ .witness))
+    co-U .U-structureᴰ.El[]ᴰ = refl
+    co-U .U-structureᴰ.codeᴰ {Γᴰ = Γᴰ} Aᴰ = by (C.ap-code (Γᴰ .witness) (Aᴰ .witness))
+    co-U .U-structureᴰ.code[]ᴰ = refl
+    co-U .U-structureᴰ.El-codeᴰ = refl
+    co-U .U-structureᴰ.code-Elᴰ = refl
 
-    rt : CwFᴰ cwf
-    rt .CwFᴰ.sortsᴰ = rt-sorts
-    rt .CwFᴰ.coreᴰ = rt-core
-    rt .CwFᴰ.Π-strᴰ = rt-Π
-    rt .CwFᴰ.U-strᴰ = rt-U
+    co : CwFᴰ cwf
+    co .CwFᴰ.sortsᴰ = co-sorts
+    co .CwFᴰ.coreᴰ = co-core
+    co .CwFᴰ.Π-strᴰ = co-Π
+    co .CwFᴰ.U-strᴰ = co-U
 
-  module RT = CwF-syntax.CwF-elim rt
+  module CO = CwF-syntax.CwF-elim co
 
   ⌞⌜⌝⌟-Con : (Γ : Con) → ⌞ ⌜ Γ ⌝ᶜ ⌟ᶜ ≡ Γ
-  ⌞⌜⌝⌟-Con Γ = RT.⟦ Γ ⟧ᶜ .witness
+  ⌞⌜⌝⌟-Con Γ = CO.⟦ Γ ⟧ᶜ .witness
 
   ⌞⌜⌝⌟-Ty : (Γ : Con) (A : Ty Γ) → ⌞ ⌜ A ⌝ᵀ ⌟ᵀ ≡[ cong Ty (⌞⌜⌝⌟-Con Γ) ] A
-  ⌞⌜⌝⌟-Ty Γ A = RT.⟦ A ⟧ᵀ .witness
+  ⌞⌜⌝⌟-Ty Γ A = CO.⟦ A ⟧ᵀ .witness
 
   ⌞⌜⌝⌟-Tm : (Γ : Con) (A : Ty Γ) (t : C.Tm Γ A)
     → ⌞ ⌜ t ⌝ᵗ ⌟ᵗ ≡[ C.ap-Tmᶜ (⌞⌜⌝⌟-Con Γ) (⌞⌜⌝⌟-Ty Γ A) ] t
-  ⌞⌜⌝⌟-Tm Γ A t = RT.⟦ t ⟧ᵗ .witness
+  ⌞⌜⌝⌟-Tm Γ A t = CO.⟦ t ⟧ᵗ .witness
 
   -- Erased conservativity
   erased-conservativity : (Γ : Con) (A : Ty Γ)

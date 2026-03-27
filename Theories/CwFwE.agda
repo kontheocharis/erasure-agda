@@ -260,14 +260,13 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
 
     record Π-structure  : Set where
       field
-        Π : (i : Mode) → (A : Ty Γ) → (B : Ty (Γ ▷[ z ] A)) → Ty Γ
+        Π : (i : Mode) → (A : Ty Γ) → (B : Ty (Γ ▷[ i ] A)) → Ty Γ
         Π[] : (Π i A B) [ σ ]T ≡ Π i (A [ σ ]T) (B [ σ ⁺ ]T)
 
-        lam : (f : Tm (Γ ▷[ i ] A) ω (B [ pz ]T)) → Tm Γ ω (Π i A B)
-        lam[] : (lam {i = i} t) [ σ ]
-          ≡[ ap-Tm Π[] ] lam (coe (ap-Tm (sym [pz][⁺]≡[⁺][pz])) (t [ σ ⁺ ]))
+        lam : (f : Tm (Γ ▷[ i ] A) ω B) → Tm Γ ω (Π i A B)
+        lam[] : (lam {i = i} t) [ σ ] ≡[ ap-Tm Π[] ] lam (t [ σ ⁺ ])
 
-        ap : (f : Tm Γ ω (Π i A B)) → Tm (Γ ▷[ i ] A) ω (B [ pz ]T)
+        ap : (f : Tm Γ ω (Π i A B)) → Tm (Γ ▷[ i ] A) ω B
 
         Πβ : ap {i = i} (lam t) ≡ t
         Πη : lam {i = i} (ap t) ≡ t
@@ -497,15 +496,13 @@ module in-CwFwEᴰ-sorts {s : CwFwE-sorts} (sᴰ : CwFwEᴰ-sorts s) (c : in-CwF
     record Π-structureᴰ (ps : Π-structure) : Set where
       open Π-structure ps
       field
-        Πᴰ : (i : Mode) → (Aᴰ : Tyᴰ Γᴰ A) → (Bᴰ : Tyᴰ (Γᴰ ▷ᴰ[ z ] Aᴰ) B) → Tyᴰ Γᴰ (Π i A B)
+        Πᴰ : (i : Mode) → ∀ {A} (Aᴰ : Tyᴰ Γᴰ A) → ∀ {B} (Bᴰ : Tyᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) B) → Tyᴰ Γᴰ (Π i A B)
         Π[]ᴰ : (Πᴰ i Aᴰ Bᴰ) [ σᴰ ]Tᴰ ≡[ ap-Tyᴰ Π[] ] Πᴰ i (Aᴰ [ σᴰ ]Tᴰ) (Bᴰ [ σᴰ ⁺ᴰ ]Tᴰ)
 
-        lamᴰ : (tᴰ : Tmᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) ω (Bᴰ [ pzᴰ ]Tᴰ) t) → Tmᴰ Γᴰ ω (Πᴰ i Aᴰ Bᴰ) (lam t)
-        -- Not including lam[]ᴰ because that would require proving the lemma pz∘⁺≡⁺∘pz
-        -- in the displayed case. This doesn't even matter when we eliminate into Prop
-        -- which is always the case in this repo. Either way it is possible to prove it.
+        lamᴰ : (tᴰ : Tmᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) ω Bᴰ t) → Tmᴰ Γᴰ ω (Πᴰ i Aᴰ Bᴰ) (lam t)
+        lamᴰ[] : (lamᴰ {i = i} tᴰ) [ σᴰ ]ᴰ ≡[ ap-Tmᴰ Π[] Π[]ᴰ lam[] ] lamᴰ (tᴰ [ σᴰ ⁺ᴰ ]ᴰ)
 
-        apᴰ : (tᴰ : Tmᴰ Γᴰ ω (Πᴰ i Aᴰ Bᴰ) t) → Tmᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) ω (Bᴰ [ pzᴰ ]Tᴰ) (ap t)
+        apᴰ : (tᴰ : Tmᴰ Γᴰ ω (Πᴰ i Aᴰ Bᴰ) t) → Tmᴰ (Γᴰ ▷ᴰ[ i ] Aᴰ) ω Bᴰ (ap t)
 
         Πβᴰ : apᴰ {i = i} (lamᴰ tᴰ) ≡[ ap-Tmᴰ refl reflᴰ (dep Πβ) ] tᴰ
         Πηᴰ : lamᴰ {i = i} (apᴰ tᴰ) ≡[ ap-Tmᴰ refl reflᴰ (dep Πη) ] tᴰ
@@ -776,6 +773,7 @@ module CwFwE-elim-Con
   nᴰ-Π-str .Πᴰ = λ i Aᴰ Bᴰ → tt
   nᴰ-Π-str .Π[]ᴰ = refl
   nᴰ-Π-str .lamᴰ = λ tᴰ → tt
+  nᴰ-Π-str .lamᴰ[] = refl
   nᴰ-Π-str .apᴰ = λ tᴰ → tt
   nᴰ-Π-str .Πβᴰ = refl
   nᴰ-Π-str .Πηᴰ = refl
@@ -870,10 +868,12 @@ module CwFwE-uniform (m : CwFwE) (n : CwFwE) where
     unfolding pzᴰ ↓*ᴰ
 
     nᴰ-Π-str : Π-structureᴰ nᴰ-sorts (m .CwFwE.core) nᴰ-core (m .CwFwE.Π-str)
-    nᴰ-Π-str .Πᴰ = Π
+    nᴰ-Π-str .Πᴰ i Aᴰ Bᴰ = Π i Aᴰ Bᴰ
     nᴰ-Π-str .Π[]ᴰ = dep Π[]
-    nᴰ-Π-str .lamᴰ {i = z} =  lam {i = z} 
-    nᴰ-Π-str .lamᴰ {i = ω} =  lam {i = ω} 
+    nᴰ-Π-str .lamᴰ {i = z} = lam {i = z}
+    nᴰ-Π-str .lamᴰ {i = ω} = lam {i = ω}
+    nᴰ-Π-str .lamᴰ[] {i = z} = lam[]
+    nᴰ-Π-str .lamᴰ[] {i = ω} = lam[]
     nᴰ-Π-str .apᴰ {i = z} = ap
     nᴰ-Π-str .Πβᴰ {i = z} = dep Πβ
     nᴰ-Π-str .Πηᴰ {i = z} = dep Πη

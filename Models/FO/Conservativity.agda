@@ -63,40 +63,24 @@ module _ (e : CwFwE)  where
   ⌜⌝-U .in-CwF-sorts.in-CwF-core.U-structure.El-code = El-code
   ⌜⌝-U .in-CwF-sorts.in-CwF-core.U-structure.code-El = code-El
 
-  opaque
-    unfolding pz ↓*
-    -- B[pz{z}]T ≡ B  (since pz{z} = p ,, q = id)
-    ⌜⌝-B[pz]≡B : ∀ {Γ A B} → B [ pz {Γ} {z} {A} ]T ≡ B
-    ⌜⌝-B[pz]≡B = trans (ap-[]T₀ p,q) [id]T
-
-  opaque
-    unfolding pz ↓*
-    ⌜⌝-Π : in-CwF-sorts.in-CwF-core.Π-structure ⌜⌝-sorts ⌜⌝-core
-    ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.Π A B = Π z A B
-    ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.Π[] = Π[]
-    ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.lam f =
-      ↓ (coe (ap-Tm (sym Π[])) (lam {i = z}
-        (coe (ap-Tm (trans (sym [∘]T) (ap-[]T₀ (trans p∘,# (sym p,q)))))
-          ((↑ (f [ p# ⁺ ])) [ id ,# (q# [ p ]#) ]))))
-    ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.lam[] = {!!}
-    ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.ap {Γ} {A} {B} f =
-      ↓ (coe (ap-Tm (trans (sym [∘]T) (trans (sym [∘]T) (ap-[]T₀ eq))))
-          ((ap {i = z} (coe (ap-Tm Π[]) (↑ f))) [ sw ]))
-      where
-        sw : Sub ((Γ ▷[ z ] A) ▷#) ((Γ ▷#) ▷[ z ] (A [ p# ]T))
-        sw = ((p ∘ p#) ,# q#) ,, coe (ap-Tm (trans (sym [∘]T) (trans (ap-[]T₀ (sym p∘,#)) [∘]T))) (q [ p# ])
-
-        η' : ∀ {Δ} {σ : Sub Δ (Γ ▷[ z ] A)} → σ ≡ ((p ∘ σ) ,, coe (ap-Tm (sym [∘]T)) (q [ σ ]))
-        η' {σ = σ} = trans (sym id∘) (trans (cong (_∘ σ) (sym p,q)) ,∘)
-
-        step3a : (p# ∘ p) ∘ sw ≡ p ∘ p#
-        step3a = trans (sym assoc) (trans (cong (p# ∘_) p∘,) p∘,#)
-
-        eq : (p# ⁺) ∘ ((p ,, q) ∘ sw) ≡ p#
-        eq = trans (cong ((p# ⁺) ∘_) (trans (cong (_∘ sw) p,q) id∘))
-               (trans ,∘ (trans {!!} (sym η')))
-    ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.Πβ = {!!}
-    ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.Πη = {!!}
+  ⌜⌝-Π : in-CwF-sorts.in-CwF-core.Π-structure ⌜⌝-sorts ⌜⌝-core
+  ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.Π A B = Π z A B
+  ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.Π[] = Π[]
+  -- lam : Tm (Γ ▷[z] A) z B → Tm Γ z (Π z A B)
+  -- Use ↓/↑ through ▷# to convert z↔ω
+  ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.lam {Γ} {A} {B} f =
+    ↓ (coe (ap-Tm (sym Π[])) (lam {i = z}
+      (coe (ap-Tm (trans (sym [∘]T) (trans (ap-[]T₀ p∘,#) [id]T)))
+        ((↑ (f [ p# ⁺ ])) [ id ,# (q# [ p ]#) ]))))
+  ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.lam[] = {!!}
+  -- ap : Tm Γ z (Π z A B) → Tm (Γ ▷[z] A) z B
+  ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.ap {Γ} {A} {B} f =
+    ↓ (let x = ap (coe (ap-Tm Π[]) (↑ f)) in coe {!!} (x [ sw ]))
+    where
+      sw : Sub ((Γ ▷[ z ] A) ▷#) ((Γ ▷#) ▷[ z ] (A [ p# ]T))
+      sw = ((p ∘ p#) ,# q#) ,, coe (ap-Tm (trans (sym [∘]T) (trans (ap-[]T₀ (sym p∘,#)) [∘]T))) (q [ p# ])
+  ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.Πβ = {!!}
+  ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.Πη = {!!}
 
   ⌜⌝ : CwF
   ⌜⌝ .CwF.sorts = ⌜⌝-sorts
@@ -185,11 +169,11 @@ module ⌞⌟-mod (m : CwF) where
   ⌞⌟-Π : in-CwFwE-sorts.in-CwFwE-core.Π-structure ⌞⌟-sorts ⌞⌟-core
   ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π i A B = Π A B
   ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π[] = Π[]
-  ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam {i = i} f = lam (coe (ap-Tm (B[pz]≡B {i = i})) f)
-  ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam[] = trans lam[] (cong lam (sym (splitl (ap-[] refl refl (dep (trans (ap-[]T₀ {! pz≡id!}) [id]T )) reflᴰ refl ))))
-  ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.ap f = coe (ap-Tm (sym B[pz]≡B)) (ap f)
-  ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πβ = trans (cong (coe _) Πβ) (splitl reflᴰ)
-  ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πη = trans (cong lam (splitl reflᴰ)) Πη
+  ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam f = lam f
+  ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam[] = lam[]
+  ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.ap f = ap f
+  ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πβ = Πβ
+  ⌞⌟-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πη = Πη
 
   ⌞⌟ : CwFwE
   ⌞⌟ .sorts = ⌞⌟-sorts

@@ -29,11 +29,11 @@ module _ {ℓty} {ℓtm} (sorts : TTwE-sorts {ℓty} {ℓtm}) where
     variable
       A B C : Ty
       A# B# C# : # → Ty
-      X Y Z : Tm z A → Ty
+      X Y Z : Tm j A → Ty
       X# Y# Z# : (p : #) → Tm z A → Ty
       t u v v' : Tm i A
       t# u# v# : (p : #) → Tm i A
-      f g h : (a : Tm j B) → Tm i A
+      f g h : (a : Tm j A) → Tm ω (X a)
       
   ↓* : Tm i A → Tm z A
   ↓* {i = z} t = t
@@ -42,15 +42,18 @@ module _ {ℓty} {ℓtm} (sorts : TTwE-sorts {ℓty} {ℓtm}) where
   record TTwE-ctors : Set (lsuc (ℓty ⊔ ℓtm)) where
     field
       -- Pi types
-      Π : (j : Mode) → (A : Ty) → (Tm z A → Ty) → Ty
-      lam : ((a : Tm j A) → Tm ω (X (↓* a))) → Tm ω (Π j A X)
-      app : Tm ω (Π j A X) → (a : Tm j A) → Tm ω (X (↓* a))
+      Π : (j : Mode) → (A : Ty) → (Tm j A → Ty) → Ty
+      lam : ((a : Tm j A) → Tm ω (X a)) → Tm ω (Π j A X)
+      app : Tm ω (Π j A X) → (a : Tm j A) → Tm ω (X a)
       lam-app : lam {j} (app t) ≡ t
-      app-lam : ∀ {A} {X : Tm z A → Ty} {j} {f : (a : Tm j A) → Tm ω (X (↓* a))} → app {j} (lam {A = A} {X = X} f) ≡ f
+      app-lam : app {j} (lam f) ≡ f
 
       -- Universe
       U : Ty
       El : Tm z U → Ty
+      code : Ty → Tm z U
+      El-code : El (code A) ≡ A
+      code-El : code (El t) ≡ t
 
       -- Natural numbers
       Nat : Ty
@@ -65,10 +68,28 @@ module _ {ℓty} {ℓtm} (sorts : TTwE-sorts {ℓty} {ℓtm}) where
       elim-Nat-zero : ∀ {mz ms} → elim-Nat X mz ms zero ≡ mz
       elim-Nat-succ : ∀ {mz ms n} → elim-Nat X mz ms (succ n) ≡ ms n (elim-Nat X mz ms n)
 
-    lamz : ((a : Tm z A) → Tm z (X a)) → Tm z (Π j A X)
+    ↑T : (# → Ty) → Ty
+    ↑T A = El (↓ λ p → ↑ p (code (A p)))
+
+    Π' : (j : Mode) → (A : Ty) → (Tm z A → Ty) → Ty
+    Π' j A B = Π j A (λ x → B (↓* x))
+
+    lam' : ∀ {j} {A} {X : Tm z A → Ty} → ((a : Tm j A) → Tm ω (X (↓* a))) → Tm ω (Π' j A X)
+    lam' f = lam (λ x → f x)
+
+    app' : ∀ {j} {A} {X : Tm z A → Ty} → Tm ω (Π' j A X) → (a : Tm j A) → Tm ω (X (↓* a))
+    app' x a = app x a
+
+    lam'-app' : ∀ {j A X t} → lam' {j} {A} {X} (app' {j} {A} {X} t) ≡ t
+    lam'-app' = lam-app
+
+    app'-lam' : ∀ {j A X t} → lam' {j} {A} {X} (app' {j} {A} {X} t) ≡ t
+    app'-lam' = lam-app
+
+    lamz : ((a : Tm z A) → Tm z (X a)) → Tm z (Π' j A X)
     lamz f = ↓ (λ p → lam (λ x → ↑ p (f (↓* x))) ) 
 
-    appz : Tm z (Π j A X) → (a : Tm z A) → Tm z (X a)
+    appz : Tm z (Π' j A X) → (a : Tm z A) → Tm z (X a)
     appz {j = z} f x = ↓ (λ p → app (↑ p f) x)
     appz {j = ω} {X = X} f x = ↓ (λ p → coeTm (cong X ↓↑) (app (↑ p f) (↑ p x) ))
 
@@ -81,21 +102,36 @@ module _ {ℓty} {ℓtm} (sorts : TTwE-sorts {ℓty} {ℓtm}) where
       ap-Π : (p : A ≡ B) → X ≡[ ap-→ (ap-Tm p) refl ] Y → Π i A X ≡ Π i B Y
       ap-Π refl refl = refl
 
-      ap-app : t ≡ u → (p : v ≡ v') → app {j = j} {X = X}  t v ≡[ cong (λ x → Tm ω (X (↓* x))) p ] app u v'
+      ap-app : t ≡ u → (p : v ≡ v') → app {j = j} {X = X}  t v ≡[ cong (λ x → Tm ω (X x)) p ] app u v'
       ap-app refl refl = refl
 
       ap-$' : (pA : A ≡ B) → (pX : X ≡[ ap-→ (ap-Tm pA) refl ] Y) → (p : v ≡[ ap-Tm pA ] v') → X (↓* {j} v) ≡ Y (↓* {j} v')
       ap-$' refl refl refl = refl
 
-      ap-app' : ∀ {t : Tm ω (Π ω A X)} {u : Tm ω (Π ω A X)} {v : Tm ω A} {v' : Tm z A} {π}
-        → (pX : X (↓* v) ≡ X v')
+      ap-app' : ∀ {t : Tm ω (Π j A X)} {u : Tm ω (Π j A X)} {v : Tm j A} {v' : Tm j A}
+        → (pX : X v ≡ X v')
         → t ≡ u
-        → (p : v ≡ (↑ π v'))
-        → app {A = A} {X = X} t v ≡[ ap-Tm pX ] coe (ap-Tm (cong X ↓↑)) (app {A = A} {X = X} u (↑ π v'))
+        → (p : v ≡ v')
+        → app {A = A} {X = X} t v ≡[ ap-Tm pX ] (app {A = A} {X = X} u v')
       ap-app' q refl refl = refl
 
       swap-↓ : (∀ p → t# p ≡ ↑ p u) → ↓ t# ≡ u
       swap-↓ f = trans (cong ↓ (propfunext f)) ↓↑
+
+      ap-↑ : ∀ {A B : Ty} {a : Tm z A} {b : Tm z B} (p : #)
+        → (pA : A ≡ B) → a ≡[ ap-Tm pA ] b
+        → ↑ p a ≡[ ap-Tm pA ] ↑ p b
+      ap-↑ p refl refl = refl
+
+      ap-dep : ∀ {a b : Tm z A} (f : (x : Tm z A) → Tm i (X x))
+        → (p : a ≡ b) → f a ≡[ ap-Tm (cong X p) ] f b
+      ap-dep f refl = refl
+
+      ap-↑∘f : ∀ {C : Ty} {X : Tm z C → Ty} {a b : Tm z C}
+        → (p# : #) (f : (x : Tm z C) → Tm z (X x))
+        → (eq : a ≡ b)
+        → coeTm (cong X eq) (↑ p# (f a)) ≡ ↑ p# (f b)
+      ap-↑∘f p# f refl = refl
 
     lamz-appz : lamz {X = X} {j = j} (appz t) ≡ t
     lamz-appz {j = z} {t = t} =
@@ -107,14 +143,18 @@ module _ {ℓty} {ℓtm} (sorts : TTwE-sorts {ℓty} {ℓtm}) where
       ↑↓))) lam-app))) ↓↑)
 
     appz-lamz : ∀ {j} {X : Tm z A → Ty} {f : (a : Tm z A) → Tm z (X a)} → appz {j = j} {X = X} (lamz {j = j} f) ≡ f
-    appz-lamz {j = z} {f = f} = funext (λ t → 
-      trans (cong ↓ (propfunext (λ p → cong (λ g → app g t) ↑↓)))
-            (trans (cong ↓ (propfunext (λ p → (ap-$ app-lam t)))) ↓↑))
-    appz-lamz {j = ω} {X = X} {f = f} = funext (λ t →
-      trans (cong ↓ (propfunext (λ p → ap-app' {u = lam λ a → ↑ p (f (↓* a))}
-        (cong X ↓↑) ↑↓ refl))) (swap-↓ (λ p → transᴰ (dep
-        (ap-$ app-lam (↑ p t))) (congᴰ (λ t → Tm ω (X t)) (λ t → ↑ p (f t)) ↓↑))))
-  
+    appz-lamz {j = z} {f = f} = funext (λ a →
+      swap-↓ (λ p → trans (cong (λ g → app g a) ↑↓) (ap-$ app-lam a)))
+    appz-lamz {j = ω} {X = X} {f = f} = funext (λ a →
+      swap-↓ (λ p →
+        let ↓*↑ : ↓* (↑ p a) ≡ a
+            ↓*↑ = trans (cong ↓ (propfunext λ _ → refl)) (↓↑ {t = a})
+            step1 = cong (λ g → app g (↑ p a)) ↑↓
+            step2 = ap-$ (app-lam {f = λ x → ↑ p (f (↓* x))}) (↑ p a)
+            step3 : coeTm (cong X ↓*↑) (↑ p (f (↓* (↑ p a)))) ≡ ↑ p (f a)
+            step3 = ap-↑∘f p f ↓*↑
+        in trans (cong (coeTm (cong X ↓*↑)) (trans step1 step2)) step3))
+
     zeroz : Tm z Nat
     zeroz = ↓* zero
 

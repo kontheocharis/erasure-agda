@@ -278,7 +278,7 @@ opaque
     , (λ γₛ γ → tt)
     , λ γₛ γₑ γ γ' → by (cong succΛ (n₁ γₛ γₑ γ γ' .witness))
 
-  tracking : Tm ∙ ω (Π {∙} ω (Nat {∙}) (Nat {∙ ▷[ z ] (Nat {∙})}))
+  tracking : Tm ∙ ω (Π {∙} ω (Nat {∙}) (Nat {∙ ▷[ ω ] (Nat {∙})}))
     → Σ[ fₛ ∈ (ℕ → ℕ) ]
       Σ[ fₑ ∈ Λ ]
       (∀ aₛ aₑ → (aₑ ≡ embed-nat aₛ) true → ((fₑ ＠ aₑ) ≡ embed-nat (fₛ aₛ)) true)

@@ -34,6 +34,9 @@ module TT-TTwE {ℓ} {ℓ'} (m : TT {ℓ} {ℓ'}) where
   f-ctors .app-lam {j = ω} = m .app-lam
   f-ctors .U = m .U
   f-ctors .El = m .El
+  f-ctors .code = {!!}
+  f-ctors .El-code = {!!}
+  f-ctors .code-El = {!!}
   f-ctors .Nat = m .Nat
   f-ctors .zero = m .zero
   f-ctors .succ = m .succ

@@ -21,14 +21,14 @@ module TTwE-zeroing {ℓ} {ℓ'} (m : TTwE {ℓ} {ℓ'}) where
   ze-sorts .↓↑ = refl
 
   ze-ctors : TTwE-ctors ze-sorts
-  ze-ctors .Π j A B = m .Π j A B
-  ze-ctors .lam {z} f = TTwE.lamz m f
-  ze-ctors .lam {ω} f = TTwE.lamz m f
-  ze-ctors .app {z} = TTwE.appz m
-  ze-ctors .app {ω} = TTwE.appz m
+  ze-ctors .Π j A B = TTwE.Π' m j A B
+  ze-ctors .lam {z} f = TTwE.lamz m {j = z} f
+  ze-ctors .lam {ω} f = TTwE.lamz m {j = ω} f
+  ze-ctors .app {z} = TTwE.appz m {j = z}
+  ze-ctors .app {ω} = TTwE.appz m {j = ω}
   ze-ctors .lam-app {z} = TTwE.lamz-appz m
-  ze-ctors .lam-app {ω} = TTwE.lamz-appz m
-  ze-ctors .app-lam {j = z} = TTwE.appz-lamz m {j = z} 
+  ze-ctors .lam-app {ω} = TTwE.lamz-appz  m
+  ze-ctors .app-lam {j = z} = TTwE.appz-lamz m {j = z}
   ze-ctors .app-lam {j = ω} {f = f} = TTwE.appz-lamz m {j = ω} {f = f}
   ze-ctors .U = m .U
   ze-ctors .El = m .El

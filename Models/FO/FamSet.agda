@@ -90,12 +90,12 @@ module _ where
     open Π-structure
 
     fam-Π : Π-structure fam-s fam-c
+    fam-Π .Π z (A₀ , A₁) (B₀ , B₁) =
+      (λ γ → (a : A₀ γ) → B₀ (γ , a))
+      , λ γ f → ∀ a → B₁ (γ , a) (f a)
     fam-Π .Π ω (A₀ , A₁) (B₀ , B₁) =
       (λ γ → (a : A₀ γ) → B₀ (γ , a))
       , λ γ f → ∀ a → A₁ γ a → B₁ (γ , a) (f a)
-    fam-Π .Π i (A₀ , A₁) (B₀ , B₁) =
-      (λ γ → (a : A₀ γ) → B₀ (γ , a))
-      , λ γ f → ∀ a → B₁ (γ , a) (f a)
     fam-Π .Π[] {z} = refl
     fam-Π .Π[] {ω} = refl
     fam-Π .lam {i = z} f = (λ γ a → f .proj₁ (γ , a)) , (λ γ γ' a → f .proj₂ (γ , a) γ')

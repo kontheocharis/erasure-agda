@@ -71,6 +71,7 @@ module _ {ℓty} {ℓtm} (sorts : TTwE-sorts {ℓty} {ℓtm}) where
     ↑T : (# → Ty) → Ty
     ↑T A = El (↓ λ p → ↑ p (code (A p)))
 
+    -- Pi with type domain always zeroed
     Π' : (j : Mode) → (A : Ty) → (Tm z A → Ty) → Ty
     Π' j A B = Π j A (λ x → B (↓* x))
 
@@ -85,6 +86,8 @@ module _ {ℓty} {ℓtm} (sorts : TTwE-sorts {ℓty} {ℓtm}) where
 
     app'-lam' : ∀ {j A X t} → lam' {j} {A} {X} (app' {j} {A} {X} t) ≡ t
     app'-lam' = lam-app
+
+    -- Fully zeroed:
 
     lamz : ((a : Tm z A) → Tm z (X a)) → Tm z (Π' j A X)
     lamz f = ↓ (λ p → lam (λ x → ↑ p (f (↓* x))) ) 
@@ -145,15 +148,14 @@ module _ {ℓty} {ℓtm} (sorts : TTwE-sorts {ℓty} {ℓtm}) where
     appz-lamz : ∀ {j} {X : Tm z A → Ty} {f : (a : Tm z A) → Tm z (X a)} → appz {j = j} {X = X} (lamz {j = j} f) ≡ f
     appz-lamz {j = z} {f = f} = funext (λ a →
       swap-↓ (λ p → trans (cong (λ g → app g a) ↑↓) (ap-$ app-lam a)))
-    appz-lamz {j = ω} {X = X} {f = f} = funext (λ a →
-      swap-↓ (λ p →
-        let ↓*↑ : ↓* (↑ p a) ≡ a
-            ↓*↑ = trans (cong ↓ (propfunext λ _ → refl)) (↓↑ {t = a})
-            step1 = cong (λ g → app g (↑ p a)) ↑↓
-            step2 = ap-$ (app-lam {f = λ x → ↑ p (f (↓* x))}) (↑ p a)
-            step3 : coeTm (cong X ↓*↑) (↑ p (f (↓* (↑ p a)))) ≡ ↑ p (f a)
-            step3 = ap-↑∘f p f ↓*↑
-        in trans (cong (coeTm (cong X ↓*↑)) (trans step1 step2)) step3))
+    appz-lamz {j = ω} {X = X} {f = f} =
+      let ↓*↑ : ∀ {p} {a : Tm z _} → ↓* (↑ p a) ≡ a
+          ↓*↑ = trans (cong ↓ (propfunext λ _ → refl)) ↓↑
+      in funext (λ a → swap-↓ (λ p →
+        trans (cong (coeTm (cong X ↓*↑))
+          (trans (cong (λ g → app g (↑ p a)) ↑↓)
+                 (ap-$ (app-lam {f = λ x → ↑ p (f (↓* x))}) (↑ p a))))
+        (ap-↑∘f p f ↓*↑)))
 
     zeroz : Tm z Nat
     zeroz = ↓* zero

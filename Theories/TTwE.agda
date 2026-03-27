@@ -51,9 +51,9 @@ module _ {ℓty} {ℓtm} (sorts : TTwE-sorts {ℓty} {ℓtm}) where
       -- Universe
       U : Ty
       El : Tm z U → Ty
-      code : Ty → Tm z U
-      El-code : El (code A) ≡ A
-      code-El : code (El t) ≡ t
+      -- code : Ty → Tm z U
+      -- El-code : El (code A) ≡ A
+      -- code-El : code (El t) ≡ t
 
       -- Natural numbers
       Nat : Ty
@@ -68,8 +68,8 @@ module _ {ℓty} {ℓtm} (sorts : TTwE-sorts {ℓty} {ℓtm}) where
       elim-Nat-zero : ∀ {mz ms} → elim-Nat X mz ms zero ≡ mz
       elim-Nat-succ : ∀ {mz ms n} → elim-Nat X mz ms (succ n) ≡ ms n (elim-Nat X mz ms n)
 
-    ↑T : (# → Ty) → Ty
-    ↑T A = El (↓ λ p → ↑ p (code (A p)))
+    -- ↑T : (# → Ty) → Ty
+    -- ↑T A = El (↓ λ p → ↑ p (code (A p)))
 
     -- Pi with type domain always zeroed
     Π' : (j : Mode) → (A : Ty) → (Tm z A → Ty) → Ty

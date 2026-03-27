@@ -25,7 +25,7 @@ module FamSet-TTwE {ℓ} (ϕ : Prop) where
 
   fs-ctors : TTwE-ctors fs-sorts
   fs-ctors .Π z A B = (a : ϕ → A) → B a
-  fs-ctors .Π ω A B = (a : A) → B (λ _ → a)
+  fs-ctors .Π ω A B = (a : A) → B a
   fs-ctors .lam {z} f = f
   fs-ctors .lam {ω} f = f
   fs-ctors .app {z} f x = f x

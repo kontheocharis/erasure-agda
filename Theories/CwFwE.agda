@@ -271,6 +271,44 @@ module in-CwFwE-sorts (s : CwFwE-sorts) where
         Πβ : ap {i = i} (lam t) ≡ t
         Πη : lam {i = i} (ap t) ≡ t
 
+    -- Zeroed Π: type always over ▷[z]
+    module zeroed-Π (ps : Π-structure) where
+      open Π-structure ps
+
+      Π' : (i : Mode) → (A : Ty Γ) → (B : Ty (Γ ▷[ z ] A)) → Ty Γ
+      Π' i A B = Π i A (B [ pz ]T)
+
+      lamz : Tm (Γ ▷[ z ] A) z B → Tm Γ z (Π' i A B)
+      lamz {Γ} {A} {B} {i} f =
+        ↓ (coe (ap-Tm (sym Π[])) (lam {i = i}
+          (coe (ap-Tm (trans (sym [∘]T) (trans (ap-[]T₀ p∘,#) [pz][⁺]≡[⁺][pz])))
+            ((↑ (f [ p# ⁺ ])) [ sw ]))))
+        where
+          sw : Sub ((Γ ▷#) ▷[ i ] (A [ p# ]T)) (((Γ ▷#) ▷[ z ] (A [ p# ]T)) ▷#)
+          sw = pz ,# (q# [ p ]#)
+
+      appz : Tm Γ z (Π' i A B) → Tm (Γ ▷[ z ] A) z B
+      appz {Γ} {z} {A} {B} f =
+        ↓ (coe (ap-Tm (trans (sym [∘]T) (trans (sym [∘]T) (ap-[]T₀ {!!}))))
+          ((ap {i = z} (coe (ap-Tm Π[]) (↑ f))) [ sw-z ]))
+        where
+          sw-z : Sub ((Γ ▷[ z ] A) ▷#) ((Γ ▷#) ▷[ z ] (A [ p# ]T))
+          sw-z = ((p ∘ p#) ,# q#) ,, coe (ap-Tm (trans (sym [∘]T) (trans (ap-[]T₀ (sym p∘,#)) [∘]T))) (q [ p# ])
+      appz {Γ} {ω} {A} {B} f =
+        ↓ (coe (ap-Tm (trans (sym [∘]T) (trans (sym [∘]T) (ap-[]T₀ {!!}))))
+          ((ap {i = ω} (coe (ap-Tm Π[]) (↑ f))) [ sw-ω ]))
+        where
+          qω : Tm ((Γ ▷[ z ] A) ▷#) ω ((A [ p ]T) [ p# ]T)
+          qω = let sect : Sub ((Γ ▷[ z ] A) ▷#) (((Γ ▷[ z ] A) ▷#) ▷#)
+                   sect = id ,# q#
+                   qz : Tm ((Γ ▷[ z ] A) ▷#) z ((A [ p ]T) [ p# ]T)
+                   qz = q [ p# ]
+               in  coe (ap-Tm (trans (sym [∘]T) (trans (ap-[]T₀ p∘,#) [id]T))) ((↑ qz) [ sect ])
+          sw-ω : Sub ((Γ ▷[ z ] A) ▷#) ((Γ ▷#) ▷[ ω ] (A [ p# ]T))
+          sw-ω = ((p ∘ p#) ,# q#) ,, coe (ap-Tm (trans (sym [∘]T) (sym (trans (sym [∘]T) (ap-[]T₀ p∘,#))))) qω
+            -- coe (ap-Tm (trans (sym [∘]T) (trans (sym [∘]T) (trans (sym [∘]T) (trans (ap-[]T₀ (trans assoc (trans (cong (_∘ _) assoc) (trans (sym assoc) (trans (cong (_ ∘_) p∘,#) ∘id))))) (trans [∘]T (ap-[]T₀ (sym p∘,#))))))))
+            --   ?
+
     record U-structure : Set where
       field
         U : Ty Γ

@@ -63,22 +63,22 @@ module _ (e : CwFwE)  where
   ⌜⌝-U .in-CwF-sorts.in-CwF-core.U-structure.El-code = El-code
   ⌜⌝-U .in-CwF-sorts.in-CwF-core.U-structure.code-El = code-El
 
+  open in-CwFwE-sorts.in-CwFwE-core.zeroed-Π (e .sorts) (e .core) (e .Π-str)
+    renaming (Π' to Π'e; lamz to lamze; appz to appze)
+
+  opaque
+    unfolding pz ↓*
+
+    -- Π' z A B ≡ Π z A B (since pz{z} = id)
+    Π'z≡Π : ∀ {Γ} {A : Ty Γ} {B} → Π'e z A B ≡ Π z A B
+    Π'z≡Π {A = A} {B} = cong (Π z A) (trans (ap-[]T₀ p,q) [id]T)
+
   ⌜⌝-Π : in-CwF-sorts.in-CwF-core.Π-structure ⌜⌝-sorts ⌜⌝-core
   ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.Π A B = Π z A B
   ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.Π[] = Π[]
-  -- lam : Tm (Γ ▷[z] A) z B → Tm Γ z (Π z A B)
-  -- Use ↓/↑ through ▷# to convert z↔ω
-  ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.lam {Γ} {A} {B} f =
-    ↓ (coe (ap-Tm (sym Π[])) (lam {i = z}
-      (coe (ap-Tm (trans (sym [∘]T) (trans (ap-[]T₀ p∘,#) [id]T)))
-        ((↑ (f [ p# ⁺ ])) [ id ,# (q# [ p ]#) ]))))
+  ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.lam f = coe (ap-Tm Π'z≡Π) (lamze f)
   ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.lam[] = {!!}
-  -- ap : Tm Γ z (Π z A B) → Tm (Γ ▷[z] A) z B
-  ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.ap {Γ} {A} {B} f =
-    ↓ (let x = ap (coe (ap-Tm Π[]) (↑ f)) in coe {!!} (x [ sw ]))
-    where
-      sw : Sub ((Γ ▷[ z ] A) ▷#) ((Γ ▷#) ▷[ z ] (A [ p# ]T))
-      sw = ((p ∘ p#) ,# q#) ,, coe (ap-Tm (trans (sym [∘]T) (trans (ap-[]T₀ (sym p∘,#)) [∘]T))) (q [ p# ])
+  ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.ap f = appze (coe (ap-Tm (sym Π'z≡Π)) f)
   ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.Πβ = {!!}
   ⌜⌝-Π .in-CwF-sorts.in-CwF-core.Π-structure.Πη = {!!}
 
@@ -247,7 +247,7 @@ module Conservativity where
     co-core .CwFᴰ-core.q[,]ᴰ = refl
 
     co-Π : Π-structureᴰ co-sorts (CwF.core cwf) co-core (CwF.Π-str cwf)
-    co-Π .Π-structureᴰ.Πᴰ Aᴰ Bᴰ = {!!}
+    co-Π .Π-structureᴰ.Πᴰ Aᴰ Bᴰ = {!!}      -- blocked on lamz/appz holes in CwFwE
     co-Π .Π-structureᴰ.Π[]ᴰ = {!!}
     co-Π .Π-structureᴰ.lamᴰ tᴰ = {!!}
     co-Π .Π-structureᴰ.lamᴰ[] = {!!}

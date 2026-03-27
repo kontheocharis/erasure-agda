@@ -67,25 +67,16 @@ module _ (e : CwFwE)  where
   ze-core .CwFwE-core.↑↓ = undep (transᴰ {q = ap-Tm (sym [id]T)} [id] (splitl reflᴰ)) 
   ze-core .CwFwE-core.↓↑ = [id]
 
-  -- -- This is annoying because of all the coercions so I will leave it out for now
-  -- -- However, it definitely works because it works in the second-order model
-  --
-  -- opaque
-  --   unfolding pz
-  --   ze-Π : in-CwFwE-sorts.in-CwFwE-core.Π-structure ze-sorts ze-core
-  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π i A B = Π i A B
-  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π[] = Π[]
-  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam {i = z} f
-  --     = ↓ (coe (ap-Tm (sym Π[])) (lam (coe (ap-Tm ( trans (sym [∘]T) ( trans (sym [∘]T) (trans (sym [∘]T)
-  --     (trans (ap-[]T₀ (trans ( cong (_∘ _) p,q)
-  --     (trans id∘ (cong (_ ∘_) (trans p∘,# (sym p,q)))))) [∘]T)))))
-  --     ((↑ (f [ (p# ∘ p) ,, coe (ap-Tm (sym [∘]T)) q ])) [  id ,# (q# [ p ]#) ]))) )
-  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam {i = ω} f = {! !}
-  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam[] {z} = {! !}
-  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam[] {ω} = {!!}
-  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.ap = {! !}
-  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πβ = {! !}
-  --   ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πη = {!!}
+  open in-CwFwE-sorts.in-CwFwE-core.zeroed-Π (e .sorts) (e .core) (e .Π-str)
+
+  ze-Π : in-CwFwE-sorts.in-CwFwE-core.Π-structure ze-sorts ze-core
+  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π i A B = Π' i A B
+  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Π[] = {!!}
+  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam f = lamz f
+  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.lam[] = {!!}
+  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.ap f = appz f
+  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πβ = {!!}
+  ze-Π .in-CwFwE-sorts.in-CwFwE-core.Π-structure.Πη = {!!}
 
   ze-U : in-CwFwE-sorts.in-CwFwE-core.U-structure ze-sorts ze-core
   ze-U .in-CwFwE-sorts.in-CwFwE-core.U-structure.U = U
@@ -100,7 +91,7 @@ module _ (e : CwFwE)  where
   ze : CwFwE
   ze .sorts = ze-sorts
   ze .core = ze-core
-  ze .Π-str = {!!}
+  ze .Π-str = ze-Π
   ze .U-str = ze-U
 
   zeᴰ : CwFwEᴰ e
